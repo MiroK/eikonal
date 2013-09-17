@@ -3,89 +3,70 @@
 #include <dolfin/fem/GenericDofMap.h>
 #include <dolfin/mesh/Mesh.h>
 #include <dolfin/mesh/Cell.h>
-#include <dolfin/mesh/Edge.h>
+#include <dolfin/mesh/Facet.h>
 #include <sstream>
 
 using namespace dolfin;
 
 //-----------------------------------------------------------------------------
-tMapLa cell_to_dof(const dolfin::FunctionSpace& V)
+t_smap_la cell_to_dof(const dolfin::FunctionSpace& V)
 {
   boost::shared_ptr<const Mesh> mesh = V.mesh();
   boost::shared_ptr<const GenericDofMap> dofmap = V.dofmap();
 
-  tMapLa _cell_to_dof;
+  t_smap_la _cell_to_dof;
   for(CellIterator cell(*mesh); !cell.end(); ++cell)
   {
     std::size_t cell_index = cell->index();
-    _cell_to_dof[cell_index] = dofmap->cell_dofs(cell_index);
+    std::vector<la_index> dofs = dofmap->cell_dofs(cell_index);
+    _cell_to_dof[cell_index] = std::set<la_index>(dofs.begin(), dofs.end());
   }
 
   return _cell_to_dof;
 }
 
 //-----------------------------------------------------------------------------
-laMapT dof_to_cell(const tMapLa& _cell_to_dof)
+la_vmap_t dof_to_cell(const t_smap_la& _cell_to_dof)
 {
-  laMapT _dof_to_cell;
-  tMapLa::const_iterator item;
-  for(item = _cell_to_dof.begin(); item != _cell_to_dof.end(); item++)
-  { 
-    std::vector<la_index>::const_iterator dof = item->second.begin();
-    for( ; dof != item->second.end(); dof++)
-    {
-      _dof_to_cell[*dof].push_back(item->first); // push_back(cell)
-    }
-  }
-
-  return _dof_to_cell;
+  return invert_map<t_smap_la, la_vmap_t, la_index>(_cell_to_dof);
 }
 
 //-----------------------------------------------------------------------------
-tMapT cell_to_facet(const dolfin::FunctionSpace& V)
+t_smap_t cell_to_facet(const dolfin::FunctionSpace& V)
 {
   boost::shared_ptr<const Mesh> mesh = V.mesh();
 
-  tMapT _cell_to_facet;
+  t_smap_t _cell_to_facet;
   for(CellIterator cell(*mesh); !cell.end(); ++cell)
   {
     std::size_t cell_index = cell->index();
-    for(EdgeIterator facet(*cell); !facet.end(); ++facet)
-      _cell_to_facet[cell_index].push_back(facet->index());
+    for(FacetIterator facet(*cell); !facet.end(); ++facet)
+      _cell_to_facet[cell_index].insert(facet->index());
   }
 
   return _cell_to_facet;
 }
 
 //-----------------------------------------------------------------------------
-tMapT facet_to_cell(const tMapT& _cell_to_facet)
+t_vmap_t facet_to_cell(const t_smap_t& _cell_to_facet)
 {
-  tMapT _facet_to_cell;
-  tMapT::const_iterator item;
-  for(item = _cell_to_facet.begin(); item != _cell_to_facet.end(); item++)
-  {
-    std::vector<std::size_t>::const_iterator facet = item->second.begin();
-    for(; facet != item->second.end(); facet++)
-    {
-      _facet_to_cell[*facet].push_back(item->first);
-    }
-  }
-  
-  return _facet_to_cell;
+  return invert_map<t_smap_t, t_vmap_t, std::size_t >(_cell_to_facet);
 }
 
 //-----------------------------------------------------------------------------
-tMapT facet_to_dof(const dolfin::FunctionSpace& V)
+t_smap_t facet_to_dof(const dolfin::FunctionSpace& V)
 {
   boost::shared_ptr<const Mesh> mesh = V.mesh();
   boost::shared_ptr<const GenericDofMap> dofmap = V.dofmap();
 
-  tMapT _facet_to_dof;
+  t_smap_t _facet_to_dof;
   for(CellIterator cell(*mesh); !cell.end(); ++cell)
   {
-    std::size_t i = 0;
+    std::size_t i = 0; // 3 edges for triangle, 4 faces for tetrahedra
     std::vector<la_index> cell_dofs = dofmap->cell_dofs(cell->index());
-    for(EdgeIterator facet(*cell); !facet.end(); ++facet)
+    // facets could be obtained from cell_to_facet but this way we have
+    // consistent interaface
+    for(FacetIterator facet(*cell); !facet.end(); ++facet)
     {
       std::vector<std::size_t> facet_dofs;
       dofmap->tabulate_facet_dofs(facet_dofs, i);
@@ -95,7 +76,8 @@ tMapT facet_to_dof(const dolfin::FunctionSpace& V)
         *dof = cell_dofs[*dof];
       }
       
-      _facet_to_dof[facet->index()] = facet_dofs;
+      _facet_to_dof[facet->index()] = std::set<std::size_t>(facet_dofs.begin(),
+                                                            facet_dofs.end());
       i++;
     }
   }
@@ -104,18 +86,27 @@ tMapT facet_to_dof(const dolfin::FunctionSpace& V)
 }
 
 //-----------------------------------------------------------------------------
-tMapT dof_to_facet(const tMapT& _facet_to_dof)
+t_vmap_t dof_to_facet(const t_smap_t& _facet_to_dof)
 {
-  tMapT _dof_to_facet;
-  tMapT::const_iterator item;
-  for(item = _facet_to_dof.begin(); item != _facet_to_dof.end(); item++)
-  {
-    std::vector<std::size_t>::const_iterator dof = item->second.begin();
-    for(; dof != item->second.end(); dof++)
-    {
-      _dof_to_facet[*dof].push_back(item->first);
-    }
-  }
+  return invert_map<t_smap_t, t_vmap_t, std::size_t >(_facet_to_dof);
+}
+
+//-----------------------------------------------------------------------------
+t_vmap_d dof_to_coordinate(const dolfin::FunctionSpace& V)
+{
+  boost::shared_ptr<const Mesh> mesh = V.mesh();
+  boost::shared_ptr<const GenericDofMap> dofmap = V.dofmap();
+  std::vector<double> all_coordinates = dofmap->tabulate_all_coordinates(*mesh);
+
+  std::size_t gdim = mesh->geometry().dim();
+  std::size_t n_dofs = all_coordinates.size()/gdim;
   
-  return _dof_to_facet;
+  t_vmap_d _dof_to_coordinate;
+  std::vector<double>::const_iterator start = all_coordinates.begin();
+  for(std::size_t i = 0; i < n_dofs; i++)
+  {
+    _dof_to_coordinate[i].assign(start + i*gdim, start + (i+1)*gdim);
+  }
+
+  return _dof_to_coordinate;
 }

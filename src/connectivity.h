@@ -20,41 +20,46 @@ namespace dolfin // Forward declarations
 }
 
 // types of map that are build
-typedef std::map<std::size_t, std::vector<dolfin::la_index> > tMapLa; 
-typedef std::map<dolfin::la_index, std::vector<std::size_t> > laMapT;
-typedef std::map<std::size_t, std::vector<std::size_t> > tMapT;
+typedef std::map<std::size_t, std::set<dolfin::la_index> > t_smap_la; 
+typedef std::map<dolfin::la_index, std::vector<std::size_t> > la_vmap_t;
+typedef std::map<std::size_t, std::set<std::size_t> > t_smap_t; 
+typedef std::map<std::size_t, std::vector<std::size_t> > t_vmap_t;
+typedef std::map<std::size_t, std::vector<double> > t_vmap_d;
 
 //--------------------MAP BUILDING---------------------------------------------
 
-// build a map: map[cell] = [dofs in cell]; size_t -> vector(la_index)
-tMapLa cell_to_dof(const dolfin::FunctionSpace& V);
+// build a map: map[cell] = [dofs in cell]; size_t -> set(la_index)
+t_smap_la cell_to_dof(const dolfin::FunctionSpace& V);
 
 // build a map: map[dof] = [cells with dof]; la_index -> vector(size_t)
-laMapT dof_to_cell(const tMapLa& _cell_to_dof);
+la_vmap_t dof_to_cell(const t_smap_la& _cell_to_dof);
 
-// build a map: map[cell] = [facets of the cell]; size_t -> vector(size_t)
-tMapT cell_to_facet(const dolfin::FunctionSpace& V);
+// build a map: map[cell] = [facets of the cell]; size_t -> set(size_t)
+t_smap_t cell_to_facet(const dolfin::FunctionSpace& V);
 
 // build a map: map[facet] = [cells that share facet]; size_t -> vector(size_t)
-tMapT facet_to_cell(const tMapT& _cell_to_facet);
+t_vmap_t facet_to_cell(const t_smap_t& _cell_to_facet);
 
-// build a map: map[facet] = [dofs on the facet]; size_t -> vector(size_t)
-tMapT facet_to_dof(const dolfin::FunctionSpace& V);
+// build a map: map[facet] = [dofs on the facet]; size_t -> set(size_t)
+t_smap_t facet_to_dof(const dolfin::FunctionSpace& V);
 
 // build a map: map[dof] = [facets that share dof]; size_t -> vector(size_t)
-tMapT dof_to_facet(const tMapT& _facet_to_dof);
+t_vmap_t dof_to_facet(const t_smap_t& _facet_to_dof);
 
-//--------------------CONVENIENCE----------------------------------------------
+// build a map: map[dof] = [dof coordinates]
+t_vmap_d dof_to_coordinate(const dolfin::FunctionSpace& V);
 
+// print content of map of type T with values of type U
 template<typename T, typename U>
-std::string print(const T& map, const std::string map_name);
+std::string print_map(const T& map, const std::string map_name);
 
+// invert the map of type I with values of type std::set<U> into map of type O
 template<typename I, typename O, typename U>
-O invert_map(const I& input_map);
+O invert_map(const I& map);
 
 //-------------------implementations-------------------------------------------
 template<typename T, typename U>
-std::string print(const T& map, const std::string map_name)
+std::string print_map(const T& map, const std::string map_name)
 {
   std::ostringstream out;
   out << "\t" << map_name << std::endl;
@@ -64,8 +69,8 @@ std::string print(const T& map, const std::string map_name)
   {
     std::size_t key = item->first;
     out << key << " : ";
-    typename std::vector<U> values = item->second;
-    typename std::vector<U>::const_iterator value;
+    U values = item->second;
+    typename U::const_iterator value;
     for(value = values.begin(); value != values.end(); value++)
     {
       out << *value << " ";
@@ -76,21 +81,21 @@ std::string print(const T& map, const std::string map_name)
   return out.str();
 }
 
-
 template<typename I, typename O, typename U>
-O invert_map(const I& input_map)
+O invert_map(const I& map)
 {
   O inverse_map;
   typename I::const_iterator item;
-  for(item = input_map.begin(); item != input_map.end(); item++)
+  for(item = map.begin(); item != map.end(); item++)
   { 
-    typename std::vector<U>::const_iterator value = item->second.begin();
+    typename std::set<U>::const_iterator value = item->second.begin();
     for( ; value != item->second.end(); value++)
     {
-      inverse_map[*value].push_back(item->first); // push_back(cell)
+      inverse_map[*value].push_back(item->first);
     }
   }
 
   return inverse_map;
 }
+
 #endif // _CONNECTIVITY_H_
