@@ -1,1 +1,11 @@
-//TODO 
+1. Setup provisional eikonal solver with fmm and geom. linear solver
+2. Read on optimization and setup minim. linear solver
+3. Look into convergence rate of linear solvers
+4. Setup quadratic optimization local
+5. Setup quadratic geom. solver local
+6. Setup gloval quadratic and make sure they are quadratic
+7. Fast marching method backend
+8. Parallel
+9. 3D 
+10. Test and present!
+

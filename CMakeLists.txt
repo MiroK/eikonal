@@ -37,6 +37,9 @@ include_directories(SYSTEM ${DOLFIN_3RD_PARTY_INCLUDE_DIRS})
 add_executable(${PROJECT_NAME}
                                ./src/main.cpp
                                ./src/connectivity.cpp
+                               ./src/test.cpp
+                               ./src/linear_algebra.cpp
+                               ./src/polyhedron.cpp
 )
 # Target libraries
 target_link_libraries(${PROJECT_NAME} ${DOLFIN_LIBRARIES} ${DOLFIN_3RD_PARTY_LIBRARIES})
