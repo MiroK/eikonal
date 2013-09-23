@@ -1,4 +1,4 @@
-#include "CG1.h"
+/*#include "CG1.h"
 #include "CG2.h"
 #include <dolfin/generation/UnitSquareMesh.h>
 #include <iostream>
@@ -7,8 +7,13 @@
 #include "test.h"
 #include "linear_algebra.h"
 #include "polyhedron.h"
+#include "polygon.h"*/
 
-using namespace dolfin;
+#include "eikonal/eikonal.h"
+
+//using namespace dolfin;
+
+using namespace eikonal;
 
 int main()
 {
@@ -39,12 +44,11 @@ int main()
   
   // test dot
   double a = dot(u, v);
-  info("%g", a);
 
   // test cross
   std::vector<double> w = cross(u, v);
-  info("%g %g %g", w[0], w[1], w[2]);
-
+  print(w);
+  /* test baryc
   std::vector<double> uvw;
   uvw.insert(uvw.begin(), u.begin(), u.end());
   uvw.insert(uvw.begin() + 3, v.begin(), v.end());
@@ -52,5 +56,18 @@ int main()
   info("size %d", uvw.size());
   std::vector<double> uvw_c = barycenter(uvw, 3);
   info("%g %g %g", uvw_c[0], uvw_c[1], uvw_c[2]);
+  
+  // tests polygon generate
+  std::vector<double> center(2);
+  std::vector<double> square = polygon_generate(4, center, 1);
+  for(std::size_t v = 0; v < 4; v++)
+  {
+    info("%g %g", square[2*v], square[2*v + 1]);
+  }
+  */ 
+  
+  
+  
+  
   return 0;
 }
