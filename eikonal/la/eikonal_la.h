@@ -5,8 +5,8 @@
   Simple operations defined over std::vector.
 */
 
-#include "common.h"
-#include "loop.h"
-#include "stl.h"
+#include "la_common.h"
+#include "la_loop.h"
+#include "la_stl.h"
 
 #endif // _EIKONAL_LA_H_

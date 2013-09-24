@@ -32,14 +32,16 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${DOLFIN_CXX_FLAGS}")
 # Include directories
 include_directories(${DOLFIN_INCLUDE_DIRS})
 include_directories(SYSTEM ${DOLFIN_3RD_PARTY_INCLUDE_DIRS})
+include_directories(./eikonal)
 
 # Executable
 add_executable(${PROJECT_NAME}
                                ./main.cpp
-                               ./eikonal/la/loop.cpp
-                               ./eikonal/la/stl.cpp
-                               ./eikonal/cg/polygon.cpp
-                               ./eikonal/cg/polyhedron.cpp
+                               ./eikonal/la/la_loop.cpp
+                               ./eikonal/la/la_stl.cpp
+                               ./eikonal/cg/cg_common.cpp
+                               ./eikonal/cg/cg_polygon.cpp
+                               ./eikonal/cg/cg_tetrahedron.cpp
 )
 # Target libraries
 target_link_libraries(${PROJECT_NAME} ${DOLFIN_LIBRARIES} ${DOLFIN_3RD_PARTY_LIBRARIES})

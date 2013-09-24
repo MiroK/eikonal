@@ -1,5 +1,5 @@
-#ifndef _COMMON_H_
-#define _COMMON_H_
+#ifndef _LA_COMMON_H_
+#define _LA_COMMON_H_
 
 // Common functionality for vectors.
 
@@ -11,7 +11,7 @@
 namespace eikonal
 {
   // equality tolerance for comparison
-  const double LA_EPS = 1E-12;
+  const double LA_EPS = 1E-15;
   
   // comparison of two entries
   template<typename T>
@@ -72,4 +72,4 @@ namespace eikonal
 }
 
 
-#endif // _COMMON_H_
+#endif // _LA_COMMON_H_

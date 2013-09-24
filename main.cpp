@@ -9,8 +9,9 @@
 #include "polyhedron.h"
 #include "polygon.h"*/
 
-#include "eikonal/eikonal.h"
+#include "eikonal.h"
 
+#include <iostream>
 //using namespace dolfin;
 
 using namespace eikonal;
@@ -37,17 +38,6 @@ int main()
   t_vmap_d _dof_to_coordinate = dof_to_coordinate(V);
   */
 
-  double _u[3] = {1., 0., 0.};
-  double _v[3] = {0., 1, 0.};
-  std::vector<double> u(_u, _u + 3);
-  std::vector<double> v(_v, _v + 3);
-  
-  // test dot
-  double a = dot(u, v);
-
-  // test cross
-  std::vector<double> w = cross(u, v);
-  print(w);
   /* test baryc
   std::vector<double> uvw;
   uvw.insert(uvw.begin(), u.begin(), u.end());
@@ -56,18 +46,42 @@ int main()
   info("size %d", uvw.size());
   std::vector<double> uvw_c = barycenter(uvw, 3);
   info("%g %g %g", uvw_c[0], uvw_c[1], uvw_c[2]);
-  
-  // tests polygon generate
-  std::vector<double> center(2);
-  std::vector<double> square = polygon_generate(4, center, 1);
-  for(std::size_t v = 0; v < 4; v++)
-  {
-    info("%g %g", square[2*v], square[2*v + 1]);
-  }
   */ 
   
+  std::vector<double> center(2);
+  std::vector<double> square = g_vertices(3, center, 1);
+  print(square); 
+
+  std::vector<double> square_center = g_barycenter(square);
+  print(square_center);
+
+  std::cout << "boundary: ";
+  print(boundary_points(square, 3));
+
+  std::cout << "area: " << area(square) << std::endl;
+  std::cout << "inside center " << g_inside(square, square_center) << std::endl;
+  g_inside(square, square_center);
   
+  std::vector<double> two_zero;
+  two_zero.push_back(10);
+  two_zero.push_back(11);
+  std::cout << "inside [1, 0] " << g_inside(square, two_zero) << std::endl;
   
-  
+  double _tet[12] = {0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2};
+  std::vector<double> tet(_tet, _tet + 12);
+  std::cout << "tet volume: " << volume(tet) << std::endl;
+ 
+  std::vector<double> t_c = t_barycenter(tet);
+  print(t_c);
+
+  std::cout << "center inside: " << t_inside(tet, t_c) << std::endl;
+
+  std::vector<double> oo4;
+  oo4.push_back(0); oo4.push_back(0); oo4.push_back(4);
+  std::cout << "[0, ,0 4] inside: " << t_inside(tet, oo4) << std::endl;
+
+  std::cout << "edges: ";
+  print(edge_points(tet, 3));
+
   return 0;
 }

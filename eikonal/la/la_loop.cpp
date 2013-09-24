@@ -1,5 +1,5 @@
-#include "loop.h"
-#include "common.h"
+#include "la_loop.h"
+#include "la_common.h"
 #include <cassert>
 #include <cmath>
 
@@ -10,7 +10,7 @@ namespace eikonal
   std::vector<double>
   operator+(const std::vector<double>& a, const std::vector<double>& b)
   {
-    size_t n = a.size();
+    const size_t n = a.size();
     assert(n == b.size());
     vector<double> ab(a.begin(), a.end());
     
@@ -24,7 +24,7 @@ namespace eikonal
   std::vector<double>
   operator-(const std::vector<double>& a, const std::vector<double>& b)
   {
-    size_t n = a.size();
+    const size_t n = a.size();
     assert(n == b.size());
     vector<double> ab(a.begin(), a.end());
     
@@ -38,7 +38,7 @@ namespace eikonal
   std::vector<double>
   operator*(const std::vector<double>& v, const double a)
   {
-    size_t n = v.size();
+    const size_t n = v.size();
     vector<double> av(v.begin(), v.end());
     
     for(size_t i = 0; i < n; i++)
@@ -65,10 +65,10 @@ namespace eikonal
 
   double dot(const std::vector<double>& a, const std::vector<double>& b)
   {
-    size_t n = a.size();
+    const size_t n = a.size();
     assert(n == b.size());
     
-    double _max = std::max(max(abs(a)), max(abs(b)));
+    const double _max = std::max(max(abs(a)), max(abs(b)));
     double _dot = 0;
     if(_max == 0)
     {
@@ -104,7 +104,7 @@ namespace eikonal
 
   double norm(const std::vector<double>& v, const std::size_t p)
   {
-    size_t n = v.size();
+    const size_t n = v.size();
     double _norm = 0;
     
     if(p == 0)  // maximum norm
@@ -139,15 +139,14 @@ namespace eikonal
 
   std::size_t argmax(const std::vector<double>& v)
   {
-    size_t n = v.size();
+    const size_t n = v.size();
     assert(n > 0);
 
     double max = v[0];
     size_t i_max = 0;
-    double current;
     for(size_t i = 1; i < n; i++)
     {
-      current = v[i];
+      double current = v[i];
       if(current > max)
       {
         i_max = i;

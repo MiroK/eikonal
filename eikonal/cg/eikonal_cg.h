@@ -6,7 +6,8 @@
   simple computations of intersections.
 */
 
-#include "polygon.h"
-#include "polyhedron.h"
+#include "cg_common.h"
+#include "cg_polygon.h"
+#include "cg_tetrahedron.h"
 
 #endif //_EIKONAL_CG_H_

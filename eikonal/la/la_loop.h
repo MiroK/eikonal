@@ -1,5 +1,5 @@
-#ifndef _LOOP_H_
-#define _LOOP_H_
+#ifndef _LA_LOOP_H_
+#define _LA_LOOP_H_
 
 // Loop-based functions for vector manipulation.
 
@@ -52,4 +52,4 @@ namespace eikonal
   std::vector<double> abs(const std::vector<double>& v);
 }
 
-#endif // _LOOP_H_
+#endif // _LA_LOOP_H_

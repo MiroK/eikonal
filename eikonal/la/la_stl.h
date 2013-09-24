@@ -1,5 +1,5 @@
-#ifndef _STL_H_
-#define _STL_H_
+#ifndef _LA_STL_H_
+#define _LA_STL_H_
 
 // STL-based functions for vector manipulation.
 
@@ -8,7 +8,7 @@
 #include <algorithm>   // transform
 #include <functional>  // plus, minus, multiplies, bind1st
 #include <numeric>     // inner_product
-#include "common.h" // abs
+#include "la_common.h" // abs
 
 namespace eikonal
 {
@@ -225,4 +225,4 @@ namespace eikonal
   }
 }
 
-#endif // _STL_H_
+#endif // _LA_STL_H_
