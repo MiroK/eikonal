@@ -42,6 +42,7 @@ add_executable(${PROJECT_NAME}
                                ./eikonal/cg/cg_common.cpp
                                ./eikonal/cg/cg_polygon.cpp
                                ./eikonal/cg/cg_tetrahedron.cpp
+                               ./eikonal/cg/cg_distance.cpp
 )
 # Target libraries
 target_link_libraries(${PROJECT_NAME} ${DOLFIN_LIBRARIES} ${DOLFIN_3RD_PARTY_LIBRARIES})

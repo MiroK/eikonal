@@ -9,5 +9,6 @@
 #include "cg_common.h"
 #include "cg_polygon.h"
 #include "cg_tetrahedron.h"
+#include "cg_distance.h"
 
 #endif //_EIKONAL_CG_H_

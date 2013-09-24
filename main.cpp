@@ -82,6 +82,21 @@ int main()
 
   std::cout << "edges: ";
   print(edge_points(tet, 3));
+  
+  double _A[2] = {0., 0.}; std::vector<double> A(_A, _A+2);
+  double _B[2] = {1., 0.}; std::vector<double> B(_B, _B+2);
+  double _C[2] = {0., 1.}; std::vector<double> C(_C, _C+2);
+  double _D[2] = {1., 1.}; std::vector<double> D(_D, _D+2);
+  double _E[2] = {2., -1.}; std::vector<double> E(_E, _E+2);
 
+  print(center);
+  std::cout << "distance |AD| (sqrt(2)/2): " << point_point(A, D) << std::endl;
+  std::cout << "distance (0,0, 1) " << point_circle(D, center, 1, "d") << std::endl;
+  std::cout << "distance " << point_circle(center, center, 1, "d") << std::endl;
+  std::cout << "distance " << point_circle(center, center, 1, "sd") << std::endl;
+  std::cout << "distance " << point_line(D, B, C, "sd").first << std::endl;
+  std::cout << "distance " << point_line(center, B, C, "sd").first << std::endl;
+  std::cout << "distance " << point_edge(E, B, C) << std::endl;
+  
   return 0;
 }
