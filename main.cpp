@@ -12,17 +12,14 @@
 #include "eikonal.h"
 
 #include <iostream>
-//using namespace dolfin;
+#include <dolfin.h>
 
+using namespace dolfin;
 using namespace eikonal;
 
 int main()
 {
-  /*UnitSquareMesh mesh(100, 100);
-  CG2::FunctionSpace V(mesh);
-  
-  Function u(V);
-  MeshFunction<bool> mesh_f(mesh, 2);
+    /*MeshFunction<bool> mesh_f(mesh, 2);
   std::vector<std::size_t> fixed_dofs;
 
   LowerBoundarySeeder lb_seeder;
@@ -67,7 +64,10 @@ int main()
   two_zero.push_back(11);
   std::cout << "inside [1, 0] " << g_inside(square, two_zero) << std::endl;
   
-  double _tet[12] = {0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2};
+  double _tet[12] = {0.25, 0.25, 0.25,
+                     0.5, 0.75, 0.5,
+                     0.75, 0.5, 0.5,
+                     0.5, 0.5, 0.75};
   std::vector<double> tet(_tet, _tet + 12);
   std::cout << "tet volume: " << volume(tet) << std::endl;
  
@@ -97,6 +97,64 @@ int main()
   std::cout << "distance " << point_line(D, B, C, "sd").first << std::endl;
   std::cout << "distance " << point_line(center, B, C, "sd").first << std::endl;
   std::cout << "distance " << point_edge(E, B, C) << std::endl;
+
+  std::vector<double> nul(3);
+  nul[0] = 1; nul[1] = 1; nul[2] = 1;
+  std::cout << "tet distance" << point_tet(t_barycenter(tet), tet, "sd") << std::endl;
   
+  /* test polygon distance
+  // create a polygon at 0.5, 0.5, 0.25
+  std::size_t dim = 2;
+  std::size_t n_vertices = 8;
+  std::vector<double> p_center(dim);
+  p_center[0]= 0.5; p_center[1] = 0.5;
+  std::vector<double> p_vertices = g_vertices(n_vertices, p_center, 0.25);
+
+  UnitSquareMesh mesh(100, 100);
+  CG2::FunctionSpace V(mesh);
+  Function u(V);
+  boost::shared_ptr<const GenericDofMap> dofmap = V.dofmap();
+  std::vector<double> coords = dofmap->tabulate_all_coordinates(mesh);
+  
+  size_t n_dofs = V.dim();
+  std::vector<double> values(n_dofs); 
+  for(std::size_t i = 0; i < n_dofs; i++)
+  {
+    const std::vector<double> point(&coords[i*dim], &coords[i*dim] + dim);
+    values[i] = point_polygon(point, p_vertices, "sd");
+  }
+  u.vector()->set_local(values);
+  plot(u);
+  interactive(true);
+  */
+
+  // test plane distance
+  double _K[3] = {0, 0, 0}; std::vector<double> K(_K, _K + 3);
+  double _L[3] = {1, 0, 0}; std::vector<double> L(_L, _L + 3);
+  double _M[3] = {0, 1, 0}; std::vector<double> M(_M, _M + 3);
+  double _X[3] = {1, 1, 10}; std::vector<double> X(_X, _X + 3);
+  double _X1[3] = {-1, -1, 10}; std::vector<double> X1(_X1, _X1 + 3);
+  std::cout << point_3face(X, K, L, M) << std::endl;
+  std::cout << point_3face(X1, K, L, M) << std::endl;
+ 
+  std::size_t dim = 3;
+  UnitCubeMesh mesh(50, 50, 50);
+  TET_CG1::FunctionSpace V(mesh);
+  Function u(V);
+  boost::shared_ptr<const GenericDofMap> dofmap = V.dofmap();
+  std::vector<double> coords = dofmap->tabulate_all_coordinates(mesh);
+  
+  size_t n_dofs = V.dim();
+  std::vector<double> values(n_dofs); 
+  for(std::size_t i = 0; i < n_dofs; i++)
+  {
+    const std::vector<double> point(&coords[i*dim], &coords[i*dim] + dim);
+    values[i] = point_tet(point, tet, "sd");
+  }
+  u.vector()->set_local(values);
+  
+  File file("tet.pvd");
+  file << u;
+
   return 0;
 }

@@ -24,8 +24,8 @@ namespace eikonal
   // (signed) distance between point and a line AB (as above but t\in R),
   // line and point make a half space so there is option for signed distance
   // pair.first is the (signed) distnace
-  // pair.second is t of the intersect
-  std::pair<double, double> 
+  // pair.second indicates whether intersect was found within segment AB
+  std::pair<double, bool> 
   point_line(const std::vector<double>& P, const std::vector<double>& A,
                     const std::vector<double>& B, const std::string type);
   
@@ -40,18 +40,19 @@ namespace eikonal
                       const std::string type);
   
   // (signed) distance between point and plane given by ABC, all in R^3
-  double point_plane(const std::vector<double>& P,
-                     const std::vector<double>& A,
-                     const std::vector<double>& B,
-                     const std::vector<double>& C,
-                     const std::string type);
+  // pair.first is the distance
+  // pair.second indicates whether intersect was found withing triangle ABC
+  std::pair<double, bool> point_plane(const std::vector<double>& P,
+                                      const std::vector<double>& A,
+                                      const std::vector<double>& B,
+                                      const std::vector<double>& C,
+                                      const std::string type);
   
-  // (signed) distance between point and a triangular face ABC, all in R^3
+  // distance between point and a triangular face ABC, all in R^3
   double point_3face(const std::vector<double>& P,
                      const std::vector<double>& A,
                      const std::vector<double>& B,
-                     const std::vector<double>& C,
-                     const std::string type);
+                     const std::vector<double>& C);
   
   // (signed) distance between point and a tetrahedon ABCD, all in R^3
   double point_tet(const std::vector<double>& P,

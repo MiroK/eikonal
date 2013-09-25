@@ -1,14 +1,15 @@
-#ifndef _TEST_H_
-#define _TEST_H_
+#ifndef _EIKONAL_TEST_H_
+#define _EIKONAL_TEST_H_
 
-#include <vector>
-#include <string>
+#include "CG1.h"
+#include "CG2.h"
+#include "TET_CG1.h"
 
-namespace dolfin
+/*namespace dolfin
 {
   class Function;
   template<typename T> class MeshFunction;
-}
+}*/
 
 /*
   Classes for defining boundary conditions (\Gamma) of different shapes. They
@@ -17,7 +18,7 @@ namespace dolfin
   values) and signed distance function (positive and negative values). All 
   shapes are meant to work on UnitSquareMesh(es) or UnitCubeMesh(es).
 */
-
+/*
 class GenericSeeder
 {
 public:
@@ -44,6 +45,6 @@ public:
                   std::string type);
 private:
   std::size_t _k;
-};
+};*/
 
-#endif // _TEST_H_
+#endif // _EIKONAL_TEST_H_
