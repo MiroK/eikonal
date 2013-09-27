@@ -6,5 +6,6 @@
 */
 
 #include "ls_geometric.h"
+#include "ls_minimize.h"
 
 #endif // _EIKONAL_LS_H

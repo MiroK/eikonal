@@ -12,14 +12,13 @@
 #include "eikonal.h"
 
 #include <iostream>
-#include <dolfin.h>
 
-using namespace dolfin;
+//using namespace dolfin;
 using namespace eikonal;
 
 int main()
 {
-    /*MeshFunction<bool> mesh_f(mesh, 2);
+  /*MeshFunction<bool> mesh_f(mesh, 2);
   std::vector<std::size_t> fixed_dofs;
 
   LowerBoundarySeeder lb_seeder;
@@ -43,7 +42,7 @@ int main()
   info("size %d", uvw.size());
   std::vector<double> uvw_c = barycenter(uvw, 3);
   info("%g %g %g", uvw_c[0], uvw_c[1], uvw_c[2]);
-  */ 
+   
   
   std::vector<double> center(2);
   std::vector<double> square = g_vertices(3, center, 1);
@@ -101,7 +100,7 @@ int main()
   std::vector<double> nul(3);
   nul[0] = 1; nul[1] = 1; nul[2] = 1;
   std::cout << "tet distance" << point_tet(t_barycenter(tet), tet, "sd") << std::endl;
-  
+ */ 
   /* test polygon distance
   // create a polygon at 0.5, 0.5, 0.25
   std::size_t dim = 2;
@@ -126,7 +125,6 @@ int main()
   u.vector()->set_local(values);
   plot(u);
   interactive(true);
-  */
 
   // test plane distance
   double _K[3] = {0, 0, 0}; std::vector<double> K(_K, _K + 3);
@@ -155,6 +153,31 @@ int main()
   
   File file("tet.pvd");
   file << u;
+*/
 
+  // local solver comparisons
+  // move vertex around to fail on alpha, beta. what happens with minim
+  double _C[2] = {0.5, 1}; std::vector<double> C(_C, _C + 2);
+  double u_C = 100;
+
+  double _A[2] = {0, 0}; std::vector<double> A(_A, _A + 2);
+  double _B[2] = {1, 0.}; std::vector<double> B(_B, _B + 2);
+  std::vector<double> AB(4);
+  AB[0] = A[0]; AB[1] = A[1]; AB[2] = B[0]; AB[3] = B[1];
+  
+  double _u_AB[2] = {0, 0}; std::vector<double> u_AB(_u_AB, _u_AB + 2);
+
+  std::cout << "geometric " << ls_geometric_2d(C, u_C, AB, u_AB) << std::endl;
+  std::cout << "minimize " << ls_minimize_2d(C, u_C, AB, u_AB) << std::endl;
+  
+  //  move source around to fail on theta, again what happend with minim. method
+  double _s[2] = {0.5, -0.5};
+  std::vector<double> source(_s, _s + 2);
+  u_AB[0] = point_point(A, source);
+  u_AB[1] = point_point(B, source);
+  
+  std::cout << "geometric " << ls_geometric_2d(C, u_C, AB, u_AB) << std::endl;
+  std::cout << "minimize " << ls_minimize_2d(C, u_C, AB, u_AB) << std::endl;
+  
   return 0;
 }
