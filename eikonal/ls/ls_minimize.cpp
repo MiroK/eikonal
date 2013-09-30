@@ -61,7 +61,7 @@ namespace eikonal
   Linear2DFunctor::Linear2DFunctor(const std::vector<double>& _A,
                                    const std::vector<double>& _B,
                                    const std::vector<double>& _C,
-                                   const double _u_A, const double _u_B) :
+                                   const double& _u_A, const double& _u_B) :
                             A(&_A), B(&_B), C(&_C), u_A(&_u_A), u_B(&_u_B) { }
   //---------------------------------------------------------------------------
 
