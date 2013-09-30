@@ -17,7 +17,7 @@ namespace eikonal
                             const double u_C)
   {
     // use boost to minimize via functor
-    Linear2DFunctor foo(A, B, C, u_A, u_B);
+    LinearBrent2D foo(A, B, C, u_A, u_B);
 
     //for(size_t i = 0; i < 10; i++)
     //  std::cout << foo(i/10.) << std::endl;
@@ -58,14 +58,7 @@ namespace eikonal
 
 namespace eikonal
 {
-  Linear2DFunctor::Linear2DFunctor(const std::vector<double>& _A,
-                                   const std::vector<double>& _B,
-                                   const std::vector<double>& _C,
-                                   const double _u_A, const double _u_B) :
-                            A(&_A), B(&_B), C(&_C), u_A(&_u_A), u_B(&_u_B) { }
-  //---------------------------------------------------------------------------
-
-  double Linear2DFunctor::operator()(double x)
+  double LinearBrent2D::operator()(double x)
   {
     const vector<double> P = *A*(1-x) + *B*x;
     const double f = *u_A*(1-x) + *u_B*x + norm(*C-P, 2);
