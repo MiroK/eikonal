@@ -11,8 +11,6 @@
 
 #include "eikonal.h"
 
-#include <iostream>
-
 //using namespace dolfin;
 using namespace eikonal;
 
@@ -157,27 +155,16 @@ int main()
 
   // local solver comparisons
   // move vertex around to fail on alpha, beta. what happens with minim
-  double _C[2] = {0.5, 1}; std::vector<double> C(_C, _C + 2);
-  double u_C = 100;
+  for(std::size_t i = 0; i < 5; i++)
+  {
+    double _C[2] = {-0.5 + i*0.5, 1}; 
+    local_test_C(&_C[0]);
+  }
 
-  double _A[2] = {0, 0}; std::vector<double> A(_A, _A + 2);
-  double _B[2] = {1, 0.}; std::vector<double> B(_B, _B + 2);
-  std::vector<double> AB(4);
-  AB[0] = A[0]; AB[1] = A[1]; AB[2] = B[0]; AB[3] = B[1];
-  
-  double _u_AB[2] = {0, 0}; std::vector<double> u_AB(_u_AB, _u_AB + 2);
-
-  std::cout << "geometric " << ls_geometric_2d(C, u_C, AB, u_AB) << std::endl;
-  std::cout << "minimize " << ls_minimize_2d(C, u_C, AB, u_AB) << std::endl;
-  
-  //  move source around to fail on theta, again what happend with minim. method
-  double _s[2] = {0.5, -0.5};
-  std::vector<double> source(_s, _s + 2);
-  u_AB[0] = point_point(A, source);
-  u_AB[1] = point_point(B, source);
-  
-  std::cout << "geometric " << ls_geometric_2d(C, u_C, AB, u_AB) << std::endl;
-  std::cout << "minimize " << ls_minimize_2d(C, u_C, AB, u_AB) << std::endl;
-  
+  for(std::size_t i = 0; i < 7; i++)
+  {
+    double _S[2] = {-1 + i*0.5, -0.5};
+    local_test_S(&_S[0]);
+  }
   return 0;
 }

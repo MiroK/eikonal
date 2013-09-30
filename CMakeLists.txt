@@ -45,6 +45,7 @@ add_executable(${PROJECT_NAME}
                                ./eikonal/cg/cg_distance.cpp
                                ./eikonal/ls/ls_geometric.cpp
                                ./eikonal/ls/ls_minimize.cpp
+                               ./eikonal/ls/ls_test.cpp
 )
 # Target libraries
 target_link_libraries(${PROJECT_NAME} ${DOLFIN_LIBRARIES}

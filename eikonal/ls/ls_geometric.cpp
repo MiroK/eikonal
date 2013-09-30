@@ -9,27 +9,11 @@ using namespace std;
 
 namespace eikonal
 {
-  double ls_geometric_2d(const std::vector<double>& u_point,
-                         const double u_value,
-                         const std::vector<double>& k_points,
-                         const std::vector<double>& k_values)
+  double linear_geometric_2d(const std::vector<double>& A,
+                             const std::vector<double>& B,
+                             const std::vector<double>& C,
+                             const double u_A, const double u_B, const double u_C)
   {
-    const size_t n_k_points = 2;
-    const size_t dim = 2;
-    assert(u_point.size() == dim);
-    assert(k_points.size() == n_k_points*dim);
-    assert(k_values.size() == n_k_points);
-
-    //TODO perhaps adding check for whetner u_value is bigger than all
-    // k_values. If it is not, causality broken?
-
-    // unpack vector
-    const double u_A = k_values[0], u_B = k_values[1], u_C = u_value;
-    
-    const std::vector<double> A(&k_points[0*dim], &k_points[0*dim] + dim),
-                              B(&k_points[1*dim], &k_points[1*dim] + dim),
-                              C(u_point);
-    
     const double a = norm(C - B);
     const double b = norm(C - A);
     const double c = norm(A - B);
@@ -71,5 +55,27 @@ namespace eikonal
     }
   }
   //---------------------------------------------------------------------------
+  
+  double linear_geometric_2d(const std::vector<double>& u_point,
+                             const double u_value,
+                             const std::vector<double>& k_points,
+                             const std::vector<double>& k_values)
+  {
+    const size_t n_k_points = 2;
+    const size_t dim = 2;
+    assert(u_point.size() == dim);
+    assert(k_points.size() == n_k_points*dim);
+    assert(k_values.size() == n_k_points);
 
+    // unpack 
+    const double u_A = k_values[0], u_B = k_values[1], u_C = u_value;
+    
+    const std::vector<double> A(&k_points[0*dim], &k_points[0*dim] + dim),
+                              B(&k_points[1*dim], &k_points[1*dim] + dim),
+                              C(u_point);
+    
+    // use the verbose interface
+    return linear_geometric_2d(A, B, C, u_A, u_B, u_C);
+  }
+  //---------------------------------------------------------------------------
 }
