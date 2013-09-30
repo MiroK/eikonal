@@ -155,16 +155,16 @@ int main()
 
   // local solver comparisons
   // move vertex around to fail on alpha, beta. what happens with minim
-  for(std::size_t i = 0; i < 5; i++)
+  for(std::size_t i = 1; i < 4; i++)
   {
     double _C[2] = {-0.5 + i*0.5, 1}; 
     local_test_C(&_C[0]);
   }
 
-  for(std::size_t i = 0; i < 7; i++)
+  /*for(std::size_t i = 0; i < 7; i++)
   {
     double _S[2] = {-1 + i*0.5, -0.5};
     local_test_S(&_S[0]);
-  }
+  }*/
   return 0;
 }
