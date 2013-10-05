@@ -16,23 +16,23 @@ void local_test_C(double* _C)
   double u_A = 0;
   double u_B = 0;
 
-//  double d_g = linear_geometric_2d(A, B, C, u_A, u_B, u_C);
-//  double e_g = abs(d_g - 1);
+  double d_g = linear_geometric_2d(A, B, C, u_A, u_B, u_C);
+  double e_g = abs(d_g - 1);
   
-//  double d_m = linear_minimize_2d(A, B, C, u_A, u_B, u_C);
-//  double e_m = abs(d_m - 1);
+  double d_m = linear_minimize_2d(A, B, C, u_A, u_B, u_C);
+  double e_m = abs(d_m - 1);
 
   double d_n = linear_newton_2d(A, B, C, u_A, u_B, u_C);
   double e_n = abs(d_n - 1);
 
 
   std::cout << "C is "; print(C);
-//  std::cout << "geometric " << d_g << "\t";
-//  std::cout << "brent " << d_m << "\t";
+  std::cout << "geometric " << d_g << "\t";
+  std::cout << "brent " << d_m << "\t";
   std::cout << "newton " << d_n << "\n";
-  std::cout << std::setprecision(16) << e_n << "\n";
-                                     /*<< e_m << "\t" 
-                                     << e_n << std::endl;*/
+  std::cout << std::setprecision(16) << e_n << "\t"
+                                     << e_m << "\t" 
+                                     << e_n << std::endl;
 
   std::cout << std::endl;
 }

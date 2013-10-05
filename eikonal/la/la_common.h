@@ -43,11 +43,18 @@ namespace eikonal
   template<typename T>
   void print(const std::vector<T>& v)
   {
-    std::cout << "[";
-    for(size_t i = 0; i < v.size()-1; i++)
-      std::cout << v[i] << ", ";
-
-    std::cout << v[v.size()-1] <<"]\n";
+    if(v.size())
+    {
+      std::cout << "[";
+      for(size_t i = 0; i < v.size()-1; i++)
+        std::cout << v[i] << ", ";
+      
+      std::cout << v[v.size()-1] <<"]\n";
+    }
+    else
+    {
+      std::cout << "[]" << std::endl;
+    }
   }
   //---------------------------------------------------------------------------
 

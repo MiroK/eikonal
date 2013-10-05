@@ -1,170 +1,51 @@
-/*#include "CG1.h"
-#include "CG2.h"
 #include <dolfin/generation/UnitSquareMesh.h>
-#include <iostream>
-
-#include "connectivity.h"
-#include "test.h"
-#include "linear_algebra.h"
-#include "polyhedron.h"
-#include "polygon.h"*/
-
 #include "eikonal.h"
 
-//using namespace dolfin;
+using namespace dolfin;
 using namespace eikonal;
 
 int main()
 {
-  /*MeshFunction<bool> mesh_f(mesh, 2);
-  std::vector<std::size_t> fixed_dofs;
+  UnitSquareMesh mesh(2, 2);
+  CG1::FunctionSpace V(mesh);
 
-  LowerBoundarySeeder lb_seeder;
-  lb_seeder.initialize(u, mesh_f, fixed_dofs, "d");
+  Solver solver(V);
 
-   build all mappings
-  t_smap_la _cell_to_dof = cell_to_dof(V);
-  la_vmap_t _dof_to_cell = dof_to_cell(_cell_to_dof);
-  t_smap_t _cell_to_facet = cell_to_facet(V);
-  t_vmap_t _facet_to_cell = facet_to_cell(_cell_to_facet);
-  t_smap_t _facet_to_dof = facet_to_dof(V);
-  t_vmap_t _dof_to_facet = dof_to_facet(_facet_to_dof);
-  t_vmap_d _dof_to_coordinate = dof_to_coordinate(V);
-  */
+  bool _ds[9] = {true, true, false, false, true, true, false, false, true};
+  std::vector<bool> dof_status(_ds, _ds + 9);
+  //print(solver.get_cell_set_dofs(5, 8, dof_status));
 
-  /* test baryc
-  std::vector<double> uvw;
-  uvw.insert(uvw.begin(), u.begin(), u.end());
-  uvw.insert(uvw.begin() + 3, v.begin(), v.end());
-  uvw.insert(uvw.begin() + 6, w.begin(), w.end());
-  info("size %d", uvw.size());
-  std::vector<double> uvw_c = barycenter(uvw, 3);
-  info("%g %g %g", uvw_c[0], uvw_c[1], uvw_c[2]);
-   
+  std::vector<std::vector<double> > ref_points;
+  std::vector<double> p0; p0.push_back(1.); p0.push_back(0.); 
+  std::vector<double> p1; p1.push_back(0.5); p1.push_back(0.5); 
+  std::vector<double> p2; p2.push_back(0.); p2.push_back(0.); 
+  ref_points.push_back(p0);
+  ref_points.push_back(p1);
+  ref_points.push_back(p2);
   
-  std::vector<double> center(2);
-  std::vector<double> square = g_vertices(3, center, 1);
-  print(square); 
+  la_index _dofs[9] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+  std::vector<la_index> dofs(_dofs, _dofs + 9);
 
-  std::vector<double> square_center = g_barycenter(square);
-  print(square_center);
+  t_vmap_d map = dof_to_coordinate(V);
+  std::cout << print_map<t_vmap_d, std::vector<double> >(map, "x"); 
 
-  std::cout << "boundary: ";
-  print(boundary_points(square, 3));
+  LpDistanceSorter sorter(map);
+  sorter.sort(dofs, ref_points, 2);
 
-  std::cout << "area: " << area(square) << std::endl;
-  std::cout << "inside center " << g_inside(square, square_center) << std::endl;
-  g_inside(square, square_center);
-  
-  std::vector<double> two_zero;
-  two_zero.push_back(10);
-  two_zero.push_back(11);
-  std::cout << "inside [1, 0] " << g_inside(square, two_zero) << std::endl;
-  
-  double _tet[12] = {0.25, 0.25, 0.25,
-                     0.5, 0.75, 0.5,
-                     0.75, 0.5, 0.5,
-                     0.5, 0.5, 0.75};
-  std::vector<double> tet(_tet, _tet + 12);
-  std::cout << "tet volume: " << volume(tet) << std::endl;
- 
-  std::vector<double> t_c = t_barycenter(tet);
-  print(t_c);
-
-  std::cout << "center inside: " << t_inside(tet, t_c) << std::endl;
-
-  std::vector<double> oo4;
-  oo4.push_back(0); oo4.push_back(0); oo4.push_back(4);
-  std::cout << "[0, ,0 4] inside: " << t_inside(tet, oo4) << std::endl;
-
-  std::cout << "edges: ";
-  print(edge_points(tet, 3));
-  
-  double _A[2] = {0., 0.}; std::vector<double> A(_A, _A+2);
-  double _B[2] = {1., 0.}; std::vector<double> B(_B, _B+2);
-  double _C[2] = {0., 1.}; std::vector<double> C(_C, _C+2);
-  double _D[2] = {1., 1.}; std::vector<double> D(_D, _D+2);
-  double _E[2] = {2., -1.}; std::vector<double> E(_E, _E+2);
-
-  print(center);
-  std::cout << "distance |AD| (sqrt(2)/2): " << point_point(A, D) << std::endl;
-  std::cout << "distance (0,0, 1) " << point_circle(D, center, 1, "d") << std::endl;
-  std::cout << "distance " << point_circle(center, center, 1, "d") << std::endl;
-  std::cout << "distance " << point_circle(center, center, 1, "sd") << std::endl;
-  std::cout << "distance " << point_line(D, B, C, "sd").first << std::endl;
-  std::cout << "distance " << point_line(center, B, C, "sd").first << std::endl;
-  std::cout << "distance " << point_edge(E, B, C) << std::endl;
-
-  std::vector<double> nul(3);
-  nul[0] = 1; nul[1] = 1; nul[2] = 1;
-  std::cout << "tet distance" << point_tet(t_barycenter(tet), tet, "sd") << std::endl;
- */ 
-  /* test polygon distance
-  // create a polygon at 0.5, 0.5, 0.25
-  std::size_t dim = 2;
-  std::size_t n_vertices = 8;
-  std::vector<double> p_center(dim);
-  p_center[0]= 0.5; p_center[1] = 0.5;
-  std::vector<double> p_vertices = g_vertices(n_vertices, p_center, 0.25);
-
-  UnitSquareMesh mesh(100, 100);
-  CG2::FunctionSpace V(mesh);
-  Function u(V);
-  boost::shared_ptr<const GenericDofMap> dofmap = V.dofmap();
-  std::vector<double> coords = dofmap->tabulate_all_coordinates(mesh);
-  
-  size_t n_dofs = V.dim();
-  std::vector<double> values(n_dofs); 
-  for(std::size_t i = 0; i < n_dofs; i++)
+  for(std::size_t k = 0; k < ref_points.size(); k++)
   {
-    const std::vector<double> point(&coords[i*dim], &coords[i*dim] + dim);
-    values[i] = point_polygon(point, p_vertices, "sd");
+    std::cout << "Dofs sorted by distance from ";
+    print(ref_points[k]);
+    for(std::size_t reverse = 0; reverse < 2; reverse++)
+    {
+      std::cout << " in " << reverse << " order: ";
+      for(MyIterator<la_index> dof = sorter.get(k, reverse); !dof.end(); ++dof)
+      {
+        std::cout << *dof << " ";
+      }
+      std::cout << std::endl;
+    }
   }
-  u.vector()->set_local(values);
-  plot(u);
-  interactive(true);
-
-  // test plane distance
-  double _K[3] = {0, 0, 0}; std::vector<double> K(_K, _K + 3);
-  double _L[3] = {1, 0, 0}; std::vector<double> L(_L, _L + 3);
-  double _M[3] = {0, 1, 0}; std::vector<double> M(_M, _M + 3);
-  double _X[3] = {1, 1, 10}; std::vector<double> X(_X, _X + 3);
-  double _X1[3] = {-1, -1, 10}; std::vector<double> X1(_X1, _X1 + 3);
-  std::cout << point_3face(X, K, L, M) << std::endl;
-  std::cout << point_3face(X1, K, L, M) << std::endl;
- 
-  std::size_t dim = 3;
-  UnitCubeMesh mesh(50, 50, 50);
-  TET_CG1::FunctionSpace V(mesh);
-  Function u(V);
-  boost::shared_ptr<const GenericDofMap> dofmap = V.dofmap();
-  std::vector<double> coords = dofmap->tabulate_all_coordinates(mesh);
   
-  size_t n_dofs = V.dim();
-  std::vector<double> values(n_dofs); 
-  for(std::size_t i = 0; i < n_dofs; i++)
-  {
-    const std::vector<double> point(&coords[i*dim], &coords[i*dim] + dim);
-    values[i] = point_tet(point, tet, "sd");
-  }
-  u.vector()->set_local(values);
-  
-  File file("tet.pvd");
-  file << u;
-*/
-
-  // local solver comparisons
-  // move vertex around to fail on alpha, beta. what happens with minim
-  for(std::size_t i = 1; i < 4; i++)
-  {
-    double _C[2] = {-0.5 + i*0.5, 1}; 
-    local_test_C(&_C[0]);
-  }
-
-  /*for(std::size_t i = 0; i < 7; i++)
-  {
-    double _S[2] = {-1 + i*0.5, -0.5};
-    local_test_S(&_S[0]);
-  }*/
   return 0;
 }
