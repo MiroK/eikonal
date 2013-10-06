@@ -46,6 +46,12 @@ int main()
       std::cout << std::endl;
     }
   }
+
+  la_index _fs[3] = {0, 5, 2};
+  std::vector<la_index> fixed_dofs(_fs, _fs + 3);
+  Function u(V);
+  solver.solve(u, fixed_dofs);
+
   
   return 0;
 }
