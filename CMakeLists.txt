@@ -53,6 +53,9 @@ add_executable(${PROJECT_NAME}
                                ./eikonal/gs/gs_connectivity.cpp
                                ./eikonal/gs/gs_LpDistanceSorter.cpp
                                ./eikonal/gs/Solver.cpp
+
+                               ./eikonal/test/Seeder.cpp
+                               ./eikonal/test/Problem.cpp
 )
 # Target libraries
 target_link_libraries(${PROJECT_NAME} ${DOLFIN_LIBRARIES}

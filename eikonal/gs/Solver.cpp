@@ -9,6 +9,9 @@
 #include <algorithm>
 #include <cmath>
 
+#include <iostream>
+#include "la/la_common.h"
+
 using namespace dolfin;
 
 namespace eikonal
@@ -100,17 +103,12 @@ namespace eikonal
     cell_2_dof.find(cell)->second.begin();
     for( ; cell_dof != cell_2_dof.find(cell)->second.end(); cell_dof++)
     {
-      std::cout << *cell_dof << std::endl;
       if(dof != *cell_dof and (*dof_status)[*cell_dof])
       {
         cell_set_dofs.push_back(*cell_dof);
       }
     }
 
-    if(cell_set_dofs.size() != 2)
-    {
-      cell_set_dofs.clear();
-    }
     return cell_set_dofs;
   }
   //---------------------------------------------------------------------------
@@ -127,10 +125,10 @@ namespace eikonal
     std::vector<double> min_max(2*dim);
     for(std::size_t d = 0; d < dim; d++)
     {
-      double min = 0, max = 0;
-      for(std::size_t i = 0; i < num_vertices; i++)
+      double min = coordinates[d], max = coordinates[d];
+      for(std::size_t i = 1; i < num_vertices; i++)
       {
-        double current = coordinates[i + dim];
+        double current = coordinates[i*dim + d];
         
         if(current > max) max = current;
 
@@ -162,6 +160,11 @@ namespace eikonal
                        const std::vector<dolfin::la_index>& cell_set_dofs,
                        const dolfin::GenericVector& u_vector) const
   {
+    if(cell_set_dofs.size() != 2)
+    {
+      return u_vector[unset_dof];
+    }
+
     // prepare data for the solver with ls interface
     const std::vector<double>
     u_point = dof_2_coordinate.find(unset_dof)->second;
@@ -191,10 +194,31 @@ namespace eikonal
                            std::vector<dolfin::la_index>& fixed_dofs)
   {
     // initialization
+    
     dof_status = init_dof_status(u, fixed_dofs);
+    // checking dof status
+    std::cout << "Dof status: ";
+    for(std::size_t i = 0; i < dof_status->size(); i++)
+    {
+      std::cout << (*dof_status)[i] << " ";
+    }
+    std::cout << std::endl;
+    
     unset_dofs = init_unset_dofs(u, fixed_dofs);
+    // checking unset_dofs
+    std::cout << "Unset dofs: ";
+    for(std::size_t i = 0; i < unset_dofs->size(); i++)
+    {
+      std::cout << (*unset_dofs)[i] << " ";
+    }
+    std::cout << std::endl;
+    
     std::vector<std::vector<double> > ref_points = get_reference_points(*V.mesh());
-
+    // checking ref_points
+    std::cout << "Reference points:\n";
+    for(std::size_t i = 0; i < ref_points.size(); i++)
+      print(ref_points[i]);
+   
     LpDistanceSorter sorter(dof_2_coordinate);
     // use L^2 norm to sort unset_dofs by their distance from ref_points;
     sorter.sort(*unset_dofs, ref_points, 2); 
@@ -215,29 +239,44 @@ namespace eikonal
       std::size_t ref_point = ((k-1)%n_uniq_sweeps)/2;
       bool reverse_flag = (k-1)%2 ?  true : false;
       // apply local solver to unset_dofs in order given by ref_point
+     
+      std::cout << "Dofs ordered by distance from point " << ref_point << " in " <<
+      reverse_flag << " order: \n";
+      
       for(MyIterator<la_index> unset_dof = sorter.get(ref_point, reverse_flag);
           !unset_dof.end(); ++unset_dof)
       {
+        std::cout << "dof is " << *unset_dof;
+        
         double u_old = (*u_vector)[*unset_dof];
         std::vector<std::size_t> cells = dof_2_cell.find(*unset_dof)->second;
+        
+        std::cout << " cells with the dof: "; print(cells);
+
         std::vector<std::size_t>::const_iterator cell = cells.begin();
         for( ; cell != cells.end(); cell++)
         {
           std::vector<la_index>
           cell_set_dofs = get_cell_set_dofs(*cell, *unset_dof);
+          std::cout << "set dofs in cell " << *cell; print(cell_set_dofs);
+
           double u_ = local_solver(*unset_dof, cell_set_dofs, *u_vector);
-          
+          std::cout << "u_ is " << u_ << std::endl; 
           if(u_ < u_old)
           {
             u_old = u_;
+            (*dof_status)[*unset_dof - offset] = true;
+
           }
         }
+        std::cout << "Final value " << u_old << std::endl;
         u_vector->setitem(*unset_dof, u_old);
       }
 
       // sweep over; check convergence as |u-v| in L infty norm
       *v_vector -= *u_vector;
       v_vector->abs();
+      std::cout << "\t\t\t\t\t\t change " << v_vector->max() << std::endl;
       if(v_vector->max() < DOLFIN_EPS)
       {
         return k;
