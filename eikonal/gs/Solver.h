@@ -3,6 +3,7 @@
 
 #include "gs_connectivity.h"
 #include <vector>
+#include <set>
 #include <boost/shared_ptr.hpp>
 
 namespace dolfin
@@ -30,19 +31,19 @@ namespace eikonal
     // solve the eikonal euqtion |grad(u)| = 1 with values of u fixed at
     // fixed_dofs TODO
     std::size_t solve(dolfin::Function& u,
-                      std::vector<dolfin::la_index>& fixed_dofs);
+                      const std::set<dolfin::la_index>& fixed_dofs);
 
   private:
     // initiliaze dof_status TODO, 
     boost::shared_ptr<std::vector<bool> >
     init_dof_status(const dolfin::Function& u,
-                    const std::vector<dolfin::la_index>& fixed_dofs);
+                    const std::set<dolfin::la_index>& fixed_dofs);
 
     // initialize unset_dofs, numbers [first,...,last[ exclude fixed TODO
     // fixed_dofs will be sorted inside so no const
     boost::shared_ptr<std::vector<dolfin::la_index> >
     init_unset_dofs(const dolfin::Function& u,
-                    std::vector<dolfin::la_index>& fixed_dofs);
+                    const std::set<dolfin::la_index>& fixed_dofs);
 
     // return dofs in cell_2_dof[cell] that are not dof and whose dof_status
     // is true, i.e set, TODO

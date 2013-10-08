@@ -5,7 +5,7 @@
   Class for specifing problems for the Eikonal equation.
 */
 
-#include <vector>
+#include <set>
 #include <dolfin/common/types.h>
 
 namespace dolfin
@@ -25,7 +25,7 @@ namespace eikonal
 
     // seeder is used to get intersected cells, dofs in them go into
     // fixed_dofs and values of u in fixed_dofs are set to exact value
-    void init(std::vector<dolfin::la_index> fixed_dofs,
+    void init(std::set<dolfin::la_index>& fixed_dofs,
               dolfin::Function& u) const;
 
     // compute the exact solution of the Eikonal equation

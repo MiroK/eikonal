@@ -32,7 +32,7 @@ namespace eikonal
 
   boost::shared_ptr<std::vector<bool> >
   Solver::init_dof_status(const dolfin::Function& u,
-                          const std::vector<dolfin::la_index>& fixed_dofs)
+                          const std::set<dolfin::la_index>& fixed_dofs)
   {
     //[status of dof_first, ..., dof_second)
     std::pair<std::size_t, std::size_t> u_range = u.vector()->local_range();
@@ -48,11 +48,12 @@ namespace eikonal
 
     // look through fixed_dofs, setting corresponding entries in dof_status to
     // true, make sure fixed_dofs is on the process
-    for(std::size_t i = 0; i < fixed_dofs.size(); i++)
+    std::set<la_index>::const_iterator fixed_dof = fixed_dofs.begin();
+    for( ; fixed_dof != fixed_dofs.end(); fixed_dof++)
     {
-      if(fixed_dofs[i] >= offset and fixed_dofs[i] < u_range.second)
+      if(*fixed_dof >= offset and *fixed_dof < u_range.second)
       {
-        (*_dof_status)[fixed_dofs[i] - offset] = true;
+        (*_dof_status)[*fixed_dof - offset] = true;
       }
     }
 
@@ -62,7 +63,7 @@ namespace eikonal
 
   boost::shared_ptr<std::vector<dolfin::la_index> >
   Solver::init_unset_dofs(const dolfin::Function& u,
-                          std::vector<dolfin::la_index>& fixed_dofs)
+                          const std::set<dolfin::la_index>& fixed_dofs)
   {
     std::pair<std::size_t, std::size_t> u_range = u.vector()->local_range();
 
@@ -80,8 +81,7 @@ namespace eikonal
     }
 
     // remove the fixed dofs
-    std::sort(fixed_dofs.begin(), fixed_dofs.end());
-    std::vector<la_index>::const_reverse_iterator
+    std::set<la_index>::const_reverse_iterator
     fixed_dof = fixed_dofs.rbegin();
     for( ; fixed_dof != fixed_dofs.rend(); fixed_dof++)
     {
@@ -191,7 +191,7 @@ namespace eikonal
   
   
   std::size_t Solver::solve(dolfin::Function& u,
-                           std::vector<dolfin::la_index>& fixed_dofs)
+                            const std::set<dolfin::la_index>& fixed_dofs)
   {
     // initialization
     
