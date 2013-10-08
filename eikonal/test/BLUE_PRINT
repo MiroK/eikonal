@@ -1,0 +1,25 @@
+1. For linear solvers we need to check the order of convergence in L1, and L2
+   norm so we need appropriate UFL stuff.
+
+2. The exact solution for two circle problem is obtained from Expression wheras
+   the other problems have exact solution as a function.
+
+3. We need function to seed a point, a line, circle, polygon and two circles. 
+
+class TestProblem
+{
+  1. return the exact solution in any FunctionSpace V, distance/signed distance
+  // FOCUS ON DISTANCE
+  2. if a function in V is passed; initialize it such tha values in cells
+     intersected by 0 level set are set with the correct solution and elso
+     we have big positive values(distance) or big posive/negative values 
+     outside/inside(signed distance).
+}
+
+class Test
+{
+  1. It has some name=name of the file where the results are stored
+  2. for N in n_elements:
+    mesh->FunctionSpace->TestProblem(V),Solver(V), solver.solve() --> get the
+    |u - u_exact| and iter count. store these in a filter. 
+}

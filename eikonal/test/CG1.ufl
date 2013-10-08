@@ -1,1 +1,3 @@
+# Continuous Lagrange element of degree 1 on triangle 
 element = FiniteElement("Lagrange", triangle, 1)
+

@@ -37,15 +37,25 @@ include_directories(./eikonal)
 # Executable
 add_executable(${PROJECT_NAME}
                                ./main.cpp
+                               
                                ./eikonal/la/la_loop.cpp
                                ./eikonal/la/la_stl.cpp
+                               
                                ./eikonal/cg/cg_common.cpp
                                ./eikonal/cg/cg_polygon.cpp
                                ./eikonal/cg/cg_tetrahedron.cpp
                                ./eikonal/cg/cg_distance.cpp
+                               
                                ./eikonal/ls/ls_geometric.cpp
                                ./eikonal/ls/ls_minimize.cpp
                                ./eikonal/ls/ls_test.cpp
+
+                               ./eikonal/gs/gs_connectivity.cpp
+                               ./eikonal/gs/gs_LpDistanceSorter.cpp
+                               ./eikonal/gs/Solver.cpp
+
+                               ./eikonal/test/Seeder.cpp
+                               ./eikonal/test/Problem.cpp
 )
 # Target libraries
 target_link_libraries(${PROJECT_NAME} ${DOLFIN_LIBRARIES}
