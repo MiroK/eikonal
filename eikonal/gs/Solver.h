@@ -32,6 +32,10 @@ namespace eikonal
     // fixed_dofs TODO
     std::size_t solve(dolfin::Function& u,
                       const std::set<dolfin::la_index>& fixed_dofs);
+  
+  public:
+    const static std::string name;
+
 
   private:
     // initiliaze dof_status TODO, 

@@ -16,6 +16,8 @@ using namespace dolfin;
 
 namespace eikonal
 {
+  const std::string Solver::name = std::string("linear_2d_geometric");
+
   Solver::Solver(const dolfin::FunctionSpace& _V) :
                                       cell_2_dof(cell_to_dof(_V)),
                                       dof_2_cell(dof_to_cell(cell_2_dof)),

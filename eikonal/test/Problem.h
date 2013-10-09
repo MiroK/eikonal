@@ -6,6 +6,7 @@
 */
 
 #include <set>
+#include <string>
 #include <dolfin/common/types.h>
 
 namespace dolfin
@@ -30,6 +31,9 @@ namespace eikonal
 
     // compute the exact solution of the Eikonal equation
     void exact_solution(dolfin::Function& u) const;
+
+    // get name of the seeder
+    std::string name() const;
   
   private:
     const Seeder& seeder;

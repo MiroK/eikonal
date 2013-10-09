@@ -6,6 +6,7 @@
 */
 
 #include <vector>
+#include <string>
 
 namespace dolfin
 {
@@ -17,12 +18,18 @@ namespace eikonal
   class Seeder // Interface fo interacting with Problem
   {
   public:
+    // constructor, set name
+    Seeder(const std::string& _name) : name(_name) { }
+
     // seed object with num_points points
     virtual void seed(std::vector<dolfin::Point>& points,
                       const std::size_t num_points) const = 0;
 
     // compute distance of point from object
-    virtual double distance(const std::vector<double>& point) const = 0;  
+    virtual double distance(const std::vector<double>& point) const = 0;
+  
+  public:
+    const std::string name;
   };
   //---------------------------------------------------------------------------
 
@@ -30,7 +37,9 @@ namespace eikonal
   {
   public:
     // constructor, segment between point _A, _B
-    Segment(const std::vector<double>& _A, const std::vector<double>& _B);
+    Segment(const std::string& name,
+            const std::vector<double>& _A,
+            const std::vector<double>& _B);
     
     // put num_points points on the segment
     void seed(std::vector<dolfin::Point>& points,

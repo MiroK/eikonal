@@ -11,8 +11,9 @@ using namespace dolfin;
 
 namespace eikonal
 {
-  Segment::Segment(const std::vector<double>& _A, const std::vector<double>& _B)
-                          : A(_A), B(_B), dim(_A.size())
+  Segment::Segment(const std::string& name, const std::vector<double>& _A,
+                   const std::vector<double>& _B)
+                          : Seeder(name), A(_A), B(_B), dim(_A.size())
   {
     assert((_A.size() == _B.size()) and ((dim == 2) or (dim == 3)));
   }
