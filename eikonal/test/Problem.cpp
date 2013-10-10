@@ -25,11 +25,13 @@ namespace eikonal
   {
     // get the points from seeder
     std::vector<Point> points;
-    seeder.seed(points, 10);
+    seeder.seed(points, 1000);
 
     // get the intersected cell
     std::set<std::size_t> cells;
     u.function_space()->mesh()->intersected_cells(points, cells);
+
+    std::cout << "intersected cells :"; print(cells);
 
     // push to fixed_dofs and modify u in fixed_dofs, other dofs set as far
     const double far = u.function_space()->mesh()->hmax()*

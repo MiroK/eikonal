@@ -4,9 +4,11 @@
 // Common functionality for vectors.
 
 #include <vector>
+#include <set>
 #include <iostream>
 #include <cassert>
 #include <cmath>
+#include <algorithm>
 
 namespace eikonal
 {
@@ -23,6 +25,10 @@ namespace eikonal
   // print vector
   template<typename T>
   void print(const std::vector<T>& v);
+  
+  // print set
+  template<typename T>
+  void print(const std::set<T>& v);
 
   // comparison, uses compare function with the tolarance
   template<typename T>
@@ -54,6 +60,25 @@ namespace eikonal
     else
     {
       std::cout << "[]" << std::endl;
+    }
+  }
+  //---------------------------------------------------------------------------
+  
+  template<typename T>
+  void print(const std::set<T>& v)
+  {
+    if(v.size())
+    {
+      std::cout << "(";
+      typename std::set<T>::const_iterator e;
+      for(e = v.begin(); std::distance(v.begin(), e) != v.size() - 1; e++)
+        std::cout << *e << ", ";
+      
+      std::cout << *e << ")\n";
+    }
+    else
+    {
+      std::cout << "()" << std::endl;
     }
   }
   //---------------------------------------------------------------------------

@@ -26,6 +26,8 @@ namespace eikonal
                                       offset(-1)
   {
     // TODO assertions on V, ideally before all the mapping build
+    std::cout << "Map of coordinates: " << std::endl;
+    std::cout << print_map<t_vmap_d, std::vector<double> >(dof_2_coordinate, "dof2coord");
   }
   //---------------------------------------------------------------------------
 
@@ -141,6 +143,8 @@ namespace eikonal
       min_max[2*d + 1] = max;
     }
 
+    std::cout << "coord min/max: "; print(min_max);
+
     // create ref. points
     std::vector<std::vector<double> > ref_points((std::size_t)pow(2, dim));
     for(std::size_t d = 0; d < dim; d++)
@@ -186,6 +190,9 @@ namespace eikonal
     double _k_values[2] = {u_vector[cell_set_dofs[0]],
                            u_vector[cell_set_dofs[1]]};
     const std::vector<double> k_values(_k_values, _k_values + 2);
+    
+    std::cout << "k_values "; print(k_values);
+    std::cout << "k_points "; print(k_points);
 
     return linear_geometric_2d(u_point, u_value, k_points, k_values);
   }
@@ -268,7 +275,6 @@ namespace eikonal
           {
             u_old = u_;
             (*dof_status)[*unset_dof - offset] = true;
-
           }
         }
         std::cout << "Final value " << u_old << std::endl;

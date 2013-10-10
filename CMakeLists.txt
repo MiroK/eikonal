@@ -56,6 +56,8 @@ add_executable(${PROJECT_NAME}
 
                                ./eikonal/test/Seeder.cpp
                                ./eikonal/test/Problem.cpp
+                               ./eikonal/test/UnitSquareMeshGenerator.cpp
+                               ./eikonal/test/GmshMeshGenerator.cpp
 )
 # Target libraries
 target_link_libraries(${PROJECT_NAME} ${DOLFIN_LIBRARIES}

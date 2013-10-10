@@ -3,6 +3,7 @@
 
 #include "Problem.h"
 #include "gs/Solver.h"
+#include "MeshGenerator.h"
 #include "CG1.h"
 #include "CG1_FORMS.h"
 #include <dolfin/generation/UnitSquareMesh.h>
@@ -22,19 +23,13 @@
 namespace eikonal
 {
   // use CG1 in 2D to test Eikonal solvers on meshes of type UnitSquareMesh
-  // with 2^i_min, 2^i_max elements, enable ploting every solution to screen
   template<typename T> int linear_2D_test(const Problem& problem,
-                                          const std::size_t i_min=3,
-                                          const std::size_t i_max=5,
+                                          MeshGenerator& mesh_gen,
                                           bool plot_on=false);
 
-  // use CG1 in 2D to test Eikonal solvers on meshes loaded from files
-  // enable ploting every solution to screen
-  template<typename T> int linear_2D_test(const Problem& problem,
-                                  const std::vector<std::string>& mesh_names,
-                                  bool plot_on=false);
-
   // use CG1 in 2D to test Eikonal solver on a given mesh
+  // return number of iterations of the sweeping, L^1 abd L^2 norms of the
+  // error and save the solution to file under u_file_name
   template<typename T> int linear_2D_test(const Problem& problem,
                                           const dolfin::Mesh& mesh,
                                           std::size_t& num_iters,
@@ -48,10 +43,8 @@ namespace eikonal
 
 namespace eikonal
 {
-
   template<typename T> int linear_2D_test(const Problem& problem,
-                                          const std::size_t i_min,
-                                          const std::size_t i_max,
+                                          MeshGenerator& mesh_gen,
                                           bool plot_on=false)
   {
     // get the file names
@@ -59,19 +52,18 @@ namespace eikonal
     help << problem.name().c_str() << "_" << T::name.c_str();
     std::string file_name_base = help.str();       // problem_solver
 
-    std::string mesh_type("f"); // uses Fenics generated meshes
+    std::string mesh_type = mesh_gen.type(); // get the type of mesh from generator
     help << "_" << mesh_type.c_str() << ".dat";
     std::string data_file_name = help.str();    // problem_solver_f.dat
 
     std::ofstream data_file;
     data_file.open(data_file_name.c_str(), std::ios::out);
     data_file.close();
-    for(std::size_t i = i_min; i < i_max; i++)
+    for( ; !mesh_gen.end(); ++mesh_gen)
     {
       // construct a mesh
-      const std::size_t N = (std::size_t)pow(2, i);
-      dolfin::UnitSquareMesh mesh(N, N);
-      const std::size_t num_cells = mesh.num_cells();
+      boost::shared_ptr<const dolfin::Mesh> mesh = *mesh_gen;
+      const std::size_t num_cells = mesh->num_cells();
 
       // get the file name for solution
       help.str("");
@@ -83,18 +75,18 @@ namespace eikonal
       double l1_norm, l2_norm;
       
       int status =
-      linear_2D_test<T>(problem, mesh, num_iters, l1_norm, l2_norm,
+      linear_2D_test<T>(problem, *mesh, num_iters, l1_norm, l2_norm,
                         u_file_name, plot_on); 
 
       // write to screen
-      std::cout << std::setprecision(16) << mesh.hmin() << " " <<
+      std::cout << std::setprecision(16) << mesh->hmin() << " " <<
                                             l1_norm << " " <<
                                             l2_norm << " " <<
                                             num_iters << std::endl;
       
       // write to text file
       data_file.open(data_file_name.c_str(), std::ios::app);
-      data_file << std::setprecision(16) << mesh.hmin() << " " <<
+      data_file << std::setprecision(16) << mesh->hmin() << " " <<
                                             l1_norm << " " <<
                                             l2_norm << " " <<
                                             num_iters << std::endl;
@@ -103,61 +95,6 @@ namespace eikonal
   }
   //----------------------------------------------------------------------------
   
-  template<typename T> int linear_2D_test(const Problem& problem,
-                                  const std::vector<std::string>& mesh_names,
-                                  bool plot_on=false)
-  {
-    // get the file names
-    std::ostringstream help;
-    help << problem.name().c_str() << "_" << T::name.c_str();
-    std::string file_name_base = help.str();       // problem_solver
-
-    std::string mesh_type("g"); // uses Gmsh generated meshes
-    help << "_" << mesh_type.c_str() << ".dat";
-    std::string data_file_name = help.str();    // problem_solver_f.dat
-
-    std::ofstream data_file;
-    data_file.open(data_file_name.c_str(), std::ios::out);
-    data_file.close();
-
-    std::vector<std::string>::const_iterator mesh_name = mesh_names.begin();
-    for( ; mesh_name != mesh_names.end(); mesh_name++)
-    {
-      // construct a mesh
-      dolfin::UnitSquareMesh mesh(*mesh_name);
-      std::size_t num_cells = mesh.num_cells();
-
-      // get the file name for solution
-      help.str("");
-      help << "u_" << file_name_base << "_" << num_cells << ".pvd"; 
-      std::string u_file_name = help.str(); // u_problem_solver_N.pvd
-
-      // get the solution
-      std::size_t num_iters;
-      double l1_norm, l2_norm;
-      
-      int status =
-      linear_2D_test<T>(problem, mesh, num_iters, l1_norm, l2_norm,
-                        u_file_name, plot_on); 
-
-      // write to screen
-      std::cout << std::setprecision(16) << mesh.hmin() << " " <<
-                                            l1_norm << " " <<
-                                            l2_norm << " " <<
-                                            num_iters << std::endl;
-      
-      // write to text file
-      data_file.open(data_file_name.c_str(), std::ios::app);
-      data_file << std::setprecision(16) << mesh.hmin() << " " <<
-                                            l1_norm << " " <<
-                                            l2_norm << " " <<
-                                            num_iters << std::endl;
-      data_file.close();
-    }
-
-  }
-  //----------------------------------------------------------------------------
-
   template<typename T> int linear_2D_test(const Problem& problem,
                                           const dolfin::Mesh& mesh,
                                           std::size_t& num_iters,
@@ -193,7 +130,8 @@ namespace eikonal
       // plot
       if(plot_on)
       {
-        dolfin::plot(u);
+        *u_exact.vector() -= *u.vector();
+        //dolfin::plot(u);
         dolfin::plot(u_exact);
         dolfin::interactive(true);
       }
