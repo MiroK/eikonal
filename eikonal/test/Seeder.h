@@ -53,6 +53,30 @@ namespace eikonal
     const std::vector<double>& B;
     const std::size_t dim;
   };
+  //----------------------------------------------------------------------------
+
+  class TwoCircles : public Seeder
+  {
+  public:
+    // constuctor, two circles with center c_i and radius r_i
+    TwoCircles(const std::string& name,
+              const std::vector<double>& _c1, const double _r1,
+              const std::vector<double>& _c2, const double _r2);
+
+    // put num_points on each circle
+    void seed(std::vector<dolfin::Point>& points,
+              const std::size_t num_points) const;
+      
+    // compute distance from the sigment, distance NOT SIGNED DISTANCE
+    double distance(const std::vector<double>& point) const;
+
+  private:
+    const std::vector<double>& c1;
+    const std::vector<double>& c2;
+    const double r1;
+    const double r2;
+  };
+  //----------------------------------------------------------------------------
   
   // seed circle (center, radius) with num_points
  /* void seed_circle(const std::vector<double>& center,

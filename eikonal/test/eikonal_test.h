@@ -7,5 +7,6 @@
 #include "MeshGenerator.h"
 #include "UnitSquareMeshGenerator.h"
 #include "GmshMeshGenerator.h"
+#include "RectangleMeshGenerator.h"
 
 #endif // _EIKONAL_TEST_H_

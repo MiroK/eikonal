@@ -38,4 +38,26 @@ namespace eikonal
     return point_edge(point, A, B);
   }
   //---------------------------------------------------------------------------
+
+  TwoCircles::TwoCircles(const std::string& name,
+                         const std::vector<double>& _c1, const double _r1,
+                         const std::vector<double>& _c2, const double _r2) :
+  Seeder(name), c1(_c1), r1(_r1), c2(_c2), r2(_r2)
+  {
+    assert((_c1.size() == _c2.size()) and (_c1.size() == 2));
+  }
+  //---------------------------------------------------------------------------
+
+  void TwoCircles::seed(std::vector<dolfin::Point>& points,
+                        const std::size_t num_points) const
+  {
+    // TODO
+  }
+  //---------------------------------------------------------------------------
+      
+  double TwoCircles::distance(const std::vector<double>& point) const
+  {
+    // TODO
+  }
+  //--------------------------------------------------------------------------
 }

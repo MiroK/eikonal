@@ -58,6 +58,7 @@ add_executable(${PROJECT_NAME}
                                ./eikonal/test/Problem.cpp
                                ./eikonal/test/UnitSquareMeshGenerator.cpp
                                ./eikonal/test/GmshMeshGenerator.cpp
+                               ./eikonal/test/RectangleMeshGenerator.cpp
 )
 # Target libraries
 target_link_libraries(${PROJECT_NAME} ${DOLFIN_LIBRARIES}
