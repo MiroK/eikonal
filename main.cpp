@@ -15,26 +15,29 @@ int main()
   Segment segment("segment_[0,0]_[1,0]", A, B);
 
   // define the problem
-  // Problem problem(segment);
+  //Problem problem(segment);
 
   /* test 2 circle problem
   double _c1[2] = {-1., -1.}; std::vector<double> c1(_c1, _c1+2);
   double _c2[2] = {1., 1.}; std::vector<double> c2(_c2, _c2+2);
-  TwoCircles two_circles("two_circles", c1, 0.5, c2. 0.5);
+  TwoCircles two_circles("two_circles", c1, 0.5, c2, 0.5);
 
+  
   Problem problem(two_circles);
 
-  dolfin::Mesh mesh(20, 20);
+  dolfin::RectangleMesh mesh(-2, -2, 2, 2, 100, 100);
   CG1::FunctionSpace V(mesh);
   dolfin::Function u(V);
   problem.exact_solution(u);
   dolfin::plot(u);
-  dolfin::interactive(true);*/
+  dolfin::interactive(true); */
 
-  RectangleMeshGenerator x(4, 4, 0, 0, 1, 1); // 2**4 to 2**4, box [0,0]x[1,1]
+  
+  UnitSquareMeshGenerator x(2, 3, true); // 2**4 to 2**4, box [0,0]x[1,1]
   dolfin::plot(*(*x));
   dolfin::interactive(true);
   print((*x)->coordinates());
+  
 
   // int status;
   // perform convergence test on problem using Solver on fenics' UnitSquareMesh

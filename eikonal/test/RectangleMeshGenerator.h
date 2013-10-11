@@ -17,13 +17,14 @@ namespace eikonal
     RectangleMeshGenerator(const std::size_t _i_min,
                            const std::size_t _i_max,
                            const double _LL_x, const double _LL_y,
-                           const double _UR_x, const double _UR_y);
-
+                           const double _UR_x, const double _UR_y,
+                           const bool _perturbed=false);
+                                                                  
     // iteration is over
     virtual bool end() const;
 
     // get the current mesh
-    virtual boost::shared_ptr<dolfin::Mesh> operator*() const;      
+    virtual boost::shared_ptr<dolfin::Mesh> operator*();      
 
     // increment
     virtual void operator++();
@@ -40,6 +41,10 @@ namespace eikonal
     const std::size_t i_min;
     const std::size_t i_max;
     std::size_t i;
+
+    const bool perturbed;
+    boost::shared_ptr<dolfin::Mesh> mesh;
+    std::size_t deref_count;
   };
 }
 

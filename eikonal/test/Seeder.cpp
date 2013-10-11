@@ -3,6 +3,7 @@
 #include "cg/cg_distance.h"
 #include <dolfin/mesh/Point.h>
 #include <cassert>
+#include <cmath>
 
 #include <dolfin/log/dolfin_log.h>
 #include "la/la_common.h"
@@ -51,13 +52,33 @@ namespace eikonal
   void TwoCircles::seed(std::vector<dolfin::Point>& points,
                         const std::size_t num_points) const
   {
-    // TODO
+    points.reserve(2*num_points);
+    const double d_theta = 2.*M_PI/(num_points-1);
+    
+    // seed the first circle
+    for(std::size_t i = 0; i < num_points; i++)
+    {
+      double P[2];
+      P[0] = c1[0] + r1*cos(i*d_theta);
+      P[1] = c1[1] + r1*sin(i*d_theta);
+      points.push_back(Point(2, &P[0]));
+    }
+
+    // seed the second circle
+    for(std::size_t i = 0; i < num_points; i++)
+    {
+      double P[2];
+      P[0] = c2[0] + r2*cos(i*d_theta);
+      P[1] = c2[1] + r2*sin(i*d_theta);
+      points.push_back(Point(2, &P[0]));
+    }
   }
   //---------------------------------------------------------------------------
       
   double TwoCircles::distance(const std::vector<double>& point) const
   {
-    // TODO
+    return std::min(point_circle(point, c1, r1, "d"),
+                    point_circle(point, c2, r2, "d"));
   }
   //--------------------------------------------------------------------------
 }

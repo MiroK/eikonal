@@ -22,7 +22,7 @@ namespace eikonal
     virtual bool end() const = 0;
 
     // get the current mesh
-    virtual boost::shared_ptr<dolfin::Mesh> operator*() const = 0;      
+    virtual boost::shared_ptr<dolfin::Mesh> operator*() = 0;      
 
     // increment
     virtual void operator++() = 0;
