@@ -36,6 +36,10 @@ namespace eikonal
 
   // get the barycenter of polygon specified by vertices
   std::vector<double> g_barycenter(const std::vector<double>& vertices);
+
+  // see if triangle with vertices [v0x, v0y, v1x...] is accute,
+  // has angle greater than pi/2
+  bool accute_triangle(std::vector<double>& vertices);
 }
 
 #endif // _CG_POLYGON_H_

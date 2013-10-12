@@ -1,6 +1,7 @@
 #ifndef _EIKONAL_TEST_H_
 #define _EIKONAL_TEST_H_
 
+#include "test_common.h"
 #include "Seeder.h"
 #include "Test.h"
 #include "Problem.h"
