@@ -33,10 +33,9 @@ int main()
   dolfin::interactive(true); */
 
   
-  UnitSquareMeshGenerator x(2, 3, true); // 2**4 to 2**4, box [0,0]x[1,1]
-  dolfin::plot(*(*x));
+  UnitSquareMeshGenerator x(1, 2, true); // 2**4 to 2**4, box [0,0]x[1,1]
+  dolfin::plot(obtuse_cells(*(*x)));
   dolfin::interactive(true);
-  print((*x)->coordinates());
   
 
   // int status;

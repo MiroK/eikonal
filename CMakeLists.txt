@@ -54,6 +54,7 @@ add_executable(${PROJECT_NAME}
                                ./eikonal/gs/gs_LpDistanceSorter.cpp
                                ./eikonal/gs/Solver.cpp
 
+                               ./eikonal/test/test_common.cpp
                                ./eikonal/test/Seeder.cpp
                                ./eikonal/test/Problem.cpp
                                ./eikonal/test/UnitSquareMeshGenerator.cpp

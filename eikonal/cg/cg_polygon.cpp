@@ -124,21 +124,22 @@ namespace eikonal
     std::vector<double> edge_sizes(3);
     for(std::size_t i = 0; i < 3; i++)
     {
-      std::vector<double> P(&vertices[2*i], &vertices[2*i+1]);
-      std::vector<double> Q(&vertices[2*((i+1)%3)], &vertices[2*((i+1)%3) + 1]);
+      std::vector<double> P(&vertices[2*i], &vertices[2*i]+2);
+      std::vector<double> Q(&vertices[2*((i+1)%3)], &vertices[2*((i+1)%3)]+2);
       edge_sizes[i] = norm(P-Q, 2);
     }
 
     // pick the longest edge, largest angle is opposite to it
     std::size_t i = std::distance(edge_sizes.begin(),
-                        std::min_element(edge_sizes.begin(), edge_sizes.end()));
-    std::vector<double> C(&vertices[2*i], &vertices[2*i + 1]);
-    std::vector<double> A(&vertices[2*((i+1)%3)], &vertices[2*((i+1)%3)+1]);
-    std::vector<double> B(&vertices[2*((i+2)%3)], &vertices[2*((i+2)%3)+1]);
+                        std::max_element(edge_sizes.begin(), edge_sizes.end()));
+    std::vector<double> C(&vertices[2*i], &vertices[2*i]+2);
+    std::vector<double> A(&vertices[2*((i+1)%3)], &vertices[2*((i+1)%3)]+2);
+    std::vector<double> B(&vertices[2*((i+2)%3)], &vertices[2*((i+2)%3)]+2);
     
     // cos of largest angle
     const double cosine = dot(A-C, B-C)/edge_sizes[(i+1)%3]/edge_sizes[(i+2)%3];
-    return (not cosine > 1);
+    std::cout << cosine << std::endl;
+    return not (cosine > 1);
   }
   //----------------------------------------------------------------------------
 }
