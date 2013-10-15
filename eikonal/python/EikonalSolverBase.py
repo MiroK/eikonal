@@ -1,4 +1,4 @@
-	import connectivity as conn
+import connectivity as conn
 from dolfin import assemble, dx, sqrt, DOLFIN_EPS, Function, plot
 import numpy as np
 
