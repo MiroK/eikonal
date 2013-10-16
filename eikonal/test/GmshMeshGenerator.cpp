@@ -16,7 +16,7 @@ namespace eikonal
   //----------------------------------------------------------------------------
 
   boost::shared_ptr<dolfin::Mesh>
-  GmshMeshGenerator::operator*() const     
+  GmshMeshGenerator::operator*()     
   {
     std::ostringstream help;
     help << root.c_str() << "_" << i << ".msh.xml";

@@ -14,26 +14,45 @@ namespace eikonal
                              const std::vector<double>& C,
                              const double u_A, const double u_B, const double u_C)
   {
-    const double a = norm(C - B);
-    const double b = norm(C - A);
-    const double c = norm(A - B);
+    const double a = norm(C - B, 2);
+    const double b = norm(C - A, 2);
+    const double c = norm(A - B, 2);
 
     if(abs(u_B - u_A) <= c)
     {
-      const double theta = asin(abs(u_B - u_A)/c);
+      double theta = asin((u_B - u_A)/c);
       const double alpha = acos(dot(C - B, A - B)/a/c);
       const double beta = acos(dot(C - A, B - A)/b/c);
       const double pip = M_PI/2.;
 
+      std::cout << "alpha " << alpha << std::endl;
+      std::cout << "beta " << beta << std::endl;
+      std::cout << "c " << c << std::endl;
+      std::cout << "theta " << theta << std::endl;
+      std::cout << (int)(std::max(0., alpha - pip) <= theta and theta <= (pip -
+      beta)) << std::endl;
+      std::cout << (int)(alpha - pip <= theta and theta <= std::min(0., pip -
+      beta)) << std::endl;
+      
+      std::cout << std::max(0., alpha - pip) << " " << 
+                   theta << " " << (pip - beta) << std::endl;
+      
       if((std::max(0., alpha - pip) <= theta and theta <= (pip - beta)) or
          ((alpha - pip) <= theta and theta <= std::min(0., pip - beta)))
       {
         const double h = a*sin(alpha - theta);
         const double H = b*sin(beta + theta);
-        
+        std::cout << "a" << a << std::endl;
+        std::cout << "b" << b << std::endl;
+        std::cout << "h " << h << std::endl; 
+        std::cout << "H " << H << std::endl; 
+
         vector<double> values(2);
         values[0] = u_C;
         values[1] = 0.5*(h + u_B) + 0.5*(H + u_A);
+        std::cout << u_B + h << " " << u_B + H << " " << u_A + h << " " <<
+                     " " << u_A + H << std::endl;
+
         return *min_element(values.begin(), values.end());
       }
       else
@@ -68,10 +87,13 @@ namespace eikonal
     assert(k_values.size() == n_k_points);
 
     // unpack 
-    const double u_A = k_values[0], u_B = k_values[1], u_C = u_value;
+    const std::size_t i = k_values[0] <= k_values[1] ? 0 : 1;
+    const std::size_t ip1 = (i+1)%2;
+
+    const double u_A = k_values[i], u_B = k_values[ip1], u_C = u_value;
     
-    const std::vector<double> A(&k_points[0*dim], &k_points[0*dim] + dim),
-                              B(&k_points[1*dim], &k_points[1*dim] + dim),
+    const std::vector<double> A(&k_points[i*dim], &k_points[i*dim] + dim),
+                              B(&k_points[ip1*dim], &k_points[ip1*dim] + dim),
                               C(u_point);
     
     // use the verbose interface

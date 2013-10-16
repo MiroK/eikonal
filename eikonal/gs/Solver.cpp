@@ -277,7 +277,7 @@ namespace eikonal
             (*dof_status)[*unset_dof - offset] = true;
           }
         }
-        std::cout << "Final value " << u_old << std::endl;
+        std::cout << std::setprecision(18) << "Final value " << u_old << std::endl;
         u_vector->setitem(*unset_dof, u_old);
       }
 

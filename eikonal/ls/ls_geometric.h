@@ -12,6 +12,7 @@ namespace eikonal
   // Given triangle ABC with values of u known at A, B compute value of u at C
   // from guess u_C
   // uses aproximation of wave front by line
+  // u_A <= u_B
   double linear_geometric_2d(const std::vector<double>& A,
                              const std::vector<double>& B,
                              const std::vector<double>& C,

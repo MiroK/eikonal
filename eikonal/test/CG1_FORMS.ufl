@@ -6,6 +6,6 @@ u = Coefficient(element)
 v = Coefficient(element)
 
 norm1 = abs(u-v)*dx
-norm2 = (u-v)*(u-v)*dx
+norm2 = abs((u-v)*(u-v))*dx
 forms = [norm1, norm2]
 

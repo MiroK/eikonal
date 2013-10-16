@@ -79,18 +79,22 @@ class EikonalSolverBase:
     # start sweeping the mesh
     count = 0
     off = len(sweep)/8
-    while True:
+    x = 0
+    CONTINUE = True
+    while CONTINUE:
       count += 1
       i = -off
       change_count = 0
       order = 0
       for dof in sweep:
+        x += 1
         i += 1
         u_old = u_vector[dof]
         for cell in self.dof_to_cell[dof]:
           _set_dofs = self.set_dofs_in_cell(dof, cell)
           #print "Cell", cell, "dof", dof, _set_dofs, "u_old", u_old
           if _set_dofs:
+            print "cell=", cell
             u_new =self.local_solver(dof, u_vector, _set_dofs)
             if u_new < 0:
               raise ValueError("negative value")
@@ -101,21 +105,20 @@ class EikonalSolverBase:
               u_old = u_new
               #print "u_old \t\t changed to", u_old 
         u_vector[dof] = u_old
+        print "dof is",dof, "error= %.16f" % abs(u_old - self.dof_to_coordinate[dof][1]),\
+        "num=%.18f" % u_old, "exact=", self.dof_to_coordinate[dof][1]
        # print "Final value", u_old
       
-        if i == 0:
-          #print "Summary iter =", count, "sweep =", order, "num_changes =",\
-          #     change_count
-          order += 1
-          i = -off
-          change_count = 0
+        if x == off:
+          x = 0
+          e = np.linalg.norm(u.vector().array() - v.vector().array(), np.inf)
+          print x
+          if e < DOLFIN_EPS:
+            CONTINUE = False
+          else:
+            v.vector()[:] = u.vector()[:]
+            order += 1
+            i = -off
 
-      #plot(u, interactive=True)
-      e = np.linalg.norm(u.vector().array() - v.vector().array(), np.inf)
-      #print count, e
-      if e < DOLFIN_EPS:
-        break
-      else:
-        v.vector()[:] = u.vector()[:]
 
     return count

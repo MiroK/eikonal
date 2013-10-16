@@ -16,6 +16,8 @@
 #include <iomanip>
 #include <string>
 
+#include "la/la_common.h"
+
 /*
   Perform convergence test of the Eikonal solver on different problems.
 */
@@ -113,6 +115,9 @@ namespace eikonal
       problem.init(fixed_dofs, u);
       problem.exact_solution(u_exact);
 
+      std::cout << "fixed dofs: ";
+      print(fixed_dofs);
+
       // create solver and compute the solution
       T solver(V);
       num_iters = solver.solve(u, fixed_dofs); 
@@ -131,8 +136,21 @@ namespace eikonal
       if(plot_on)
       {
         *u_exact.vector() -= *u.vector();
-        //dolfin::plot(u);
+        u_exact.vector()->abs();
+        dolfin::plot(u);
         dolfin::plot(u_exact);
+        
+        double max = u_exact.vector()->max();
+        std::cout << "error max " << max << std::endl;
+        
+        for(std::size_t i = 0; i < u_exact.vector()->size(); i++)
+        {
+          std::cout << std::setprecision(16) << i << " " << (*u.vector())[i] <<
+          std::endl;
+        }
+
+        std::cout << "L1 " << l1_norm << std::endl;
+        std::cout << "L2 " << l2_norm << std::endl;
         dolfin::interactive(true);
       }
   }

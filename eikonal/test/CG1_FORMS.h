@@ -1250,11 +1250,6 @@ public:
                                const double*  vertex_coordinates,
                                int cell_orientation) const
   {
-    // Number of operations (multiply-add pairs) for Jacobian data:      3
-    // Number of operations (multiply-add pairs) for geometry tensor:    54
-    // Number of operations (multiply-add pairs) for tensor contraction: 35
-    // Total number of operations (multiply-add pairs):                  92
-    
     // Compute Jacobian
     double J[4];
     compute_jacobian_triangle_2d(J, vertex_coordinates);
@@ -1267,46 +1262,47 @@ public:
     // Set scale factor
     const double det = std::abs(detJ);
     
-    // Compute geometry tensor
-    const double G0_0_0 = det*w[0][0]*w[0][0]*(1.0);
-    const double G0_0_1 = det*w[0][0]*w[0][1]*(1.0);
-    const double G0_0_2 = det*w[0][0]*w[0][2]*(1.0);
-    const double G0_1_0 = det*w[0][1]*w[0][0]*(1.0);
-    const double G0_1_1 = det*w[0][1]*w[0][1]*(1.0);
-    const double G0_1_2 = det*w[0][1]*w[0][2]*(1.0);
-    const double G0_2_0 = det*w[0][2]*w[0][0]*(1.0);
-    const double G0_2_1 = det*w[0][2]*w[0][1]*(1.0);
-    const double G0_2_2 = det*w[0][2]*w[0][2]*(1.0);
-    const double G1_0_0 = det*w[0][0]*w[1][0]*(1.0);
-    const double G1_0_1 = det*w[0][0]*w[1][1]*(1.0);
-    const double G1_0_2 = det*w[0][0]*w[1][2]*(1.0);
-    const double G1_1_0 = det*w[0][1]*w[1][0]*(1.0);
-    const double G1_1_1 = det*w[0][1]*w[1][1]*(1.0);
-    const double G1_1_2 = det*w[0][1]*w[1][2]*(1.0);
-    const double G1_2_0 = det*w[0][2]*w[1][0]*(1.0);
-    const double G1_2_1 = det*w[0][2]*w[1][1]*(1.0);
-    const double G1_2_2 = det*w[0][2]*w[1][2]*(1.0);
-    const double G2_0_0 = det*w[1][0]*w[0][0]*(1.0);
-    const double G2_0_1 = det*w[1][0]*w[0][1]*(1.0);
-    const double G2_0_2 = det*w[1][0]*w[0][2]*(1.0);
-    const double G2_1_0 = det*w[1][1]*w[0][0]*(1.0);
-    const double G2_1_1 = det*w[1][1]*w[0][1]*(1.0);
-    const double G2_1_2 = det*w[1][1]*w[0][2]*(1.0);
-    const double G2_2_0 = det*w[1][2]*w[0][0]*(1.0);
-    const double G2_2_1 = det*w[1][2]*w[0][1]*(1.0);
-    const double G2_2_2 = det*w[1][2]*w[0][2]*(1.0);
-    const double G3_0_0 = det*w[1][0]*w[1][0]*(1.0);
-    const double G3_0_1 = det*w[1][0]*w[1][1]*(1.0);
-    const double G3_0_2 = det*w[1][0]*w[1][2]*(1.0);
-    const double G3_1_0 = det*w[1][1]*w[1][0]*(1.0);
-    const double G3_1_1 = det*w[1][1]*w[1][1]*(1.0);
-    const double G3_1_2 = det*w[1][1]*w[1][2]*(1.0);
-    const double G3_2_0 = det*w[1][2]*w[1][0]*(1.0);
-    const double G3_2_1 = det*w[1][2]*w[1][1]*(1.0);
-    const double G3_2_2 = det*w[1][2]*w[1][2]*(1.0);
+    // Cell volume
     
-    // Compute element tensor
-    A[0] = 0.0833333333333333*G0_0_0 + 0.0416666666666667*G0_0_1 + 0.0416666666666667*G0_0_2 + 0.0416666666666667*G0_1_0 + 0.0833333333333333*G0_1_1 + 0.0416666666666666*G0_1_2 + 0.0416666666666667*G0_2_0 + 0.0416666666666666*G0_2_1 + 0.0833333333333333*G0_2_2 - 0.0833333333333333*G1_0_0 - 0.0416666666666667*G1_0_1 - 0.0416666666666667*G1_0_2 - 0.0416666666666667*G1_1_0 - 0.0833333333333333*G1_1_1 - 0.0416666666666666*G1_1_2 - 0.0416666666666667*G1_2_0 - 0.0416666666666666*G1_2_1 - 0.0833333333333333*G1_2_2 - 0.0833333333333333*G2_0_0 - 0.0416666666666667*G2_0_1 - 0.0416666666666667*G2_0_2 - 0.0416666666666667*G2_1_0 - 0.0833333333333333*G2_1_1 - 0.0416666666666666*G2_1_2 - 0.0416666666666667*G2_2_0 - 0.0416666666666666*G2_2_1 - 0.0833333333333333*G2_2_2 + 0.0833333333333333*G3_0_0 + 0.0416666666666667*G3_0_1 + 0.0416666666666667*G3_0_2 + 0.0416666666666667*G3_1_0 + 0.0833333333333333*G3_1_1 + 0.0416666666666666*G3_1_2 + 0.0416666666666667*G3_2_0 + 0.0416666666666666*G3_2_1 + 0.0833333333333333*G3_2_2;
+    // Compute circumradius of triangle in 2D
+    
+    
+    // Array of quadrature weights.
+    static const double W3[3] = {0.166666666666667, 0.166666666666667, 0.166666666666667};
+    // Quadrature points on the UFC reference element: (0.166666666666667, 0.166666666666667), (0.166666666666667, 0.666666666666667), (0.666666666666667, 0.166666666666667)
+    
+    // Value of basis functions at quadrature points.
+    static const double FE0[3][3] = \
+    {{0.666666666666667, 0.166666666666667, 0.166666666666667},
+    {0.166666666666667, 0.166666666666667, 0.666666666666667},
+    {0.166666666666667, 0.666666666666667, 0.166666666666667}};
+    
+    // Reset values in the element tensor.
+    A[0] = 0.0;
+    
+    // Compute element tensor using UFL quadrature representation
+    // Optimisations: ('eliminate zeros', False), ('ignore ones', False), ('ignore zero tables', False), ('optimisation', False), ('remove zero terms', False)
+    
+    // Loop quadrature points for integral.
+    // Number of operations to compute element tensor for following IP loop = 60
+    for (unsigned int ip = 0; ip < 3; ip++)
+    {
+      
+      // Coefficient declarations.
+      double F0 = 0.0;
+      double F1 = 0.0;
+      
+      // Total number of operations to compute function values = 12
+      for (unsigned int r = 0; r < 3; r++)
+      {
+        F0 += FE0[ip][r]*w[0][r];
+        F1 += FE0[ip][r]*w[1][r];
+      }// end loop over 'r'
+      
+      // Number of operations for primary indices: 8
+      // Number of operations to compute entry: 8
+      A[0] += std::abs(((F0 + (-1.0)*F1))*((F0 + (-1.0)*F1)))*W3[ip]*det;
+    }// end loop over 'ip'
   }
 
 };
@@ -1532,7 +1528,7 @@ public:
   /// Return a string identifying the form
   virtual const char* signature() const
   {
-    return "af63129b17a8dca0a51c56f7fca58c71683557e81296252ac3aecae4aaa316a0acb29c222e95eb65b4f4b8e3d499b9286274fc8093b35718286ab56dabbd7492";
+    return "8bd4702b967444081b22533b032b148f2b40119ac41e6de4b92c3062d6b92dcfc218ec0fd54c527f8cfa58a83186346320968967dc091e82edffd23bbdcfb65a";
   }
 
   /// Return the rank of the global tensor (r)
