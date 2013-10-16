@@ -41,7 +41,7 @@ class EikonalSolverGeometric(EikonalSolverBase):
     print A, B, u_A, u_B
 
     if abs(u_B-u_A) <= c:
-      theta = asin(abs(u_B-u_A)/c)
+      theta = asin((u_B-u_A)/c)
       print "c=", c, "theta=", theta
       cond1 = max(0, alpha-pi/2) <= theta <= pi/2-beta
       cond2 = alpha-pi/2 <= theta <= min(0, pi/2-beta)
@@ -50,8 +50,6 @@ class EikonalSolverGeometric(EikonalSolverBase):
       if (max(0, alpha-pi/2) <= theta <= pi/2-beta) or \
          (alpha-pi/2 <= theta <= min(0, pi/2-beta)):
          
-         theta = theta if u_A <= u_B else -theta;
-
          h = a*sin(alpha-theta)
          H = b*sin(beta+theta)
 

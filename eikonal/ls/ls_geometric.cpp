@@ -18,7 +18,7 @@ namespace eikonal
     const double b = norm(C - A, 2);
     const double c = norm(A - B, 2);
 
-    if(abs(u_B - u_A) <= c)
+    if((u_B - u_A) <= c)
     {
       double theta = asin((u_B - u_A)/c);
       const double alpha = acos(dot(C - B, A - B)/a/c);
@@ -37,21 +37,13 @@ namespace eikonal
       std::cout << std::max(0., alpha - pip) << " " << 
                    theta << " " << (pip - beta) << std::endl;
       
-      if((std::max(0., alpha - pip) <= theta and theta <= (pip - beta)) or
-         ((alpha - pip) <= theta and theta <= std::min(0., pip - beta)))
+      if((std::max(0., alpha - pip) <= theta and theta <= (pip - beta)))
       {
         const double h = a*sin(alpha - theta);
-        const double H = b*sin(beta + theta);
-        std::cout << "a" << a << std::endl;
-        std::cout << "b" << b << std::endl;
-        std::cout << "h " << h << std::endl; 
-        std::cout << "H " << H << std::endl; 
 
         vector<double> values(2);
         values[0] = u_C;
-        values[1] = 0.5*(h + u_B) + 0.5*(H + u_A);
-        std::cout << u_B + h << " " << u_B + H << " " << u_A + h << " " <<
-                     " " << u_A + H << std::endl;
+        values[1] = h + u_B;
 
         return *min_element(values.begin(), values.end());
       }
@@ -89,7 +81,6 @@ namespace eikonal
     // unpack 
     const std::size_t i = k_values[0] <= k_values[1] ? 0 : 1;
     const std::size_t ip1 = (i+1)%2;
-
     const double u_A = k_values[i], u_B = k_values[ip1], u_C = u_value;
     
     const std::vector<double> A(&k_points[i*dim], &k_points[i*dim] + dim),
