@@ -37,16 +37,20 @@ class EikonalSolverGeometric(EikonalSolverBase):
     alpha = acos(dot(C-B, A-B)/a/c)
     beta = acos(dot(C-A, B-A)/b/c)
     
-    print "local solver, set_dofs=", set_dofs, "alpha, beta", alpha, beta
-    print A, B, u_A, u_B
-
     if abs(u_B-u_A) <= c:
       theta = asin((u_B-u_A)/c)
-      print "c=", c, "theta=", theta
-      cond1 = max(0, alpha-pi/2) <= theta <= pi/2-beta
-      cond2 = alpha-pi/2 <= theta <= min(0, pi/2-beta)
-      print cond1, cond2
-      print max(0, alpha-pi/2), theta, pi/2 - beta
+      print set_dofs
+      print "\t u_A %.16f" % u_A
+      print "\t u_B %.16f" % u_B
+      print "\t A [%.16f, %.16f]" % (A[0], A[1])
+      print "\t B [%.16f, %.16f]" % (B[0], B[1])
+      print "\t alpha %.16f" % alpha
+      print "\t beta %.16f" % beta
+      print "\t theta %.16f" % theta
+      print "\t a %.16f" % a
+      print "\t b %.16f" % b
+      print "\t c %.16f" % c
+
       if (max(0, alpha-pi/2) <= theta <= pi/2-beta) or \
          (alpha-pi/2 <= theta <= min(0, pi/2-beta)):
          
@@ -59,16 +63,10 @@ class EikonalSolverGeometric(EikonalSolverBase):
       else:
         u_ = u_A + b
         _u = u_B + a
-        print "Returning on alfa, beta fail."
-        print "u_A=%.12f u_B=%.12f a=%.12f b=%.12f" %  (u_A, u_B, a, b)
-        print "A=[%.12f, %.12f], B=[%.12f, %.12f] C[1]=%.12f" % \
-        (A[0], A[1], B[0], B[1], C[1])
-        print min([u_C, u_, _u])
         return min([u_C, u_, _u])
     
     else:
       u_ = u_A + b
       _u = u_B + a
-      print "Returning on theta fail"
       return min([u_C, u_, _u])
 

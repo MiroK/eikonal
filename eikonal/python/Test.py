@@ -9,7 +9,7 @@ if __name__ == "__main__":
   #i = 6
   #N = 2**i
   #mesh = UnitSquareMesh(N, N, "crossed")
-  mesh = Mesh("../../test_results/sqr_3.msh.xml")
+  mesh = Mesh("../../test_results/sqr_1.msh.xml")
   #mesh = Mesh("../../test_results/mesh_perturbed_5.xml")
   V = FunctionSpace(mesh, "CG", 1)
 

@@ -146,7 +146,7 @@ namespace eikonal
         for(std::size_t i = 0; i < u_exact.vector()->size(); i++)
         {
           std::cout << std::setprecision(16) << i << " " << (*u.vector())[i] <<
-          std::endl;
+          " " << (*u_exact.vector())[i] << std::endl;
         }
 
         std::cout << "L1 " << l1_norm << std::endl;
