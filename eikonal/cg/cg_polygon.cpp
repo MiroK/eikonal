@@ -138,7 +138,6 @@ namespace eikonal
     
     // cos of largest angle
     const double cosine = dot(A-C, B-C)/edge_sizes[(i+1)%3]/edge_sizes[(i+2)%3];
-    std::cout << cosine << std::endl;
     return not (cosine > 1);
   }
   //----------------------------------------------------------------------------

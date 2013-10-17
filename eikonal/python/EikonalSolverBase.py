@@ -36,11 +36,11 @@ class EikonalSolverBase:
     '''
     raise NotImplementedError('''Implement in child!''')
 
-  def local_solver(self,unset_U, u, set_dofs):
+  def local_solver(self,unset_U, u, set_dofs, xtol):
     ''' Local solver on a triangle. Return new value for u in dof=unset_U. '''
     raise NotImplementedError('''Implement in child!''')
 
-  def solve(self, u, fixed_dofs):
+  def solve(self, u, fixed_dofs, xtol):
     '''Global Eikonal solver.'''
     # we are expecting u from V
     u_vector = u.vector()
@@ -88,7 +88,7 @@ class EikonalSolverBase:
         for cell in self.dof_to_cell[dof]:
           _set_dofs = self.set_dofs_in_cell(dof, cell)
           if _set_dofs:
-            u_new =self.local_solver(dof, u_vector, _set_dofs)
+            u_new =self.local_solver(dof, u_vector, _set_dofs, xtol)
             if u_new < 0:
               raise ValueError("negative value")
             
@@ -96,7 +96,7 @@ class EikonalSolverBase:
               self.dof_status[dof] = True
               u_old = u_new
         u_vector[dof] = u_old
-      
+        
         if x == off:
           n_sweeps += 1
           x = 0

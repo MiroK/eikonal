@@ -20,7 +20,7 @@ class EikonalSolverGeometric(EikonalSolverBase):
     else:
       return []
 
-  def local_solver(self, unset_U, u, set_dofs):
+  def local_solver(self, unset_U, u, set_dofs, xtol):
     ''' Local solver on a triangle. Return new value for u in dof=unset_U. '''
     C = self.dof_to_coordinate[unset_U]
     A = self.dof_to_coordinate[set_dofs[0]]
