@@ -26,8 +26,6 @@ namespace eikonal
                                       offset(-1)
   {
     // TODO assertions on V, ideally before all the mapping build
-    std::cout << "Map of coordinates: " << std::endl;
-    std::cout << print_map<t_vmap_d, std::vector<double> >(dof_2_coordinate, "dof2coord");
   }
   //---------------------------------------------------------------------------
 
@@ -143,8 +141,6 @@ namespace eikonal
       min_max[2*d + 1] = max;
     }
 
-    std::cout << "coord min/max: "; print(min_max);
-
     // create ref. points
     std::vector<std::vector<double> > ref_points((std::size_t)pow(2, dim));
     for(std::size_t d = 0; d < dim; d++)
@@ -191,9 +187,6 @@ namespace eikonal
                            u_vector[cell_set_dofs[1]]};
     const std::vector<double> k_values(_k_values, _k_values + 2);
     
-    std::cout << "k_values "; print(k_values);
-    std::cout << "k_points "; print(k_points);
-
     return linear_geometric_2d(u_point, u_value, k_points, k_values);
   }
   //---------------------------------------------------------------------------
@@ -205,28 +198,10 @@ namespace eikonal
     // initialization
     
     dof_status = init_dof_status(u, fixed_dofs);
-    // checking dof status
-    std::cout << "Dof status: ";
-    for(std::size_t i = 0; i < dof_status->size(); i++)
-    {
-      std::cout << (*dof_status)[i] << " ";
-    }
-    std::cout << std::endl;
     
     unset_dofs = init_unset_dofs(u, fixed_dofs);
-    // checking unset_dofs
-    std::cout << "Unset dofs: ";
-    for(std::size_t i = 0; i < unset_dofs->size(); i++)
-    {
-      std::cout << (*unset_dofs)[i] << " ";
-    }
-    std::cout << std::endl;
     
     std::vector<std::vector<double> > ref_points = get_reference_points(*V.mesh());
-    // checking ref_points
-    std::cout << "Reference points:\n";
-    for(std::size_t i = 0; i < ref_points.size(); i++)
-      print(ref_points[i]);
    
     LpDistanceSorter sorter(dof_2_coordinate);
     // use L^2 norm to sort unset_dofs by their distance from ref_points;
@@ -249,42 +224,31 @@ namespace eikonal
       bool reverse_flag = (k-1)%2 ?  true : false;
       // apply local solver to unset_dofs in order given by ref_point
      
-      std::cout << "Dofs ordered by distance from point " << ref_point << " in " <<
-      reverse_flag << " order: \n";
-      
       for(MyIterator<la_index> unset_dof = sorter.get(ref_point, reverse_flag);
           !unset_dof.end(); ++unset_dof)
       {
-        std::cout << "dof is " << *unset_dof;
-        
         double u_old = (*u_vector)[*unset_dof];
         std::vector<std::size_t> cells = dof_2_cell.find(*unset_dof)->second;
-        
-        std::cout << " cells with the dof: "; print(cells);
 
         std::vector<std::size_t>::const_iterator cell = cells.begin();
         for( ; cell != cells.end(); cell++)
         {
           std::vector<la_index>
           cell_set_dofs = get_cell_set_dofs(*cell, *unset_dof);
-          std::cout << "set dofs in cell " << *cell; print(cell_set_dofs);
 
           double u_ = local_solver(*unset_dof, cell_set_dofs, *u_vector);
-          std::cout << "u_ is " << u_ << std::endl; 
           if(u_ < u_old)
           {
             u_old = u_;
             (*dof_status)[*unset_dof - offset] = true;
           }
         }
-        std::cout << std::setprecision(18) << "Final value " << u_old << std::endl;
         u_vector->setitem(*unset_dof, u_old);
       }
 
       // sweep over; check convergence as |u-v| in L infty norm
       *v_vector -= *u_vector;
       v_vector->abs();
-      std::cout << "\t\t\t\t\t\t change " << v_vector->max() << std::endl;
       if(v_vector->max() < DOLFIN_EPS)
       {
         return k;

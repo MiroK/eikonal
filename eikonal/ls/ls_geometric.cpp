@@ -24,17 +24,6 @@ namespace eikonal
       const double alpha = acos(dot(C - B, A - B)/a/c);
       const double beta = acos(dot(C - A, B - A)/b/c);
       const double pip = M_PI/2.;
-
-      std::cout << "\tu_A " << u_A << std::endl; 
-      std::cout << "\tu_B " << u_B << std::endl;
-      std::cout << "\tA "; print(A);
-      std::cout << "\tB "; print(B);
-      std::cout << "\talpha " << alpha << std::endl;
-      std::cout << "\tbeta " << beta << std::endl;
-      std::cout << "\ttheta " << theta << std::endl;
-      std::cout << "\ta " << a << std::endl;
-      std::cout << "\tb " << b << std::endl;
-      std::cout << "\tc " << c << std::endl;
       
       if((std::max(0., alpha - pip) <= theta and theta <= (pip - beta)))
       {

@@ -13,10 +13,7 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
-#include <iomanip>
 #include <string>
-
-#include "la/la_common.h"
 
 /*
   Perform convergence test of the Eikonal solver on different problems.
@@ -30,13 +27,14 @@ namespace eikonal
                                           bool plot_on=false);
 
   // use CG1 in 2D to test Eikonal solver on a given mesh
-  // return number of iterations of the sweeping, L^1 abd L^2 norms of the
+  // return number of iterations of the sweeping, L^1,L^2 and C^{oo} norms of the
   // error and save the solution to file under u_file_name
   template<typename T> int linear_2D_test(const Problem& problem,
                                           const dolfin::Mesh& mesh,
                                           std::size_t& num_iters,
                                           double& l1_norm,
                                           double& l2_norm,
+                                          double& coo_norm,
                                           std::string u_file_name,
                                           bool plot_on=false);
 }
@@ -74,24 +72,27 @@ namespace eikonal
 
       // get the solution
       std::size_t num_iters;
-      double l1_norm, l2_norm;
+      double l1_norm, l2_norm, coo_norm;
       
       int status =
-      linear_2D_test<T>(problem, *mesh, num_iters, l1_norm, l2_norm,
+      linear_2D_test<T>(problem, *mesh, num_iters, l1_norm, l2_norm, coo_norm,
                         u_file_name, plot_on); 
 
       // write to screen
-      std::cout << std::setprecision(16) << mesh->hmin() << " " <<
-                                            l1_norm << " " <<
-                                            l2_norm << " " <<
-                                            num_iters << std::endl;
+      std::cout.precision(16);
+      std::cout << std::scientific << mesh->hmin() << " " <<
+                                           l1_norm << " " <<
+                                           l2_norm << " " <<
+                                           coo_norm << " " <<
+                                           num_iters << std::endl;
       
       // write to text file
       data_file.open(data_file_name.c_str(), std::ios::app);
-      data_file << std::setprecision(16) << mesh->hmin() << " " <<
-                                            l1_norm << " " <<
-                                            l2_norm << " " <<
-                                            num_iters << std::endl;
+      data_file << std::scientific << mesh->hmin() << " " <<
+                                           l1_norm << " " <<
+                                           l2_norm << " " <<
+                                           coo_norm << " " <<
+                                           num_iters << std::endl;
       data_file.close();
     }
   }
@@ -102,6 +103,7 @@ namespace eikonal
                                           std::size_t& num_iters,
                                           double& l1_norm,
                                           double& l2_norm,
+                                          double& coo_norm,
                                           std::string u_file_name,
                                           bool plot_on=false)
   {
@@ -115,18 +117,18 @@ namespace eikonal
       problem.init(fixed_dofs, u);
       problem.exact_solution(u_exact);
 
-      std::cout << "fixed dofs: ";
-      print(fixed_dofs);
-
       // create solver and compute the solution
       T solver(V);
       num_iters = solver.solve(u, fixed_dofs); 
 
-      // get the error of in L1, L2 norms
+      // get the error in norms
       CG1_FORMS::Form_norm1 l1(mesh, u, u_exact);
       CG1_FORMS::Form_norm2 l2(mesh, u, u_exact);
       l1_norm = dolfin::assemble(l1);
       l2_norm = dolfin::assemble(l2);
+      *u_exact.vector() -= *u.vector();
+      u_exact.vector()->abs();
+      coo_norm = u_exact.vector()->max();
 
       // save solution
       dolfin::File u_file(u_file_name);
@@ -135,22 +137,8 @@ namespace eikonal
       // plot
       if(plot_on)
       {
-        *u_exact.vector() -= *u.vector();
-        u_exact.vector()->abs();
         dolfin::plot(u);
-        dolfin::plot(u_exact);
-        
-        double max = u_exact.vector()->max();
-        std::cout << "error max " << max << std::endl;
-        
-        for(std::size_t i = 0; i < u_exact.vector()->size(); i++)
-        {
-          std::cout << std::setprecision(16) << i << " " << (*u.vector())[i] <<
-          " " << (*u_exact.vector())[i] << std::endl;
-        }
-
-        std::cout << "L1 " << l1_norm << std::endl;
-        std::cout << "L2 " << l2_norm << std::endl;
+        dolfin::plot(u_exact); // this is the error
         dolfin::interactive(true);
       }
   }

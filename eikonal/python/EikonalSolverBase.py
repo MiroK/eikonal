@@ -75,50 +75,36 @@ class EikonalSolverBase:
     # create the reference function, fill it with some big
     v = Function(u.function_space())
     v.vector()[:] = max(u_vector.array())
-    #print sweep    
+    
     # start sweeping the mesh
-    count = 0
+    n_sweeps = 0
     off = len(sweep)/8
     x = 0
     CONTINUE = True
     while CONTINUE:
-      count += 1
-      i = -off
-      change_count = 0
-      order = 0
       for dof in sweep:
         x += 1
-        i += 1
         u_old = u_vector[dof]
         for cell in self.dof_to_cell[dof]:
           _set_dofs = self.set_dofs_in_cell(dof, cell)
-          #print "Cell", cell, "dof", dof, _set_dofs, "u_old", u_old
           if _set_dofs:
-            print "cell=", cell
             u_new =self.local_solver(dof, u_vector, _set_dofs)
             if u_new < 0:
               raise ValueError("negative value")
-           # print "\t new value", u_new
+            
             if u_new < u_old:
-              change_count += 1
               self.dof_status[dof] = True
               u_old = u_new
-              #print "u_old \t\t changed to", u_old 
         u_vector[dof] = u_old
-        print "dof is",dof, "error= %.16f" % abs(u_old - self.dof_to_coordinate[dof][1]),\
-        "num=%.18f" % u_old, "exact=", self.dof_to_coordinate[dof][1]
-       # print "Final value", u_old
       
         if x == off:
+          n_sweeps += 1
           x = 0
           e = np.linalg.norm(u.vector().array() - v.vector().array(), np.inf)
-          print x
           if e < DOLFIN_EPS:
             CONTINUE = False
+            break
           else:
             v.vector()[:] = u.vector()[:]
-            order += 1
-            i = -off
 
-
-    return count
+    return n_sweeps

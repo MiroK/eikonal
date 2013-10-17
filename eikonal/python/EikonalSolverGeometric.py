@@ -39,17 +39,6 @@ class EikonalSolverGeometric(EikonalSolverBase):
     
     if abs(u_B-u_A) <= c:
       theta = asin((u_B-u_A)/c)
-      print set_dofs
-      print "\t u_A %.16f" % u_A
-      print "\t u_B %.16f" % u_B
-      print "\t A [%.16f, %.16f]" % (A[0], A[1])
-      print "\t B [%.16f, %.16f]" % (B[0], B[1])
-      print "\t alpha %.16f" % alpha
-      print "\t beta %.16f" % beta
-      print "\t theta %.16f" % theta
-      print "\t a %.16f" % a
-      print "\t b %.16f" % b
-      print "\t c %.16f" % c
 
       if (max(0, alpha-pi/2) <= theta <= pi/2-beta) or \
          (alpha-pi/2 <= theta <= min(0, pi/2-beta)):
@@ -69,4 +58,3 @@ class EikonalSolverGeometric(EikonalSolverBase):
       u_ = u_A + b
       _u = u_B + a
       return min([u_C, u_, _u])
-
