@@ -1,6 +1,7 @@
 #include "Seeder.h"
 #include "la/la_loop.h"
 #include "cg/cg_distance.h"
+#include "cg/cg_polygon.h"
 #include <dolfin/mesh/Point.h>
 #include <cassert>
 #include <cmath>
@@ -81,4 +82,34 @@ namespace eikonal
                     point_circle(point, c2, r2, "d"));
   }
   //--------------------------------------------------------------------------
+
+  Polygon::Polygon(const std::string& name, const std::vector<double>& c,
+                   const double r, const std::size_t n) : Seeder(name)
+  {
+    assert(c.size() == 2);
+    vertices = g_vertices(n, c, r);
+  }
+  //---------------------------------------------------------------------------
+
+  void Polygon::seed(std::vector<dolfin::Point>& points,
+            const std::size_t num_points) const
+  {
+    points.clear();
+    points.reserve(num_points);
+
+    std::vector<double> points_x = boundary_points(vertices, num_points);
+    std::vector<double>::const_iterator point_x = points_x.begin();
+    for( ; point_x != points_x.end(); point_x += 2)
+    {
+      points.push_back(Point(2, &(*point_x)));
+      std::cout << points[points.size() - 1].str() << std::endl;
+    }
+  }
+  //---------------------------------------------------------------------------
+
+  double Polygon::distance(const std::vector<double>& point) const
+  {
+    return point_polygon(point, vertices, "d");
+  }
+  //---------------------------------------------------------------------------
 }

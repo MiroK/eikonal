@@ -77,6 +77,26 @@ namespace eikonal
     const double r2;
   };
   //----------------------------------------------------------------------------
+ 
+  class Polygon : public Seeder
+  {
+  public:
+    // constructor, polygon with n vertices, incribed into circle centered
+    // at c with radius r
+    Polygon(const std::string& name, const std::vector<double>& c,
+            const double r, const std::size_t n);
+
+    // put num_points in the surface of the polygon
+    void seed(std::vector<dolfin::Point>& points,
+              const std::size_t num_points) const;
+
+    // compute distance from the polygon
+    double distance(const std::vector<double>& point) const;
+
+  private:
+    std::vector<double> vertices;
+  };
+  //----------------------------------------------------------------------------
   
   // seed circle (center, radius) with num_points
  /* void seed_circle(const std::vector<double>& center,

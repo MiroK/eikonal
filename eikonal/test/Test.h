@@ -137,6 +137,10 @@ namespace eikonal
       problem.init(fixed_dofs, u);
       problem.exact_solution(u_exact);
 
+      dolfin::plot(u_exact);
+      dolfin::plot(u);
+      dolfin::interactive(true);
+
       // create solver and compute the solution
       T solver(V);
       // time the sweeping
