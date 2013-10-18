@@ -36,7 +36,6 @@ namespace eikonal
   public:
     const static std::string name;
 
-
   private:
     // initiliaze dof_status TODO, 
     boost::shared_ptr<std::vector<bool> >

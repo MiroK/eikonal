@@ -86,7 +86,7 @@ namespace eikonal
     Polygon(const std::string& name, const std::vector<double>& c,
             const double r, const std::size_t n);
 
-    // put num_points in the surface of the polygon
+    // put num_points on each edge of the polygon
     void seed(std::vector<dolfin::Point>& points,
               const std::size_t num_points) const;
 
@@ -97,28 +97,26 @@ namespace eikonal
     std::vector<double> vertices;
   };
   //----------------------------------------------------------------------------
-  
-  // seed circle (center, radius) with num_points
- /* void seed_circle(const std::vector<double>& center,
-                    const double radius,
-                    const std::size_t num_points,
-                    std::vector<dolfin::Point>& points);
 
-  // seed circles (center1, radius1) and (ceter2, radius2) with num_points each
-  void seed_two_circles(const std::vector<double>& center1,
-                        const double radius1,
-                        const std::vector<double>& center2,
-                        const double radius2,
-                        const std::size_t num_points,
-                        std::vector<dolfin::Point>& points);
+  class Zalesak : public Seeder
+  {
+  public:
+    // constructor, Zalesak disk defined as polygon with by num_vertices
+    // center, radius, notch length and notch width
+    Zalesak(const std::vector<double>& c,
+            const double R, const double W, const double L, 
+            const std::size_t num_vertices);
 
-  // seed polygon with num_vertices incribed into circle (center, radius) 
-  // with num_points
-  void seed_polygon(const std::vector<double>& center,
-                    const double radius,
-                    const std::size_t num_vertices
-                    const std::size_t num_points,
-                    std::vector<dolfin::Point>& points);*/
+    // here num_points are ignored and 3 points are put on each edge
+    void seed(std::vector<dolfin::Point>& points,
+              const std::size_t num_points) const;
+
+    // compute distance from the disk
+    double distance(const std::vector<double>& point) const;
+
+  private:
+    std::vector<double> vertices;
+  };
+  //----------------------------------------------------------------------------
 }
-
 #endif // _SEEDER_H_

@@ -95,19 +95,88 @@ namespace eikonal
             const std::size_t num_points) const
   {
     points.clear();
-    points.reserve(num_points);
 
     std::vector<double> points_x = boundary_points(vertices, num_points);
     std::vector<double>::const_iterator point_x = points_x.begin();
     for( ; point_x != points_x.end(); point_x += 2)
     {
       points.push_back(Point(2, &(*point_x)));
-      std::cout << points[points.size() - 1].str() << std::endl;
     }
   }
   //---------------------------------------------------------------------------
 
   double Polygon::distance(const std::vector<double>& point) const
+  {
+    return point_polygon(point, vertices, "d");
+  }
+  //---------------------------------------------------------------------------
+  
+  Zalesak::Zalesak(const std::vector<double>& c,
+                   const double R, const double W, const double L, 
+                   const std::size_t num_vertices) : Seeder("zalesak")
+  {
+    const double cx = c[0]; 
+    const double cy = c[1];
+
+    const double dl = 1./(num_vertices-1);
+    const double theta = asin(W/2/R); // angle between axis of notch and notch
+                                      // circle intersect
+    const double l = R*cos(theta); // dist center to top of notch
+    const double len = W + 2*L + 2*R*(M_PI - theta); // length of the disk
+    const double x_0 = cx;
+    const double y_0 = cy - l + L;
+
+    vertices.resize(2*num_vertices);
+    const double d_len = len/num_vertices;
+    for(std::size_t i = 0; i < num_vertices; i++)
+    {
+      const double d = i*d_len;
+      
+      if(d <= W/2) 
+      {
+        vertices[2*i + 0] = x_0 + d;
+        vertices[2*i + 1] = y_0;
+      }
+      else if(d <= W/2 + L)
+      {
+        vertices[2*i + 0] = x_0 + W/2;
+        vertices[2*i + 1] = y_0 - (d - W/2);
+      }
+      else if(d <= len - (W/2 + L))
+      {
+        const double phi = theta + (d - (W/2 + L))/R;
+        vertices[2*i + 0] = cx + R*sin(phi);
+        vertices[2*i + 1] = cy - R*cos(phi);
+      }
+      else if(d <= len - W/2)
+      {
+        vertices[2*i + 0] = x_0 - W/2;
+        vertices[2*i + 1] = y_0 - (len - d - W/2);
+      }
+      else
+      {
+        vertices[2*i + 0] = x_0 - (len - d);
+        vertices[2*i + 1] = y_0;
+      }
+    }
+  }
+  //---------------------------------------------------------------------------
+
+  void Zalesak::seed(std::vector<dolfin::Point>& points,
+                     const std::size_t num_points) const
+  {
+    points.clear();
+    
+    std::vector<double> points_x = boundary_points(vertices, 3);
+    std::vector<double>::const_iterator point_x = points_x.begin();
+    for( ; point_x != points_x.end(); point_x += 2)
+    {
+      points.push_back(Point(2, &(*point_x)));
+    }
+  }
+  //---------------------------------------------------------------------------
+
+  double Zalesak::distance(const std::vector<double>& point) const
   {
     return point_polygon(point, vertices, "d");
   }
