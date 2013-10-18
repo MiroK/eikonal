@@ -9,14 +9,11 @@
 #include <algorithm>
 #include <cmath>
 
-#include <iostream>
-#include "la/la_common.h"
-
 using namespace dolfin;
 
 namespace eikonal
 {
-  const std::string Solver::name = std::string("linear_2d_geometric");
+  std::string Solver::name = std::string("linear_2d_geometric");
 
   Solver::Solver(const dolfin::FunctionSpace& _V) :
                                       cell_2_dof(cell_to_dof(_V)),
@@ -236,7 +233,7 @@ namespace eikonal
           std::vector<la_index>
           cell_set_dofs = get_cell_set_dofs(*cell, *unset_dof);
 
-          double u_ = local_solver(*unset_dof, cell_set_dofs, *u_vector);
+          double u_ = this->local_solver(*unset_dof, cell_set_dofs, *u_vector);
           if(u_ < u_old)
           {
             u_old = u_;

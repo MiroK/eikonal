@@ -27,14 +27,13 @@ int main()
   Segment segment("segment", A, B);
   Problem problem(segment);
 
-
   dolfin::RectangleMesh mesh(-2, -2, 2, 2, 100, 100);
 
   int status;
   //perform convergence test on problem using Solver on fenics' UnitSquareMesh
   RectangleMeshGenerator mesh_gen(3, 8, -2, -2, 2, 2, false);
 
-  status = linear_2D_test<Solver>(problem, mesh_gen, true);
+  status = linear_2D_test<LinMinSolver>(problem, mesh_gen, false);
 
   return 0;
 }

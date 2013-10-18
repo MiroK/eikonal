@@ -101,6 +101,6 @@ void RectangleMeshGenerator::operator++() { i++; }
 //----------------------------------------------------------------------------
 
 std::string RectangleMeshGenerator::type() const
-  { return perturbed ? std::string("f") : std::string("f_perturbed"); } 
+  { return perturbed ? std::string("f_perturbed") : std::string("f"); } 
   //----------------------------------------------------------------------------
 }

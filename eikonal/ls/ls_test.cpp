@@ -19,7 +19,7 @@ void local_test_C(double* _C)
   double d_g = linear_geometric_2d(A, B, C, u_A, u_B, u_C);
   double e_g = abs(d_g - 1);
   
-  double d_m = linear_minimize_2d(A, B, C, u_A, u_B, u_C);
+  double d_m = linear_brent_2d(A, B, C, u_A, u_B, u_C);
   double e_m = abs(d_m - 1);
 
   double d_n = linear_newton_2d(A, B, C, u_A, u_B, u_C);
@@ -52,7 +52,7 @@ void local_test_S(double* _S)
 
   double d_g = linear_geometric_2d(A, B, C, u_A, u_B, u_C);
   double e_g = abs(ex - d_g);
-  double d_m = linear_minimize_2d(A, B, C, u_A, u_B, u_C);
+  double d_m = linear_brent_2d(A, B, C, u_A, u_B, u_C);
   double e_m = abs(ex - d_m);
 
   std::cout << "S is "; print(source);

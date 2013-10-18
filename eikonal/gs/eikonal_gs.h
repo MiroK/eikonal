@@ -10,5 +10,6 @@
 #include "gs_LpDistanceSorter.h"
 
 #include "Solver.h"
+#include "LinMinSolver.h"
 
 #endif //_EIKONAL_GS_H_

@@ -26,7 +26,7 @@ namespace eikonal
     Solver(const dolfin::FunctionSpace& V);
 
     // destructor
-    ~Solver();
+    virtual ~Solver();
 
     // solve the eikonal euqtion |grad(u)| = 1 with values of u fixed at
     // fixed_dofs TODO
@@ -34,7 +34,7 @@ namespace eikonal
                       const std::set<dolfin::la_index>& fixed_dofs);
   
   public:
-    const static std::string name;
+    static std::string name;
 
   private:
     // initiliaze dof_status TODO, 
@@ -61,11 +61,11 @@ namespace eikonal
     // local solver of Eikonal equation in the cell
     // compute the approximate value of u_vector in unset_dof from values
     // in set_dofs TODO
-    double local_solver(const dolfin::la_index unset_dof,
-                        const std::vector<dolfin::la_index>& cell_set_dofs,
-                        const dolfin::GenericVector& u_vector) const;
+    virtual double local_solver(const dolfin::la_index unset_dof,
+                             const std::vector<dolfin::la_index>& cell_set_dofs,
+                             const dolfin::GenericVector& u_vector) const;
 
-  private:
+  protected:
     // map between cell=size_t and dofs it contains=set([la_index])
     const eikonal::t_smap_la cell_2_dof;
 
