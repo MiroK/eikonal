@@ -5,9 +5,7 @@
 #include <dolfin/mesh/Point.h>
 #include <cassert>
 #include <cmath>
-
-#include <dolfin/log/dolfin_log.h>
-#include "la/la_common.h"
+#include <fstream>
 
 using namespace dolfin;
 
@@ -177,6 +175,45 @@ namespace eikonal
   //---------------------------------------------------------------------------
 
   double Zalesak::distance(const std::vector<double>& point) const
+  {
+    return point_polygon(point, vertices, "d");
+  }
+  //---------------------------------------------------------------------------
+
+  Dolphin::Dolphin() : Seeder("dolfin")
+  {
+    std::ifstream file;
+    
+    file.open("dolfin_file.txt", std::ios::in);
+    assert(file);
+
+    for(std::size_t i = 0; i < 126; i++)
+    {
+      for(std::size_t j = 0; j < 2; j++)
+      {
+        double x;
+        file >> x;
+        vertices.push_back(x);
+      }
+    }
+  }
+  //---------------------------------------------------------------------------
+
+  void Dolphin::seed(std::vector<dolfin::Point>& points,
+                    const std::size_t num_points) const
+  {
+    points.clear();
+    
+    std::vector<double> points_x = boundary_points(vertices, 3);
+    std::vector<double>::const_iterator point_x = points_x.begin();
+    for( ; point_x != points_x.end(); point_x += 2)
+    {
+      points.push_back(Point(2, &(*point_x)));
+    }
+  }
+  //---------------------------------------------------------------------------
+
+  double Dolphin::distance(const std::vector<double>& point) const
   {
     return point_polygon(point, vertices, "d");
   }

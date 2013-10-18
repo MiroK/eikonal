@@ -49,8 +49,8 @@ namespace eikonal
     double distance(const std::vector<double>& point) const;  
     
   private:
-    const std::vector<double>& A;
-    const std::vector<double>& B;
+    const std::vector<double> A;
+    const std::vector<double> B;
     const std::size_t dim;
   };
   //----------------------------------------------------------------------------
@@ -71,8 +71,8 @@ namespace eikonal
     double distance(const std::vector<double>& point) const;
 
   private:
-    const std::vector<double>& c1;
-    const std::vector<double>& c2;
+    const std::vector<double> c1;
+    const std::vector<double> c2;
     const double r1;
     const double r2;
   };
@@ -112,6 +112,24 @@ namespace eikonal
               const std::size_t num_points) const;
 
     // compute distance from the disk
+    double distance(const std::vector<double>& point) const;
+
+  private:
+    std::vector<double> vertices;
+  };
+  //----------------------------------------------------------------------------
+
+  class Dolphin : public Seeder
+  {
+  public:
+    // seed dolfin usin points in file 
+    Dolphin();
+
+    // here num_points are ignored and
+    void seed(std::vector<dolfin::Point>& points,
+              const std::size_t num_points) const;
+
+    // compute distance from dolfin
     double distance(const std::vector<double>& point) const;
 
   private:

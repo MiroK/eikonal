@@ -78,10 +78,13 @@ namespace eikonal
       const std::size_t num_cells = mesh->num_cells();
       const std::size_t n_obtuse_cells = asset_obtuse_cells(*mesh).size();
 
-      // get the file name for solution
+      // get the file name for solution and error
       help.str("");
       help << "u_" << data_file_name << "_" << num_cells << ".pvd"; 
       std::string u_file_name = help.str(); // u_problem_solver_N.pvd
+      help.str("");
+      help << "e_" << data_file_name << "_" << num_cells << ".pvd";
+      std::string error_file_name = help.str();
 
       // get the solution
       std::size_t num_iters;
@@ -89,7 +92,7 @@ namespace eikonal
       
       int status =
       linear_2D_test<T>(problem, *mesh, num_iters, l1_norm, l2_norm, coo_norm,
-                        time, u_file_name, plot_on); 
+                        time, u_file_name, error_file_name, plot_on); 
 
       // write to screen
       std::cout.precision(8);
@@ -125,6 +128,7 @@ namespace eikonal
                                           double& coo_norm,
                                           double& time,
                                           std::string u_file_name,
+                                          std::string error_file_name,
                                           bool plot_on=false)
   {
       CG1::FunctionSpace V(mesh);
@@ -160,6 +164,10 @@ namespace eikonal
       // save solution
       dolfin::File u_file(u_file_name);
       u_file << u;
+
+      // save error
+      dolfin::File error_file(error_file_name);
+      error_file << u_exact;
 
       // plot
       if(plot_on)

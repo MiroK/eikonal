@@ -20,12 +20,16 @@ int main()
   const double R = 0.5, W = 0.25, L = 0.75;
   Zalesak zalesak(c, R, W, L, 1000);
   Problem problem(zalesak);*/
+  
+  /*
+    double _A[2] = {-2., -2.}; std::vector<double> A(_A, _A + 2);
+    double _B[2] = {2., -2}; std::vector<double> B(_B, _B+2);
+    Segment segment("segment", A, B);
+    Problem problem(segment);
+  */
 
-  // line
-  double _A[2] = {-2., -2.}; std::vector<double> A(_A, _A + 2);
-  double _B[2] = {2., -2}; std::vector<double> B(_B, _B+2);
-  Segment segment("segment", A, B);
-  Problem problem(segment);
+  Dolphin dolphin;
+  Problem problem(dolphin);
 
   dolfin::RectangleMesh mesh(-2, -2, 2, 2, 100, 100);
 
@@ -33,7 +37,7 @@ int main()
   //perform convergence test on problem using Solver on fenics' UnitSquareMesh
   RectangleMeshGenerator mesh_gen(3, 8, -2, -2, 2, 2, false);
 
-  status = linear_2D_test<LinMinSolver>(problem, mesh_gen, false);
+  status = linear_2D_test<Solver>(problem, mesh_gen, false);
 
   return 0;
 }
