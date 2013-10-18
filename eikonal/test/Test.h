@@ -24,8 +24,11 @@
 namespace eikonal
 {
   // use CG1 in 2D to test Eikonal solvers on meshes of type UnitSquareMesh
+  // for iterative solver define convergence tolerance as 
+  // std::num_limits<double>::digits/precision
   template<typename T> int linear_2D_test(const Problem& problem,
                                           MeshGenerator& mesh_gen,
+                                          std::size_t precision,
                                           bool plot_on=false);
 
   // use CG1 in 2D to test Eikonal solver on a given mesh
@@ -33,12 +36,16 @@ namespace eikonal
   // error + thec comp time and save the solution to file under u_file_name
   template<typename T> int linear_2D_test(const Problem& problem,
                                           const dolfin::Mesh& mesh,
+                                          std::size_t precision,
                                           std::size_t& num_iters,
+                                          std::size_t& min_calls,
+                                          std::size_t& max_calls,
                                           double& l1_norm,
                                           double& l2_norm,
                                           double& coo_norm,
                                           double& time,
                                           std::string u_file_name,
+                                          std::string error_file_name,
                                           bool plot_on=false);
 }
 
@@ -48,6 +55,7 @@ namespace eikonal
 {
   template<typename T> int linear_2D_test(const Problem& problem,
                                           MeshGenerator& mesh_gen,
+                                          std::size_t precision,
                                           bool plot_on=false)
   {
     // get the file names
@@ -69,7 +77,8 @@ namespace eikonal
 
     // write legend
     std::cout << "    h_min    |    l1_norm  |     l2_norm  |  coo_norm     |"
-                 "   time     | obtuse/cells |   n_iters    " << std::endl; 
+                 "   time     | obtuse/cells |   n_iters    |   min_calls   |"
+                 "  max_calls |" << std::endl; 
       
     for( ; !mesh_gen.end(); ++mesh_gen)
     {
@@ -87,34 +96,51 @@ namespace eikonal
       std::string error_file_name = help.str();
 
       // get the solution
-      std::size_t num_iters;
+      std::size_t num_iters, min_calls = 0, max_calls = 0;
       double l1_norm, l2_norm, coo_norm, time;
       
       int status =
-      linear_2D_test<T>(problem, *mesh, num_iters, l1_norm, l2_norm, coo_norm,
-                        time, u_file_name, error_file_name, plot_on); 
+      linear_2D_test<T>(problem, *mesh, precision, num_iters, min_calls,
+                        max_calls, l1_norm, l2_norm, coo_norm, time,
+                        u_file_name, error_file_name, plot_on); 
 
-      // write to screen
       std::cout.precision(8);
       std::cout.width(14);
-      std::cout << std::scientific << mesh->hmin() << " " <<
-                                           l1_norm << " " <<
-                                           l2_norm << " " <<
-                                           coo_norm << " " <<
-                                           time << " " <<
-                                  n_obtuse_cells << "/" << num_cells << " " <<
-                                           num_iters << std::endl;
+      if(max_calls != 1E6 or min_calls != 0) // write for iterative solver
+      {
+      // write to screen
+      std::cout << std::scientific << mesh->hmin() << " " << l1_norm << " " <<
+        l2_norm << " " << coo_norm << " " << time << " " <<
+        n_obtuse_cells << "/" << num_cells << " " << num_iters << " " <<
+        min_calls << " " << max_calls << std::endl;
       
       // write to text file
       data_file.open(data_file_name.c_str(), std::ios::app);
-      data_file << std::scientific << mesh->hmin() << " " <<
-                                           l1_norm << " " <<
-                                           l2_norm << " " <<
-                                           coo_norm << " " <<
-                                           time << " " <<
-                                           n_obtuse_cells << " " << num_cells << " " << 
-                                           num_iters << std::endl;
+      
+      data_file << std::scientific << mesh->hmin() << " " << l1_norm << " " <<
+        l2_norm << " " << coo_norm << " " << time << " " << n_obtuse_cells <<
+        " " << num_cells << " " << num_iters << " " << min_calls << 
+        " " << max_calls << std::endl;
+      
       data_file.close();
+      }
+
+      if(max_calls == 1E6 and min_calls == 0) 
+      {
+      // write to screen
+      std::cout << std::scientific << mesh->hmin() << " " << l1_norm << " " <<
+        l2_norm << " " << coo_norm << " " << time << " " <<
+        n_obtuse_cells << "/" << num_cells << " " << num_iters << std::endl;
+      
+      // write to text file
+      data_file.open(data_file_name.c_str(), std::ios::app);
+      
+      data_file << std::scientific << mesh->hmin() << " " << l1_norm << " " <<
+        l2_norm << " " << coo_norm << " " << time << " " << n_obtuse_cells <<
+        " " << num_cells << " " << num_iters << std::endl;
+      
+      data_file.close();
+      }
     }
     std::cout << std::endl;
   }
@@ -122,7 +148,10 @@ namespace eikonal
   
   template<typename T> int linear_2D_test(const Problem& problem,
                                           const dolfin::Mesh& mesh,
+                                          std::size_t precision, 
                                           std::size_t& num_iters,
+                                          std::size_t& min_calls,
+                                          std::size_t& max_calls,
                                           double& l1_norm,
                                           double& l2_norm,
                                           double& coo_norm,
@@ -141,10 +170,6 @@ namespace eikonal
       problem.init(fixed_dofs, u);
       problem.exact_solution(u_exact);
 
-      dolfin::plot(u_exact);
-      dolfin::plot(u);
-      dolfin::interactive(true);
-
       // create solver and compute the solution
       T solver(V);
       // time the sweeping
@@ -160,6 +185,10 @@ namespace eikonal
       *u_exact.vector() -= *u.vector();
       u_exact.vector()->abs();
       coo_norm = u_exact.vector()->max();
+
+      // if this is an iterative solver extract min/max number of calls to eval
+      min_calls = solver.min_calls;
+      max_calls = solver.max_calls;
 
       // save solution
       dolfin::File u_file(u_file_name);

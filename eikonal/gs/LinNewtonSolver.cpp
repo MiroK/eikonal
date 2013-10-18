@@ -1,20 +1,20 @@
-#include "LinMinSolver.h"
+#include "LinNewtonSolver.h"
 #include "ls/ls_minimize.h"
 #include <dolfin/function/FunctionSpace.h>
 #include <dolfin/la/GenericVector.h>
 
 namespace eikonal
 {
-  std::string LinMinSolver::name = std::string("linear_2d_minimize");
+  std::string LinNewtonSolver::name = std::string("linear_2d_newton");
 
-  LinMinSolver::LinMinSolver(const dolfin::FunctionSpace& V) : Solver(V) { }
+  LinNewtonSolver::LinNewtonSolver(const dolfin::FunctionSpace& V) : Solver(V) { }
   //----------------------------------------------------------------------------
 
-  LinMinSolver::~LinMinSolver(){ }
+  LinNewtonSolver::~LinNewtonSolver(){ }
   //----------------------------------------------------------------------------
 
   double 
-  LinMinSolver::local_solver(const dolfin::la_index unset_dof,
+  LinNewtonSolver::local_solver(const dolfin::la_index unset_dof,
                              const std::vector<dolfin::la_index>& cell_set_dofs,
                              const dolfin::GenericVector& u_vector)
   {
@@ -44,8 +44,8 @@ namespace eikonal
     const std::vector<double> k_values(_k_values, _k_values + 2);
     
     std::size_t n_calls;
-    double u_new = linear_brent_2d(u_point, u_value, k_points, k_values,
-                                   n_calls);
+    double u_new = linear_newton_2d(u_point, u_value, k_points, k_values,
+                                    n_calls);
     
     if(n_calls > max_calls)
     {

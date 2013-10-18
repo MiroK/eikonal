@@ -19,7 +19,8 @@ namespace eikonal
   GmshMeshGenerator::operator*()     
   {
     std::ostringstream help;
-    help << root.c_str() << "_" << i << ".msh.xml";
+    help << "/home/miro3/Documents/Programming/Cpp/Eikonal/test_results/meshes/"
+    << root.c_str() << "_" << i << ".msh.xml";
     std::string mesh_name = help.str();
     return boost::shared_ptr<Mesh>(new Mesh(mesh_name));
   }

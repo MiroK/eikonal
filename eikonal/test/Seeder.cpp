@@ -184,7 +184,8 @@ namespace eikonal
   {
     std::ifstream file;
     
-    file.open("dolfin_file.txt", std::ios::in);
+    file.open("/home/miro3/Documents/Programming/Cpp/Eikonal/test_results/"
+              "meshes/dolfin_file.txt", std::ios::in);
     assert(file);
 
     for(std::size_t i = 0; i < 126; i++)

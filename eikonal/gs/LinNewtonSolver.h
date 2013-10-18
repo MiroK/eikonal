@@ -1,21 +1,21 @@
-#ifndef _LIN_MIN_SOLVER_H
-#define _LIN_MIN_SOLVER_H
+#ifndef _LIN_NEWTON_SOLVER_H
+#define _LIN_NEWTON_SOLVER_H
 
 #include "Solver.h"
 
 namespace eikonal
 {
-  class LinMinSolver : public Solver
+  class LinNewtonSolver : public Solver
   {
     /*
-      Solver of the Eikonal equation based on linear brent minimization problem.
+      Solver of the Eikonal equation based on linear newton minimization problem.
     */
   public:
     // constructor
-    LinMinSolver(const dolfin::FunctionSpace& V);
+    LinNewtonSolver(const dolfin::FunctionSpace& V);
 
     // destructor
-    virtual ~LinMinSolver();
+    virtual ~LinNewtonSolver();
   
   public:
     static std::string name;
@@ -28,4 +28,4 @@ namespace eikonal
   };
 }
 
-#endif // _LIN_MIN_SOLVER
+#endif // _LIN_NEWTON_SOLVER

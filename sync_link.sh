@@ -1,4 +1,9 @@
 #!/bin/bash
 
 ln -T eikonal.x link_to_eikonal.x;
-mv link_to_eikonal.x test_results;
+cp link_to_eikonal.x test_results/lin_brent/digits_double;
+cp link_to_eikonal.x test_results/lin_brent/digits_double_2;
+cp link_to_eikonal.x test_results/lin_geometric;
+cp link_to_eikonal.x test_results/lin_newton/digits_double;
+cp link_to_eikonal.x test_results/lin_newton/digits_double_2;
+rm link_to_eikonal.x

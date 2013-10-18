@@ -16,13 +16,14 @@ void local_test_C(double* _C)
   double u_A = 0;
   double u_B = 0;
 
+  std::size_t n_calls;
   double d_g = linear_geometric_2d(A, B, C, u_A, u_B, u_C);
   double e_g = abs(d_g - 1);
   
-  double d_m = linear_brent_2d(A, B, C, u_A, u_B, u_C);
+  double d_m = linear_brent_2d(A, B, C, u_A, u_B, u_C, n_calls);
   double e_m = abs(d_m - 1);
 
-  double d_n = linear_newton_2d(A, B, C, u_A, u_B, u_C);
+  double d_n = linear_newton_2d(A, B, C, u_A, u_B, u_C, n_calls);
   double e_n = abs(d_n - 1);
 
 
@@ -50,9 +51,10 @@ void local_test_S(double* _S)
   double u_B = point_point(B, source);
   double ex = point_point(C, source);
 
+  std::size_t n_calls;
   double d_g = linear_geometric_2d(A, B, C, u_A, u_B, u_C);
   double e_g = abs(ex - d_g);
-  double d_m = linear_brent_2d(A, B, C, u_A, u_B, u_C);
+  double d_m = linear_brent_2d(A, B, C, u_A, u_B, u_C, n_calls);
   double e_m = abs(ex - d_m);
 
   std::cout << "S is "; print(source);

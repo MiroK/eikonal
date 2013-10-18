@@ -20,7 +20,9 @@ namespace eikonal
                                       dof_2_cell(dof_to_cell(cell_2_dof)),
                                       dof_2_coordinate(dof_to_coordinate(_V)),
                                       V(_V),
-                                      offset(-1)
+                                      offset(-1),
+                                      min_calls(1E6),
+                                      max_calls(0)
   {
     // TODO assertions on V, ideally before all the mapping build
   }
@@ -157,7 +159,7 @@ namespace eikonal
   double
   Solver::local_solver(const dolfin::la_index unset_dof,
                        const std::vector<dolfin::la_index>& cell_set_dofs,
-                       const dolfin::GenericVector& u_vector) const
+                       const dolfin::GenericVector& u_vector)
   {
     if(cell_set_dofs.size() != 2)
     {
