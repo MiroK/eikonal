@@ -10,7 +10,7 @@ class Problem:
     '''Initiliaze values of u at fixed_dofs.'''
     points = self.seeder.seed(100)
     i_cells = u.function_space().mesh().intersected_cells(points)
-
+    
     # set everything to far
     far = 10
     u.vector()[:] += far

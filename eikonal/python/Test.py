@@ -1,6 +1,8 @@
 from EikonalSolverLinear import EikonalSolverLinear as Linear
+from EikonalSolverQuadratic import EikonalSolverQuadratic as Quadratic
 from EikonalSolverGeometric import EikonalSolverGeometric as Geometric
-from Seeder import Segment, TwoCircle 
+from EikonalSolverSampleByLine import EikonalSolverSampleByLine as SampleLine
+from Seeder import Segment, TwoCircle, MyPoint
 from Problem import Problem
 from accute_statistics import obtuse_cells
 from numpy import array
@@ -76,39 +78,51 @@ def two_circle(i, mesh_type, xtol, plot_on=False):
 def line(i, mesh_type, xtol, plot_on=False):
   names = ["rect_right", "rect_crossed", "rect_perturbed", "rect_gmsh"]
 
-  print "line", names[mesh_type]
-  
   if mesh_type == 0:
     N = 2**i
-    mesh = RectangleMesh(-2, -2, 2, 2, N, N)
-  elif mesh_type == 1:
-    N = 2**i
-    mesh = RectangleMesh(-2, -2, 2, 2, N, N, 'crossed')
-  elif mesh_type == 2:
-    mesh = Mesh("../../test_results/perturbed_rect_%d.xml" % i)
-  elif mesh_type == 3:
-    mesh = Mesh("../../test_results/rectangle_%d.msh.xml" % i)
+    mesh = UnitSquareMesh(N, N)
+    #mesh = RectangleMesh(-2, -2, 2, 2, N, N)
+  #elif mesh_type == 1:
+  #  N = 2**i
+  #  mesh = RectangleMesh(-2, -2, 2, 2, N, N, 'crossed')
+  #elif mesh_type == 2:
+  #  mesh = Mesh("../../test_results/perturbed_rect_%d.xml" % i)
+  #elif mesh_type == 3:
+  #  mesh = Mesh("../../test_results/rectangle_%d.msh.xml" % i)
 
   n_cells = mesh.num_cells()
   n_obtuse_cells = len(obtuse_cells(mesh))
-
-  V = FunctionSpace(mesh, "CG", 1)
+  
+  V = FunctionSpace(mesh, "CG", 2)
+  
   u = Function(V)
   u_exact = Function(V)
   fixed_dofs = []
 
-  A = array([-2., -2.])
-  B = array([2, -2])
-  line_distance = Problem(Segment(A, B))
-  line_distance.init(u, fixed_dofs)
-  line_distance.exact_solution(u_exact)
+  #
+  A = array([1., 0.])
+  point_distance = Problem(MyPoint(A))
+  point_distance.init(u, fixed_dofs)
+  point_distance.exact_solution(u_exact)
+
+  # distance from line
+  #A = array([0, 0.1])
+  #B = array([1, 0.1])
+  #line_distance = Problem(Segment(A, B))
+  #line_distance.init(u, fixed_dofs)
+  #line_distance.exact_solution(u_exact)
 
   if plot_on:
     plot(u_exact, interactive=True)
     plot(u, interactive=True)
 
+  #print fixed_dofs
+
   #solver1 = Geometric(V)
-  solver1 = Linear(V)
+  #solver1 = Linear(V)
+  solver1 = Quadratic(V)
+  #solver1 = SampleLine(V)
+
   start = clock()
   n_sweeps = solver1.solve(u, fixed_dofs, xtol=xtol)
   stop = clock() - start
@@ -117,6 +131,7 @@ def line(i, mesh_type, xtol, plot_on=False):
   l2 = assemble((u - u_exact)**2*dx)
 
   diff = u.vector() - u_exact.vector()
+  #print u.vector().array()
   diff.abs()
   ci = diff.max()
   
@@ -136,10 +151,8 @@ def line(i, mesh_type, xtol, plot_on=False):
 #-------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-  for i in range(3, 8):
-    two_circle(i, 0, xtol=1E-5, plot_on=False)
-  print
-
+  for i in range(1, 6):
+    line(i, 0, 1E-12, False)
 #  for i in range(3, 8):
 #    two_circle(i, 1, False)
 #  print

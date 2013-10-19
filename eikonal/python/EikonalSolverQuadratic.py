@@ -1,7 +1,7 @@
 from EikonalSolverBase import *
 from scipy.optimize import fminbound, fmin_bfgs
 import connectivity as conn
-
+import numpy as np
 import matplotlib.pyplot as plt
 
 def exact(U):
@@ -68,10 +68,11 @@ class EikonalSolverQuadratic(EikonalSolverBase):
    
     return set_dofs
     
-  def local_solver(self, unset_U, u, _set_dofs):
+  def local_solver(self, unset_U, u, _set_dofs, xtol):
     ''' Local solver on a triangle. Return new value for u in dof=unset_U. '''
     # set dofs can be a [[], []], i.e coming from multiple edges
     retvals = []
+    #print "ls, unset_U,", unset_U, ", _set_dofs", _set_dofs
     for set_dofs in _set_dofs: # get the minima from edge
       U = self.dof_to_coordinate[unset_U]
       A = self.dof_to_coordinate[set_dofs[0]]
@@ -84,35 +85,34 @@ class EikonalSolverQuadratic(EikonalSolverBase):
       fC = u[set_dofs[2]]
 
       def value(t): # function to be minimized
-        P = (1-t)*(1-2*t)*A + 4*t*(1-t)*B + t*(2*t-1)*C
+        P = (1-t)*A + t*C
         d2 = sqrt(np.dot((U-P).flat, (U-P).flat))
         d1 = (1-t)*(1-2*t)*fA + 4*t*(1-t)*fB + t*(2*t-1)*fC
         return d1 + d2 
 
-      def d_value(t): # gradient
-        P = A*(1-t) + C*t
-        d_d2 = np.dot((U-P).flat, (A-C).flat)/sqrt(np.dot((U-P).flat, (U-P).flat))
-        d_d1 = fA*(4*t-3) + 4*fB*(1-2*t) + fC*(4*t-1)
-        return d_d1 + d_d2
-
-      def dd_value(t): # hessian
-        P = A*(1-t) + C*t
-        dd_d2 = np.dot((A-C).flat, (A-C).flat)/sqrt(np.dot((U-P).flat, (U-P).flat))\
-        - np.dot((U-P).flat, (A-C).flat)**2/np.dot((U-P).flat,(U-P).flat)**1.5
-        dd_d1 = 4*(fA -2*fB + fC) 
-        return dd_d1 + dd_d2
-
+      plt.figure()
+      t = np.linspace(-1, 1, 100)
+      x = np.zeros(100)
+      for i in range(len(x)):
+        x[i] = value(t[i])
+      plt.plot(t, x)
+      plt.show()
+     
+      #plt.plot(t, x, label="quad")
+      #plt.plot(t, y, label="lin")
+      #plt.legend()
+      #plt.show()
       # use the linear solver as initial guess
-      def value_linear(t):
-        P = A*(1-t) + C*t
-        return fA*(1-t) + fC*t + sqrt(np.dot((P-U).flat, (P-U).flat))
-      lin_out = fminbound(value_linear, 0, 1, full_output=True)
-      res = lin_out[0]
-      guess = lin_out[1]
-      lin_flag = lin_out[2]
+      #def value_linear(t):
+      #  P = A*(1-t) + C*t
+      #  return fA*(1-t) + fC*t + sqrt(np.dot((P-U).flat, (P-U).flat))
+      #lin_out = fminbound(value_linear, 0, 1, full_output=True)
+      #res = lin_out[0]
+      #guess = lin_out[1]
+      #lin_flag = lin_out[2]
 
       # perform quadratic minimization
-      output = fminbound(value, 0, 1, full_output=True)
+      output = fminbound(value, 0, 1, xtol=xtol, full_output=True)
       t_min = output[0]
       value_min = output[1]
       flag = output[2]
@@ -125,8 +125,13 @@ class EikonalSolverQuadratic(EikonalSolverBase):
       b = sqrt(np.dot(U-C, U-C)) + fC
 
 
-      f_min = min([fA, fB, fC])
-      
+      #f_min = min([fA, fB, fC])
+      f_min = min([value_min, fp])
+      exact = sqrt((U[0] - 1)**2 + (U[1] - 0)**2)
+      #print "fmi n", f_min, exact, "error=", abs(f_min - exact)
+      retvals.append(f_min)
+    #print "final", min(retvals)
+    return min(retvals)
       #print "linear", guess, "quadratic", value_min, "exact", exact(U)
       #print "using", fA, fB, fC, A, B, C
       #print "crude", a, b 
@@ -134,35 +139,15 @@ class EikonalSolverQuadratic(EikonalSolverBase):
       #if guess < exact(U) or value_min < exact(U):
       #  raise ValueError("NO!!!!!")
 
-      #plt.figure()      # plot nodes
-      #plt.plot(A[0], A[1], "x" ,label="A")
-      #plt.plot(B[0], B[1], "x" ,label="B")
-      #plt.plot(C[0], C[1], "x" ,label="C")
-      #plt.plot(U[0], U[1], "x" ,label="U")
-      #plt.legend()
-      #plt.show()
-
-      #plt.figure()
-      #t = np.linspace(-1, 1, 100)
-      #x = np.zeros(100)
-      #y = np.zeros(100)
-      #for i in range(len(x)):
-      #  x[i] = value(t[i])
-      #  y[i] = value_linear(t[i])
-     
-      #plt.plot(t, x, label="quad")
-      #plt.plot(t, y, label="lin")
-      #plt.legend()
-      #plt.show()
    
-      if flag == 0:
-        if value_min >= f_min:
-          retvals.append(min([fp, value_min]))
-        else:
-          if lin_flag == 0 and guess >= f_min: # use linear as fallback
-            retvals.append(min([fp, guess]))
-          else:
-            retvals.append(min([fp, a, b]))
+      #if flag == 0:
+        #if value_min >= f_min:
+        #  retvals.append(min([fp, value_min]))
+        #else:
+        #  if lin_flag == 0 and guess >= f_min: # use linear as fallback
+        #    retvals.append(min([fp, guess]))
+        #  else:
+            #retvals.append(min([fp, a, b]))
             #print "dofs", A, B, C, "updating", U
             #print "using values", fA, fB, fC, fp
             #print "quadratic fo got", value_min
@@ -192,9 +177,8 @@ class EikonalSolverQuadratic(EikonalSolverBase):
             #plt.plot(t, y, label="lin")
             #plt.legend()
             #plt.show()
-            raise ValueError("Pushing value smaller than f_min") 
-      else:
-          retvals.append(min([fp, a, b]))
+            #raise ValueError("Pushing value smaller than f_min") 
+      #else:
+      #    retvals.append(min([fp, a, b]))
     
     # return minimizer over all edges
-    return min(retvals)

@@ -58,3 +58,19 @@ class Segment:
     '''Compute distance of point from segment.'''
     return point_edge(P, self.A, self. B)
 #-------------------------------------------------------------------------------
+
+class MyPoint:
+  '''Seeder for point distance problem.'''
+  
+  def __init__(self, A):
+    '''Set the points defining segment.'''
+    self.A = A
+
+  def seed(self, num_points=1000):
+    '''Put num_points points on the segment.'''
+    return Point(float(self.A[0]), float(self.A[1]))
+
+  def distance(self, P):
+    '''Compute distance of point from point'''
+    return point_circle(P, self.A, 0)
+#-------------------------------------------------------------------------------

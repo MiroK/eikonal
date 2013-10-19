@@ -89,9 +89,6 @@ class EikonalSolverBase:
           _set_dofs = self.set_dofs_in_cell(dof, cell)
           if _set_dofs:
             u_new =self.local_solver(dof, u_vector, _set_dofs, xtol)
-            if u_new < 0:
-              raise ValueError("negative value")
-            
             if u_new < u_old:
               self.dof_status[dof] = True
               u_old = u_new
