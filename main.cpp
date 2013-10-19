@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
       std::cout << "Solving with linear geometric solver:" << std::endl;
       run_test<Solver>("line");
       run_test<Solver>("point");
-      run_test<Solver>("two_circle");
+      run_test<Solver>("twocircle");
       run_test<Solver>("triangle");
       run_test<Solver>("zalesak");
       run_test<Solver>("dolphin");
@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
       std::cout << precision << std::endl;
       run_test<LinMinSolver>("line", precision);
       run_test<LinMinSolver>("point", precision);
-      run_test<LinMinSolver>("two_circle", precision);
+      run_test<LinMinSolver>("twocircle", precision);
       run_test<LinMinSolver>("triangle", precision);
       run_test<LinMinSolver>("zalesak", precision);
       run_test<LinMinSolver>("dolphin", precision);
@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
       std::cout << precision << std::endl;
       run_test<LinNewtonSolver>("line", precision);
       run_test<LinNewtonSolver>("point", precision);
-      run_test<LinNewtonSolver>("two_circle", precision);
+      run_test<LinNewtonSolver>("twocircle", precision);
       run_test<LinNewtonSolver>("triangle", precision);
       run_test<LinNewtonSolver>("zalesak", precision);
       run_test<LinNewtonSolver>("dolphin", precision);
@@ -79,11 +79,11 @@ template<typename T> int run_test(std::string type, std::size_t precision=1)
     return status;
   }
 
-  if(type == std::string("two_circle"))
+  if(type == std::string("twocircle"))
   {
     double _c1[2] = {-1., 0.}; std::vector<double> c1(_c1, _c1+2);
     double _c2[2] = {sqrt(1.5), 0}; std::vector<double> c2(_c2, _c2+2);
-    TwoCircles two_circles("two_circles", c1, 0.5, c2, 0.5);
+    TwoCircles two_circles("twocircle", c1, 0.5, c2, 0.5);
     Problem problem(two_circles);
     
     int status;
