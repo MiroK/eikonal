@@ -70,7 +70,7 @@ template<typename T> int run_test(std::string type, std::size_t precision=1)
     status = linear_2D_test<T>(problem, mesh_gen1, precision, false);
     
     // convergence test on meshes by gmsh 0 .. 6
-    GmshMeshGenerator mesh_gen2(0, 7, "rectangle");
+    GmshMeshGenerator mesh_gen2(1, 7, "rectangle");
     status = linear_2D_test<T>(problem, mesh_gen2, precision, false);
     
     return status;
@@ -93,7 +93,7 @@ template<typename T> int run_test(std::string type, std::size_t precision=1)
     status = linear_2D_test<T>(problem, mesh_gen1, precision, false);
     
     // convergence test on meshes by gmsh 0 .. 6
-    GmshMeshGenerator mesh_gen2(0, 7, "rectangle");
+    GmshMeshGenerator mesh_gen2(1, 7, "rectangle");
     status = linear_2D_test<T>(problem, mesh_gen2, precision, false);
     
     return status;
@@ -107,7 +107,7 @@ template<typename T> int run_test(std::string type, std::size_t precision=1)
     
     int status;
     // convergence test on meshes by gmsh 0 .. 6
-    GmshMeshGenerator mesh_gen2(0, 7, "rectangle");
+    GmshMeshGenerator mesh_gen2(1, 7, "rectangle");
     status = linear_2D_test<T>(problem, mesh_gen2, precision, false);
     
     return status;
@@ -122,7 +122,7 @@ template<typename T> int run_test(std::string type, std::size_t precision=1)
     
     int status;
     // convergence test on meshes by gmsh 0 .. 6
-    GmshMeshGenerator mesh_gen2(0, 7, "rectangle");
+    GmshMeshGenerator mesh_gen2(1, 7, "rectangle");
     status = linear_2D_test<T>(problem, mesh_gen2, precision, false);
     
     return status;
@@ -136,7 +136,7 @@ template<typename T> int run_test(std::string type, std::size_t precision=1)
     
     int status;
     // convergence test on meshes by gmsh 0 .. 6
-    GmshMeshGenerator mesh_gen2(0, 7, "rectangle");
+    GmshMeshGenerator mesh_gen2(1, 7, "rectangle");
     status = linear_2D_test<T>(problem, mesh_gen2, precision, false);
     
     return status;

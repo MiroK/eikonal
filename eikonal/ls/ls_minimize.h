@@ -54,14 +54,15 @@ namespace eikonal
                     const std::vector<double>& _B,
                     const std::vector<double>& _C,
                     const double _u_A, const double _u_B);
-
+  public: 
+    static std::size_t n_calls;
+  
   protected:
     const std::vector<double>& A;
     const std::vector<double>& B;
     const std::vector<double>& C;
     const double u_A;
     const double u_B;
-  
   };
   //---------------------------------------------------------------------------
 
@@ -76,8 +77,6 @@ namespace eikonal
     
     // eval
     double operator()(double x);
-
-    std::size_t n_calls;
   };
   //----------------------------------------------------------------------------
 
@@ -92,8 +91,6 @@ namespace eikonal
     
     // eval
     boost::math::tuple<double, double> operator()(double x);
-
-    std::size_t n_calls;
   };
 }
 

@@ -10,6 +10,8 @@ using namespace std;
 
 namespace eikonal
 {
+  std::size_t Linear2DFunctor::n_calls = 0;
+
   double linear_brent_2d(const std::vector<double>& A,
                          const std::vector<double>& B,
                          const std::vector<double>& C,
@@ -18,13 +20,13 @@ namespace eikonal
   {
     // use boost to minimize via functor
     LinearBrent2D foo(A, B, C, u_A, u_B);
+    foo.n_calls = 0;
 
     int digits = std::numeric_limits<double>::digits/2;
     pair<double, double> t_ft = 
     boost::math::tools::brent_find_minima(foo, 0., 1., digits);
     
     n_calls = foo.n_calls;
-    std::cout << foo.n_calls << std::endl;
 
     double u_ = t_ft.second;
     return u_ < u_C ? u_ : u_C;
@@ -39,6 +41,7 @@ namespace eikonal
   {
     // use boost to minimize via functor
     LinearNewton2D foo(A, B, C, u_A, u_B);
+    foo.n_calls = 0;
     int digits = std::numeric_limits<double>::digits/2; 
     double t_min = 0.;
     double t_max = 1.;
@@ -123,33 +126,28 @@ namespace eikonal
                                    const std::vector<double>& _B,
                                    const std::vector<double>& _C,
                                    const double _u_A, const double _u_B) :
-                               A(_A), B(_B), C(_C), u_A(_u_A), u_B(_u_B) { }
+                  A(_A), B(_B), C(_C), u_A(_u_A), u_B(_u_B){ } 
   //---------------------------------------------------------------------------
 
   LinearBrent2D::LinearBrent2D(const std::vector<double>& _A,
                                const std::vector<double>& _B,
                                const std::vector<double>& _C,
                                const double _u_A, const double _u_B) :
-                      Linear2DFunctor(_A, _B, _C, _u_A, _u_B), n_calls(0) {
-                      {
-                        std::cout << &n_calls << std::endl;
-                      }
-                      }
+                      Linear2DFunctor(_A, _B, _C, _u_A, _u_B){ }
   //---------------------------------------------------------------------------
 
   LinearNewton2D::LinearNewton2D(const std::vector<double>& _A,
                                  const std::vector<double>& _B,
                                  const std::vector<double>& _C,
                                  const double _u_A, const double _u_B) : 
-                      Linear2DFunctor(_A, _B, _C, _u_A, _u_B), n_calls(0){ }
+                      Linear2DFunctor(_A, _B, _C, _u_A, _u_B) { }
   //---------------------------------------------------------------------------
   
   double LinearBrent2D::operator()(double x)
   {
     const vector<double> P = A*(1.-x) + B*x;
     const double f = u_A*(1.-x) + u_B*x + norm(C-P, 2);
-    this->n_calls++;
-    std::cout << &n_calls << std::endl;
+    n_calls++;
     return f;
   }
   //---------------------------------------------------------------------------
@@ -159,7 +157,7 @@ namespace eikonal
     const vector<double> P = A*(1.-x) + B*x;
     const double f = u_A*(1.-x) + u_B*x + norm(C-P, 2);
     const double df = -u_A + u_B + dot(C-P, A-B)/norm(C-P, 2);
-    this->n_calls++;
+    n_calls++;
     return boost::math::make_tuple(f, df);
   }
 }
