@@ -3,3 +3,5 @@ Makefile
 eikonal.x
 CMakeCache.txt
 cmake_install.cmake
+*.swp
+*.pyc
