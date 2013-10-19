@@ -18,6 +18,7 @@ int main(int argc, char* argv[])
     {
       std::cout << "Solving with linear geometric solver:" << std::endl;
       run_test<Solver>("line");
+      run_test<Solver>("point");
       run_test<Solver>("two_circle");
       run_test<Solver>("triangle");
       run_test<Solver>("zalesak");
@@ -28,6 +29,7 @@ int main(int argc, char* argv[])
       std::cout << "Solving with linear Brent solver" << std::endl;
       std::cout << precision << std::endl;
       run_test<LinMinSolver>("line", precision);
+      run_test<LinMinSolver>("point", precision);
       run_test<LinMinSolver>("two_circle", precision);
       run_test<LinMinSolver>("triangle", precision);
       run_test<LinMinSolver>("zalesak", precision);
@@ -39,6 +41,7 @@ int main(int argc, char* argv[])
       std::cout << "Solving with linear Newton solver:" << std::endl;
       std::cout << precision << std::endl;
       run_test<LinNewtonSolver>("line", precision);
+      run_test<LinNewtonSolver>("point", precision);
       run_test<LinNewtonSolver>("two_circle", precision);
       run_test<LinNewtonSolver>("triangle", precision);
       run_test<LinNewtonSolver>("zalesak", precision);
@@ -142,5 +145,19 @@ template<typename T> int run_test(std::string type, std::size_t precision=1)
     return status;
   }
 
+  if(type == std::string("point"))
+  {
+    double _P[2] = {0., 0.}; std::vector<double> P(_P, _P+2);
+    MyPoint point(P);
+    Problem problem(point);
+    
+    int status;
+    // convergence test on meshes by gmsh 0 .. 6
+    GmshMeshGenerator mesh_gen2(1, 7, "rectangle");
+    status = linear_2D_test<T>(problem, mesh_gen2, precision, false);
+    
+    return status;
+  }
+  
   return 1;
 }

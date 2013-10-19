@@ -136,5 +136,23 @@ namespace eikonal
     std::vector<double> vertices;
   };
   //----------------------------------------------------------------------------
+
+  class MyPoint : public Seeder
+  {
+  public:
+    // interface is just one point
+    MyPoint(const std::vector<double>& _vertex);
+
+    // turn point to dolfin::Point
+    void seed(std::vector<dolfin::Point>& points,
+              const std::size_t num_points) const;
+
+    // distance between points
+    double distance(const std::vector<double>& point) const;
+
+  private:
+    const std::vector<double> vertex;
+  };
+  //----------------------------------------------------------------------------
 }
 #endif // _SEEDER_H_

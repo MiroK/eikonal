@@ -45,6 +45,7 @@ namespace eikonal
                                           double& coo_norm,
                                           double& time,
                                           std::string u_file_name,
+                                          std::string exact_file_name,
                                           std::string error_file_name,
                                           bool plot_on=false);
 }
@@ -87,13 +88,18 @@ namespace eikonal
       const std::size_t num_cells = mesh->num_cells();
       const std::size_t n_obtuse_cells = asset_obtuse_cells(*mesh).size();
 
-      // get the file name for solution and error
+      // get the file name for solution, exact_solution and error
       help.str("");
       help << "u_" << data_file_name << "_" << num_cells << ".pvd"; 
       std::string u_file_name = help.str(); // u_problem_solver_N.pvd
+
       help.str("");
-      help << "e_" << data_file_name << "_" << num_cells << ".pvd";
-      std::string error_file_name = help.str();
+      help << "exact_" << data_file_name << "_" << num_cells << ".pvd"; 
+      std::string exact_file_name = help.str(); // exact_problem_solver_N.pvd
+
+      help.str("");
+      help << "error_" << data_file_name << "_" << num_cells << ".pvd";
+      std::string error_file_name = help.str(); // error_problem...
 
       // get the solution
       std::size_t num_iters, min_calls = 0, max_calls = 0;
@@ -102,7 +108,7 @@ namespace eikonal
       int status =
       linear_2D_test<T>(problem, *mesh, precision, num_iters, min_calls,
                         max_calls, l1_norm, l2_norm, coo_norm, time,
-                        u_file_name, error_file_name, plot_on); 
+                        u_file_name, exact_file_name, error_file_name, plot_on); 
 
       std::cout.precision(8);
       std::cout.width(14);
@@ -157,6 +163,7 @@ namespace eikonal
                                           double& coo_norm,
                                           double& time,
                                           std::string u_file_name,
+                                          std::string exact_file_name,
                                           std::string error_file_name,
                                           bool plot_on=false)
   {
@@ -182,6 +189,11 @@ namespace eikonal
       CG1_FORMS::Form_norm2 l2(mesh, u, u_exact);
       l1_norm = dolfin::assemble(l1);
       l2_norm = dolfin::assemble(l2);
+      
+      // save exact solution now, because later it is used to hold the error
+      dolfin::File exact_file(exact_file_name);
+      exact_file << u_exact;
+      
       *u_exact.vector() -= *u.vector();
       u_exact.vector()->abs();
       coo_norm = u_exact.vector()->max();

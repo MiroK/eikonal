@@ -219,4 +219,22 @@ namespace eikonal
     return point_polygon(point, vertices, "d");
   }
   //---------------------------------------------------------------------------
+
+  MyPoint::MyPoint(const std::vector<double>& _vertex) : 
+  Seeder("point"), vertex(_vertex) { }
+  //---------------------------------------------------------------------------
+
+  void MyPoint::seed(std::vector<dolfin::Point>& points,
+                      const std::size_t num_points) const
+  {
+    points.clear();
+    points.push_back(Point(2, &(*vertex.begin())));
+  }
+  //---------------------------------------------------------------------------
+
+  double MyPoint::distance(const std::vector<double>& point) const
+  {
+    return point_point(point, vertex);
+  }
+  //---------------------------------------------------------------------------
 }
