@@ -5,10 +5,9 @@ import connectivity as conn
 import numpy as np
 from numpy.linalg import norm
 from numpy import array
+from dolfin import Cell
 
-# this is Q1
-
-class EikonalSolverQuadratic(EikonalSolverBase, LineSampler):
+class Q4(EikonalSolverBase, LineSampler):
   '''Quadratic Eikonal solver'''
   def __init__(self, V, choice):
     EikonalSolverBase.__init__(self, V)
@@ -58,15 +57,29 @@ class EikonalSolverQuadratic(EikonalSolverBase, LineSampler):
    
     return set_dofs
     
-  def sort_dofs(self, u_vector, reverse):
+  def sort_dofs(self, order_u, reverse):
     '''Order nodes_to_set(dofs) by their l^norm_type distance from point. '''
-    key = lambda dof : u_vector[dof]
-    return sorted(self.nodes_to_set, key=key, reverse=reverse)
-  
+    cells = range(len(self.cell_to_dof)) 
+    
+    def foo(cell_index): # get the midpoint as array
+      cell = Cell(self.mesh, cell_index)
+      midpoint = cell.midpoint()
+      return [midpoint.x(), midpoint.y()]
+    
+    key = lambda c_index : order_u(*foo(c_index))
+    
+    sorted_dofs = []
+    cells.sort(key=key, reverse = reverse) # sort cells
+    for cell in cells: # add all dofs of the cell that are to be set
+      for dof in self.cell_to_dof[cell]:
+        if dof in self.nodes_to_set:
+          sorted_dofs.append(dof)
+
+    return sorted_dofs
+
   def local_solver(self, unset_U, u, _set_dofs, xtol):
     ''' Local solver on a triangle. Return new value for u in dof=unset_U. '''
     # set dofs can be a [[], []], i.e coming from multiple edges
-   
     if self.choice == 0:
       return self.sample(unset_U, u, _set_dofs, xtol)
     
@@ -97,15 +110,15 @@ class EikonalSolverQuadratic(EikonalSolverBase, LineSampler):
       f_min = min([value_min, fp])
       exact = norm(U - array([1., 0.]))
       
-      print "old value", fp
-      print "dof=", unset_U, "set_dofs", set_dofs, "value_min", value_min
-      print "exact", exact, "error", abs(exact-value_min) 
+      #print "old value", fp
+      #print "dof=", unset_U, "set_dofs", set_dofs, "value_min", value_min
+      #print "exact", exact, "error", abs(exact-value_min) 
 
       retvals.append(f_min)
     # return minima from all the edges
     return min(retvals)
   
-  def solve(self, u, fixed_dofs, xtol, order_vector):
+  def solve(self, u, fixed_dofs, xtol, order_u):
     '''Global Quadratic solver.'''
     # we are expecting u from V
     u_vector = u.vector()
@@ -121,10 +134,10 @@ class EikonalSolverQuadratic(EikonalSolverBase, LineSampler):
       self.nodes_to_set.pop(i)
 
     #create the sweep order
-    sweep = self.sort_dofs(order_vector, False) +\
-            self.sort_dofs(order_vector, True)
-    print sweep
-    plot(u, interactive=True)
+    sweep = self.sort_dofs(order_u, False) +\
+            self.sort_dofs(order_u, True)
+    #print sweep
+
     # create the reference function
     v = Function(u.function_space())
     v.vector()[:] = u_vector.array()
@@ -135,7 +148,7 @@ class EikonalSolverQuadratic(EikonalSolverBase, LineSampler):
     CONTINUE = True
     while CONTINUE:
       for dof in sweep:
-        print "out dof", dof
+        #print "out dof", dof
         x += 1
         u_old = u_vector[dof]
         for cell in self.dof_to_cell[dof]:

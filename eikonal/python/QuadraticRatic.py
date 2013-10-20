@@ -1,14 +1,13 @@
-from EikonalSolverBase import *
 from LineSampler import LineSampler
+from EikonalSolverBase import *
 from scipy.optimize import fminbound, fmin_bfgs
 import connectivity as conn
 import numpy as np
 from numpy.linalg import norm
 from numpy import array
+from dolfin import Cell
 
-# this is Q1
-
-class EikonalSolverQuadratic(EikonalSolverBase, LineSampler):
+class QuadraticRatic(EikonalSolverBase, LineSampler):
   '''Quadratic Eikonal solver'''
   def __init__(self, V, choice):
     EikonalSolverBase.__init__(self, V)
@@ -57,16 +56,32 @@ class EikonalSolverQuadratic(EikonalSolverBase, LineSampler):
          set_dofs.append(self.order_dofs(set_edge_dofs))
    
     return set_dofs
-    
-  def sort_dofs(self, u_vector, reverse):
+ 
+  def sort_dofs(self, point, norm_type, reverse):
     '''Order nodes_to_set(dofs) by their l^norm_type distance from point. '''
-    key = lambda dof : u_vector[dof]
-    return sorted(self.nodes_to_set, key=key, reverse=reverse)
+    cells = range(len(self.cell_to_dof)) 
+    
+    def foo(cell_index): # get the midpoint as array
+      cell = Cell(self.mesh, cell_index)
+      midpoint = cell.midpoint()
+      return array([midpoint.x(), midpoint.y()])
+  
+    d = point.shape[0]
+    key = lambda c_index : norm(point - foo(c_index))
+
+    sorted_dofs = []
+    cells.sort( key=key, reverse = reverse) # sort cells
+    for cell in cells: # add all dofs of the cell that are to be set
+      for dof in self.cell_to_dof[cell]:
+        if dof in self.nodes_to_set:
+          sorted_dofs.append(dof)
+
+    return sorted_dofs
   
   def local_solver(self, unset_U, u, _set_dofs, xtol):
     ''' Local solver on a triangle. Return new value for u in dof=unset_U. '''
     # set dofs can be a [[], []], i.e coming from multiple edges
-   
+    
     if self.choice == 0:
       return self.sample(unset_U, u, _set_dofs, xtol)
     
@@ -97,64 +112,10 @@ class EikonalSolverQuadratic(EikonalSolverBase, LineSampler):
       f_min = min([value_min, fp])
       exact = norm(U - array([1., 0.]))
       
-      print "old value", fp
-      print "dof=", unset_U, "set_dofs", set_dofs, "value_min", value_min
-      print "exact", exact, "error", abs(exact-value_min) 
+      #print "old value", fp
+      #print "dof=", unset_U, "set_dofs", set_dofs, "value_min", value_min
+      #print "exact", exact, "error", abs(exact-value_min) 
 
       retvals.append(f_min)
     # return minima from all the edges
     return min(retvals)
-  
-  def solve(self, u, fixed_dofs, xtol, order_vector):
-    '''Global Quadratic solver.'''
-    # we are expecting u from V
-    u_vector = u.vector()
-    if len(u_vector) != len(self.nodes_to_set):
-      raise ValueError("u in not from the same function space as the solver.")
-
-    # modify dof_status using fixed_dofs
-    for dof in fixed_dofs:
-      self.dof_status[dof] = True
-
-    # remove dofs that are in fixed_dofs from nodes_to_set
-    for i in sorted(fixed_dofs)[::-1]:
-      self.nodes_to_set.pop(i)
-
-    #create the sweep order
-    sweep = self.sort_dofs(order_vector, False) +\
-            self.sort_dofs(order_vector, True)
-    print sweep
-    plot(u, interactive=True)
-    # create the reference function
-    v = Function(u.function_space())
-    v.vector()[:] = u_vector.array()
-    # start sweeping the mesh
-    n_sweeps = 0
-    off = len(sweep)/2
-    x = 0
-    CONTINUE = True
-    while CONTINUE:
-      for dof in sweep:
-        print "out dof", dof
-        x += 1
-        u_old = u_vector[dof]
-        for cell in self.dof_to_cell[dof]:
-          _set_dofs = self.set_dofs_in_cell(dof, cell)
-          if _set_dofs:
-            u_new =self.local_solver(dof, u_vector, _set_dofs, xtol)
-            if u_new < u_old:
-              self.dof_status[dof] = True
-              u_old = u_new
-        u_vector[dof] = u_old
-        
-        if x == off:
-          n_sweeps += 1
-          x = 0
-          e = np.linalg.norm(u.vector().array() - v.vector().array(), np.inf)
-          if e < DOLFIN_EPS:
-            CONTINUE = False
-            break
-          else:
-            v.vector()[:] = u.vector()[:]
-
-    return n_sweeps

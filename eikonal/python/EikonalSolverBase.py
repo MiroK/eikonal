@@ -20,6 +20,9 @@ class EikonalSolverBase:
     # and nodes_to_set, now it is all nodes
     self.nodes_to_set = range(V.dim())
 
+    # mesh
+    self.mesh = V.mesh()
+
   def sort_dofs(self, point, norm_type, reverse):
     '''Order nodes_to_set(dofs) by their l^norm_type distance from point. '''
     d = point.shape[0]
@@ -52,9 +55,13 @@ class EikonalSolverBase:
       self.dof_status[dof] = True
 
     # remove dofs that are in fixed_dofs from nodes_to_set
+    
+    print "fixed", fixed_dofs
+    
     for i in sorted(fixed_dofs)[::-1]:
       self.nodes_to_set.pop(i)
 
+    print "nodes to set", self.nodes_to_set
     # we use four corners of mesh as reference points get them
     mesh = u.function_space().mesh()
     mesh_coordinates = mesh.coordinates()
@@ -72,6 +79,7 @@ class EikonalSolverBase:
         sweep += partial_sweep
         sweep += partial_sweep[::-1]
     
+    print sweep
     # create the reference function, fill it with some big
     v = Function(u.function_space())
     v.vector()[:] = max(u_vector.array())
@@ -83,14 +91,17 @@ class EikonalSolverBase:
     CONTINUE = True
     while CONTINUE:
       for dof in sweep:
+        print "global solver", dof
         x += 1
         u_old = u_vector[dof]
         for cell in self.dof_to_cell[dof]:
           _set_dofs = self.set_dofs_in_cell(dof, cell)
+          print _set_dofs
           if _set_dofs:
             u_new =self.local_solver(dof, u_vector, _set_dofs, xtol)
             if u_new < u_old:
               self.dof_status[dof] = True
+              print "dof status of", dof, self.dof_status[dof]
               u_old = u_new
         u_vector[dof] = u_old
         

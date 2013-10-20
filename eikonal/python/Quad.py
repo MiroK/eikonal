@@ -6,9 +6,7 @@ import numpy as np
 from numpy.linalg import norm
 from numpy import array
 
-# this is Q1
-
-class EikonalSolverQuadratic(EikonalSolverBase, LineSampler):
+class Quad(EikonalSolverBase, LineSampler):
   '''Quadratic Eikonal solver'''
   def __init__(self, V, choice):
     EikonalSolverBase.__init__(self, V)
@@ -58,15 +56,9 @@ class EikonalSolverQuadratic(EikonalSolverBase, LineSampler):
    
     return set_dofs
     
-  def sort_dofs(self, u_vector, reverse):
-    '''Order nodes_to_set(dofs) by their l^norm_type distance from point. '''
-    key = lambda dof : u_vector[dof]
-    return sorted(self.nodes_to_set, key=key, reverse=reverse)
-  
   def local_solver(self, unset_U, u, _set_dofs, xtol):
     ''' Local solver on a triangle. Return new value for u in dof=unset_U. '''
     # set dofs can be a [[], []], i.e coming from multiple edges
-   
     if self.choice == 0:
       return self.sample(unset_U, u, _set_dofs, xtol)
     
@@ -104,9 +96,10 @@ class EikonalSolverQuadratic(EikonalSolverBase, LineSampler):
       retvals.append(f_min)
     # return minima from all the edges
     return min(retvals)
-  
-  def solve(self, u, fixed_dofs, xtol, order_vector):
-    '''Global Quadratic solver.'''
+
+
+  def solve(self, u, fixed_dofs, xtol):
+    '''Global Eikonal solver.'''
     # we are expecting u from V
     u_vector = u.vector()
     if len(u_vector) != len(self.nodes_to_set):
@@ -117,33 +110,53 @@ class EikonalSolverQuadratic(EikonalSolverBase, LineSampler):
       self.dof_status[dof] = True
 
     # remove dofs that are in fixed_dofs from nodes_to_set
+    
+    print "fixed", fixed_dofs
+    
     for i in sorted(fixed_dofs)[::-1]:
       self.nodes_to_set.pop(i)
 
+    print "nodes to set", self.nodes_to_set
+    # we use four corners of mesh as reference points get them
+    mesh = u.function_space().mesh()
+    mesh_coordinates = mesh.coordinates()
+    x_min = min(mesh_coordinates[:, 0])
+    x_max = max(mesh_coordinates[:, 0])
+    y_min = min(mesh_coordinates[:, 1])
+    y_max = max(mesh_coordinates[:, 1])
+
     #create the sweep order
-    sweep = self.sort_dofs(order_vector, False) +\
-            self.sort_dofs(order_vector, True)
+    sweep = []
+    for x in [x_min, x_max]:
+      for y in [y_min, y_max]:
+        point = np.array([x, y])
+        partial_sweep = self.sort_dofs(point, 2, False)
+        sweep += partial_sweep
+        sweep += partial_sweep[::-1]
+    plot(u, interactive=True)    
     print sweep
-    plot(u, interactive=True)
-    # create the reference function
+    # create the reference function, fill it with some big
     v = Function(u.function_space())
-    v.vector()[:] = u_vector.array()
+    v.vector()[:] = max(u_vector.array())
+    
     # start sweeping the mesh
     n_sweeps = 0
-    off = len(sweep)/2
+    off = len(sweep)/8
     x = 0
     CONTINUE = True
     while CONTINUE:
       for dof in sweep:
-        print "out dof", dof
+        print "global solver", dof
         x += 1
         u_old = u_vector[dof]
         for cell in self.dof_to_cell[dof]:
           _set_dofs = self.set_dofs_in_cell(dof, cell)
+          print _set_dofs
           if _set_dofs:
             u_new =self.local_solver(dof, u_vector, _set_dofs, xtol)
             if u_new < u_old:
               self.dof_status[dof] = True
+              print "dof status of", dof, self.dof_status[dof]
               u_old = u_new
         u_vector[dof] = u_old
         
