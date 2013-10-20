@@ -237,4 +237,11 @@ namespace eikonal
     return point_point(point, vertex);
   }
   //---------------------------------------------------------------------------
+
+  void MyPoint::gradient(const std::vector<double>& point,
+                         std::vector<double>& _gradient) const
+  {
+    point_point_gradient(point, vertex, _gradient); 
+  }
+  //---------------------------------------------------------------------------
 }

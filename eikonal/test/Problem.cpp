@@ -88,6 +88,38 @@ namespace eikonal
   }
   //---------------------------------------------------------------------------
 
+  void Problem::exact_solution(dolfin::Function& u, dolfin::Function& du_dx,
+                               dolfin::Function& du_dy)
+  {
+    // call to values
+    exact_solution(u);
+
+    // get the gradients, //TODO checks for same space for alll function
+
+    // get coordinates of all dofs
+    boost::shared_ptr<const GenericDofMap> dofmap(u.function_space()->dofmap());
+    std::vector<double> dof_coordinates =
+    dofmap->tabulate_all_coordinates(*u.function_space()->mesh());
+
+    std::size_t num_dofs = u.function_space()->dim();
+    std::size_t dim = u.function_space()->mesh()->geometry().dim();
+
+    std::vector<double> dx_values(num_dofs);
+    std::vector<double> dy_values(num_dofs);
+    for(std::size_t i = 0; i < num_dofs; i++)
+    {
+      const std::vector<double> point(&dof_coordinates[i*dim],
+                                      &dof_coordinates[i*dim] + dim);
+      std::vector<double> gradient;
+      seeder.gradient(point, gradient);
+      dx_values[i] = gradient[0];
+      dy_values[i] = gradient[1];
+    }
+    du_dx.vector()->set_local(dx_values);
+    du_dy.vector()->set_local(dy_values);
+  }
+  //---------------------------------------------------------------------------
+
   std::string Problem::name() const { return seeder.name; }
   //---------------------------------------------------------------------------
 }

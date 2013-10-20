@@ -1,4 +1,6 @@
 #include "eikonal.h"
+#include "test/CG1_VECTOR.h"
+#include <dolfin.h>
 #include <cstdlib>
 
 using namespace eikonal;
@@ -8,47 +10,41 @@ template<typename T> int run_test(std::string type, std::size_t precision=1);
 
 int main(int argc, char* argv[])
 {
-  enum SOLVERS { LIN_GEOMETRIC, LIN_BRENT, LIN_NEWTON};
+  dolfin::UnitSquareMesh mesh(10, 10);
+  CG1::FunctionSpace V(mesh);
+ 
+  dolfin::Function u(V);
+  dolfin::Function du_dx(V);
+  dolfin::Function du_dy(V);
+  
+  double _P[2] = {0.5, 0.5}; std::vector<double> P(_P, _P+2);
+  MyPoint point(P);
+  Problem problem(point);
+  problem.exact_solution(u, du_dx, du_dy);
 
-  if(argc == 3)
+  dolfin::plot(u);
+  dolfin::interactive(true);
+
+  CG1_VECTOR::FunctionSpace VV(mesh);
+  dolfin::Function du(VV);
+  std::vector<double> du_values(VV.dim());
+
+  boost::shared_ptr<dolfin::GenericVector> dx_vector = du_dx.vector();
+  boost::shared_ptr<dolfin::GenericVector> dy_vector = du_dy.vector();
+  for(std::size_t i = 0; i < du_values.size()/2; i++)
   {
-    int solver = atoi(argv[1]);
-    int precision = atoi(argv[2]);
-    if(solver == LIN_GEOMETRIC)
-    {
-      std::cout << "Solving with linear geometric solver:" << std::endl;
-      run_test<Solver>("line");
-      run_test<Solver>("point");
-      run_test<Solver>("twocircle");
-      run_test<Solver>("triangle");
-      run_test<Solver>("zalesak");
-      run_test<Solver>("dolphin");
-    }
-    if(solver == LIN_BRENT)
-    {
-      std::cout << "Solving with linear Brent solver" << std::endl;
-      std::cout << precision << std::endl;
-      run_test<LinMinSolver>("line", precision);
-      run_test<LinMinSolver>("point", precision);
-      run_test<LinMinSolver>("twocircle", precision);
-      run_test<LinMinSolver>("triangle", precision);
-      run_test<LinMinSolver>("zalesak", precision);
-      run_test<LinMinSolver>("dolphin", precision);
-    }
-
-    if(solver == LIN_NEWTON)
-    {
-      std::cout << "Solving with linear Newton solver:" << std::endl;
-      std::cout << precision << std::endl;
-      run_test<LinNewtonSolver>("line", precision);
-      run_test<LinNewtonSolver>("point", precision);
-      run_test<LinNewtonSolver>("twocircle", precision);
-      run_test<LinNewtonSolver>("triangle", precision);
-      run_test<LinNewtonSolver>("zalesak", precision);
-      run_test<LinNewtonSolver>("dolphin", precision);
-    }
+    du_values[2*i] = (*dx_vector)[i];
+    du_values[2*i+1] = (*dy_vector)[i];
   }
-  return 1;
+ 
+  std::cout << VV.dim() << std::endl;
+  std::cout << V.dim() << std::endl;
+
+  du.vector()->set_local(du_values);
+  dolfin::plot(du);
+  dolfin::interactive(true);
+
+  return 0;
 }
 
 //-----------------------------------------------------------------------------

@@ -1,0 +1,11 @@
+# L1 and L2 norms of (u-v) where u is the exact and v is the approximate
+# solution, both in CG1 vector
+
+element = VectorElement("Lagrange", triangle, 1)
+u = Coefficient(element)
+v = Coefficient(element)
+
+norm1 = sqrt(dot(u-v, u-v))*dx
+norm2 = abs(dot(u-v, u-v))*dx
+forms = [norm1, norm2]
+

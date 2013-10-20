@@ -27,7 +27,11 @@ namespace eikonal
 
     // compute distance of point from object
     virtual double distance(const std::vector<double>& point) const = 0;
-  
+    
+    // compute gradient of the distance function to object at point
+    virtual void gradient(const std::vector<double>& point,
+                          std::vector<double>& _gradient) const = 0;
+
   public:
     const std::string name;
   };
@@ -149,6 +153,10 @@ namespace eikonal
 
     // distance between points
     double distance(const std::vector<double>& point) const;
+
+    // distance + gradient of the distance function
+    void gradient(const std::vector<double>& point,
+                  std::vector<double>& _gradient) const;
 
   private:
     const std::vector<double> vertex;

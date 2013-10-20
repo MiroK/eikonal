@@ -1,0 +1,2 @@
+# Continuous Lagrange element of degree 1 on triangle, vector version
+element = VectorElement("Lagrange", triangle, 1)

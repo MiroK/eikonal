@@ -16,6 +16,24 @@ namespace eikonal
   }
   //---------------------------------------------------------------------------
   
+  void point_point_gradient(const std::vector<double>& P,
+                            const std::vector<double>& Q,
+                            std::vector<double>& gradient)
+  {
+    const double distance = point_point(P, Q);
+    const std::size_t dim = P.size(); 
+    gradient.resize(dim);
+    if(distance > LA_EPS)
+    {
+      gradient = (P-Q)/distance;
+    }
+    else
+    {
+      gradient.assign(dim, 0.0); 
+    }
+  }
+  //---------------------------------------------------------------------------
+  
   double point_edge(const std::vector<double>& P,
                        const std::vector<double>& A,
                        const std::vector<double>& B)

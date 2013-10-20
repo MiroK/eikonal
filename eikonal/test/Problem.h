@@ -32,6 +32,11 @@ namespace eikonal
     // compute the exact solution of the Eikonal equation
     void exact_solution(dolfin::Function& u) const;
 
+    // compute the exact solution of the Eikonal equation phi, also
+    // grad(u)/|grad(u) by components
+    void exact_solution(dolfin::Function& u, dolfin::Function& du_dx,
+                        dolfin::Function& du_dy);
+
     // get name of the seeder
     std::string name() const;
   
