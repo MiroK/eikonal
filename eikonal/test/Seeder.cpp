@@ -38,6 +38,13 @@ namespace eikonal
     return point_edge(point, A, B);
   }
   //---------------------------------------------------------------------------
+  
+  void Segment::gradient(const std::vector<double>& point,
+                         std::vector<double>& _gradient) const
+  {
+
+  }
+  //---------------------------------------------------------------------------
 
   TwoCircles::TwoCircles(const std::string& name,
                          const std::vector<double>& _c1, const double _r1,
@@ -81,6 +88,13 @@ namespace eikonal
   }
   //--------------------------------------------------------------------------
 
+  void TwoCircles::gradient(const std::vector<double>& point,
+                         std::vector<double>& _gradient) const
+  {
+
+  }
+  //---------------------------------------------------------------------------
+  
   Polygon::Polygon(const std::string& name, const std::vector<double>& c,
                    const double r, const std::size_t n) : Seeder(name)
   {
@@ -106,6 +120,13 @@ namespace eikonal
   double Polygon::distance(const std::vector<double>& point) const
   {
     return point_polygon(point, vertices, "d");
+  }
+  //---------------------------------------------------------------------------
+  
+  void Polygon::gradient(const std::vector<double>& point,
+                         std::vector<double>& _gradient) const
+  {
+
   }
   //---------------------------------------------------------------------------
   
@@ -180,6 +201,13 @@ namespace eikonal
   }
   //---------------------------------------------------------------------------
 
+  void Zalesak::gradient(const std::vector<double>& point,
+                         std::vector<double>& _gradient) const
+  {
+
+  }
+  //---------------------------------------------------------------------------
+  
   Dolphin::Dolphin() : Seeder("dolfin")
   {
     std::ifstream file;
@@ -220,6 +248,13 @@ namespace eikonal
   }
   //---------------------------------------------------------------------------
 
+  void Dolphin::gradient(const std::vector<double>& point,
+                         std::vector<double>& _gradient) const
+  {
+
+  }
+  //---------------------------------------------------------------------------
+  
   MyPoint::MyPoint(const std::vector<double>& _vertex) : 
   Seeder("point"), vertex(_vertex) { }
   //---------------------------------------------------------------------------

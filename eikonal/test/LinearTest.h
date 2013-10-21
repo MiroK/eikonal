@@ -1,5 +1,5 @@
-#ifndef _TEST_H_
-#define _TEST_H_
+#ifndef _LINEAR_TEST_H_
+#define _LINEAR_TEST_H_
 
 #include "Problem.h"
 #include "MeshGenerator.h"
@@ -7,7 +7,6 @@
 #include "CG1_FORMS.h"
 #include "test_common.h"
 #include "gs/Solver.h"
-#include <dolfin/generation/UnitSquareMesh.h>
 #include <dolfin/fem/assemble.h>
 #include <dolfin/io/File.h>
 #include <dolfin/plot/plot.h>
@@ -221,5 +220,5 @@ namespace eikonal
   //----------------------------------------------------------------------------
 }
 
-#endif // _TEST_H_
+#endif // _LINEAR_TEST_H_
 

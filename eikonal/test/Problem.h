@@ -29,13 +29,18 @@ namespace eikonal
     void init(std::set<dolfin::la_index>& fixed_dofs,
               dolfin::Function& u) const;
 
+    void init(std::set<dolfin::la_index>& fixed_dofs,
+              dolfin::Function& u,
+              dolfin::Function& du_dx,
+              dolfin::Function& du_dy) const;
+
     // compute the exact solution of the Eikonal equation
     void exact_solution(dolfin::Function& u) const;
 
     // compute the exact solution of the Eikonal equation phi, also
     // grad(u)/|grad(u) by components
     void exact_solution(dolfin::Function& u, dolfin::Function& du_dx,
-                        dolfin::Function& du_dy);
+                        dolfin::Function& du_dy) const;
 
     // get name of the seeder
     std::string name() const;

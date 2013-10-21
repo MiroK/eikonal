@@ -66,6 +66,63 @@ namespace eikonal
     }
   }
   //---------------------------------------------------------------------------
+    
+
+  void Problem::init(std::set<dolfin::la_index>& fixed_dofs,
+                     dolfin::Function& u, dolfin::Function& du_dx,
+                     dolfin::Function& du_dy) const
+  {
+    // get the points from seeder
+    std::vector<Point> points;
+    seeder.seed(points, 1000);
+
+    // get the intersected cell
+    std::set<std::size_t> cells;
+    u.function_space()->mesh()->intersected_cells(points, cells);
+
+    // push to fixed_dofs and modify u in fixed_dofs, other dofs set as far
+    const double far = u.function_space()->mesh()->hmax()*
+                       u.function_space()->mesh()->num_cells();
+    boost::shared_ptr<GenericVector> u_vector(u.vector());
+    *u_vector += far;
+    // vectors for the gradient components
+    boost::shared_ptr<GenericVector> du_dx_vector(du_dx.vector());
+    boost::shared_ptr<GenericVector> du_dy_vector(du_dy.vector());
+    
+    fixed_dofs.clear();
+    boost::shared_ptr<const GenericDofMap> dofmap(u.function_space()->dofmap());
+    std::set<std::size_t>::const_iterator cell;
+    for(cell = cells.begin(); cell != cells.end(); cell++)
+    {
+      // fixed dofs
+      std::vector<la_index> cell_dofs = dofmap->cell_dofs(*cell);
+      fixed_dofs.insert(cell_dofs.begin(), cell_dofs.end());
+
+      // get coordinates of dofs and compute distance for setting u
+      boost::multi_array<double, 2> dof_coordinates;
+      dofmap->tabulate_coordinates(dof_coordinates,
+                                   UFCCell(Cell(*u.function_space()->mesh(),
+                                           *cell)));
+      // len of position vector of dof
+      std::size_t dim = dof_coordinates.shape()[1]; 
+
+      std::vector<la_index>::const_iterator dof = cell_dofs.begin();
+      int index = 0;
+      for( ; dof != cell_dofs.end(); dof++, index++)
+      {
+        std::vector<double> dof_x(&dof_coordinates[index][0],
+                                  &dof_coordinates[index][0] + dim);
+       
+        u_vector->setitem(*dof, seeder.distance(dof_x));
+
+        std::vector<double> grad_u;
+        seeder.gradient(dof_x, grad_u);
+        du_dx_vector->setitem(*dof, grad_u[0]);
+        du_dy_vector->setitem(*dof, grad_u[1]);
+      }
+    }
+  }
+  //---------------------------------------------------------------------------
 
   void Problem::exact_solution(dolfin::Function& u) const
   {
@@ -89,7 +146,7 @@ namespace eikonal
   //---------------------------------------------------------------------------
 
   void Problem::exact_solution(dolfin::Function& u, dolfin::Function& du_dx,
-                               dolfin::Function& du_dy)
+                               dolfin::Function& du_dy) const
   {
     // call to values
     exact_solution(u);

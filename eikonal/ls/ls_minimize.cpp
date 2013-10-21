@@ -135,7 +135,7 @@ namespace eikonal
                     std::size_t& n_calls,
                     const std::size_t precision)
   {
-    // first call the newton solver //TODO do via call!
+    // first call the newton solver 
     std::pair<double, double> t_ft = 
     linear_newton_2d(A, B, C, u_A, u_B, u_C, n_calls, precision);
 

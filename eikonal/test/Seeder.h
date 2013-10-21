@@ -51,7 +51,11 @@ namespace eikonal
     
     // compute distance from the segment 
     double distance(const std::vector<double>& point) const;  
-    
+   
+    // gradient of the distance function defined above
+    void gradient(const std::vector<double>& point,
+                  std::vector<double>& _gradient) const;
+
   private:
     const std::vector<double> A;
     const std::vector<double> B;
@@ -73,6 +77,10 @@ namespace eikonal
       
     // compute distance from the sigment, distance NOT SIGNED DISTANCE
     double distance(const std::vector<double>& point) const;
+    
+    // gradient of the distance function defined above
+    void gradient(const std::vector<double>& point,
+                  std::vector<double>& _gradient) const;
 
   private:
     const std::vector<double> c1;
@@ -97,6 +105,10 @@ namespace eikonal
     // compute distance from the polygon
     double distance(const std::vector<double>& point) const;
 
+    // gradient of the distance function defined above
+    void gradient(const std::vector<double>& point,
+                  std::vector<double>& _gradient) const;
+  
   private:
     std::vector<double> vertices;
   };
@@ -117,6 +129,10 @@ namespace eikonal
 
     // compute distance from the disk
     double distance(const std::vector<double>& point) const;
+    
+    // gradient of the distance function defined above
+    void gradient(const std::vector<double>& point,
+                  std::vector<double>& _gradient) const;
 
   private:
     std::vector<double> vertices;
@@ -136,6 +152,10 @@ namespace eikonal
     // compute distance from dolfin
     double distance(const std::vector<double>& point) const;
 
+    // gradient of the distance function defined above
+    void gradient(const std::vector<double>& point,
+                  std::vector<double>& _gradient) const;
+
   private:
     std::vector<double> vertices;
   };
@@ -154,7 +174,7 @@ namespace eikonal
     // distance between points
     double distance(const std::vector<double>& point) const;
 
-    // distance + gradient of the distance function
+    // gradient of the distance function defined above
     void gradient(const std::vector<double>& point,
                   std::vector<double>& _gradient) const;
 
