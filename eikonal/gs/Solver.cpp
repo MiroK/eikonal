@@ -159,7 +159,8 @@ namespace eikonal
   double
   Solver::local_solver(const dolfin::la_index unset_dof,
                        const std::vector<dolfin::la_index>& cell_set_dofs,
-                       const dolfin::GenericVector& u_vector)
+                       const dolfin::GenericVector& u_vector,
+                       const std::size_t precision)
   {
     if(cell_set_dofs.size() != 2)
     {
@@ -185,14 +186,16 @@ namespace eikonal
     double _k_values[2] = {u_vector[cell_set_dofs[0]],
                            u_vector[cell_set_dofs[1]]};
     const std::vector<double> k_values(_k_values, _k_values + 2);
-    
+   
+    // geoemtric does not use precision!
     return linear_geometric_2d(u_point, u_value, k_points, k_values);
   }
   //---------------------------------------------------------------------------
   
   
   std::size_t Solver::solve(dolfin::Function& u,
-                            const std::set<dolfin::la_index>& fixed_dofs)
+                            const std::set<dolfin::la_index>& fixed_dofs,
+                            const std::size_t precision)
   {
     // initialization
     
@@ -235,7 +238,8 @@ namespace eikonal
           std::vector<la_index>
           cell_set_dofs = get_cell_set_dofs(*cell, *unset_dof);
 
-          double u_ = this->local_solver(*unset_dof, cell_set_dofs, *u_vector);
+          double u_ = this->local_solver(*unset_dof, cell_set_dofs, *u_vector,
+                                         precision);
           if(u_ < u_old)
           {
             u_old = u_;

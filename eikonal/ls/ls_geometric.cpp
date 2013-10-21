@@ -9,10 +9,11 @@ using namespace std;
 
 namespace eikonal
 {
-  double linear_geometric_2d(const std::vector<double>& A,
-                             const std::vector<double>& B,
-                             const std::vector<double>& C,
-                             const double u_A, const double u_B, const double u_C)
+  double
+  linear_geometric_2d(const std::vector<double>& A,
+                      const std::vector<double>& B,
+                      const std::vector<double>& C,
+                      const double u_A, const double u_B, const double u_C)
   {
     const double a = norm(C - B, 2);
     const double b = norm(C - A, 2);

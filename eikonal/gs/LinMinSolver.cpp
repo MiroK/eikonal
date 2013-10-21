@@ -16,7 +16,8 @@ namespace eikonal
   double 
   LinMinSolver::local_solver(const dolfin::la_index unset_dof,
                              const std::vector<dolfin::la_index>& cell_set_dofs,
-                             const dolfin::GenericVector& u_vector)
+                             const dolfin::GenericVector& u_vector,
+                             const std::size_t precision)
   {
     if(cell_set_dofs.size() != 2)
     {
@@ -45,7 +46,7 @@ namespace eikonal
     
     std::size_t n_calls;
     double u_new = linear_brent_2d(u_point, u_value, k_points, k_values,
-                                   n_calls);
+                                   n_calls, precision);
     
     if(n_calls > max_calls)
     {

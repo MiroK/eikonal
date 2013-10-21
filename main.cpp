@@ -10,7 +10,13 @@ template<typename T> int run_test(std::string type, std::size_t precision=1);
 
 int main(int argc, char* argv[])
 {
-  dolfin::UnitSquareMesh mesh(10, 10);
+  double C[2] = {0.5, 1.};
+  local_test_C(C);
+
+  double S[2] = {0.5, -1};
+  local_test_S(S);
+
+  /*dolfin::UnitSquareMesh mesh(10, 10);
   CG1::FunctionSpace V(mesh);
  
   dolfin::Function u(V);
@@ -42,7 +48,7 @@ int main(int argc, char* argv[])
 
   du.vector()->set_local(du_values);
   dolfin::plot(du);
-  dolfin::interactive(true);
+  dolfin::interactive(true);*/
 
   return 0;
 }

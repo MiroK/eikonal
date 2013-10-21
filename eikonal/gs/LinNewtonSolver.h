@@ -24,7 +24,8 @@ namespace eikonal
     // local solver of the Eikonal equation     
     virtual double local_solver(const dolfin::la_index unset_dof,
                             const std::vector<dolfin::la_index>& cell_set_dofs,
-                            const dolfin::GenericVector& u_vector);
+                            const dolfin::GenericVector& u_vector,
+                            const std::size_t precision);
   };
 }
 

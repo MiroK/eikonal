@@ -177,11 +177,11 @@ namespace eikonal
       problem.init(fixed_dofs, u);
       problem.exact_solution(u_exact);
 
-      // create solver and compute the solution
+      // create solver and compute the sol //TODO do via call!ution
       T solver(V);
       // time the sweeping
       clock_t start = clock();
-      num_iters = solver.solve(u, fixed_dofs); 
+      num_iters = solver.solve(u, fixed_dofs, precision); 
       time = (double)(clock() - start)/CLOCKS_PER_SEC;
 
       // get the error in norms

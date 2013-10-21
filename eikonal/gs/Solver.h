@@ -29,9 +29,11 @@ namespace eikonal
     virtual ~Solver();
 
     // solve the eikonal euqtion |grad(u)| = 1 with values of u fixed at
-    // fixed_dofs 
+    // fixed_dofs, precision is the parameter used with iteratative local solver
+    // convergence tolerance = std::num_limits<double>::digits/precision
     std::size_t solve(dolfin::Function& u,
-                      const std::set<dolfin::la_index>& fixed_dofs);
+                      const std::set<dolfin::la_index>& fixed_dofs,
+                      const std::size_t precision);
   
   public:
     static std::string name;
@@ -63,9 +65,11 @@ namespace eikonal
     // local solver of Eikonal equation in the cell
     // compute the approximate value of u_vector in unset_dof from values
     // in set_dofs 
-    virtual double local_solver(const dolfin::la_index unset_dof,
-                             const std::vector<dolfin::la_index>& cell_set_dofs,
-                             const dolfin::GenericVector& u_vector);
+    virtual double
+    local_solver(const dolfin::la_index unset_dof,
+                 const std::vector<dolfin::la_index>& cell_set_dofs,
+                 const dolfin::GenericVector& u_vector,
+                 const std::size_t precision);
 
   protected:
     // map between cell=size_t and dofs it contains=set([la_index])

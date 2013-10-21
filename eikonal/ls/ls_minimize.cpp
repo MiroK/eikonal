@@ -4,7 +4,7 @@
 #include <cassert>
 #include <boost/math/tools/minima.hpp>
 #include <boost/math/tools/roots.hpp>
-#include <utility>
+#include <cmath>
 
 using namespace std;
 
@@ -12,37 +12,41 @@ namespace eikonal
 {
   std::size_t Linear2DFunctor::n_calls = 0;
 
-  double linear_brent_2d(const std::vector<double>& A,
+  std::pair<double, double>
+  linear_brent_2d(const std::vector<double>& A,
                          const std::vector<double>& B,
                          const std::vector<double>& C,
                          const double u_A, const double u_B,
-                         const double u_C, std::size_t& n_calls)
+                         const double u_C, std::size_t& n_calls,
+                         const std::size_t precision)
   {
     // use boost to minimize via functor
     LinearBrent2D foo(A, B, C, u_A, u_B);
     foo.n_calls = 0;
 
-    int digits = std::numeric_limits<double>::digits/2;
+    int digits = std::numeric_limits<double>::digits/precision;
     pair<double, double> t_ft = 
     boost::math::tools::brent_find_minima(foo, 0., 1., digits);
     
     n_calls = foo.n_calls;
 
     double u_ = t_ft.second;
-    return u_ < u_C ? u_ : u_C;
+    return std::make_pair<double, double>(t_ft.first, u_ < u_C ? u_ : u_C);
   }
   //---------------------------------------------------------------------------
   
-  double linear_newton_2d(const std::vector<double>& A,
-                          const std::vector<double>& B,
-                          const std::vector<double>& C,
-                          const double u_A, const double u_B,
-                          const double u_C, std::size_t& n_calls)
+  std::pair<double, double>
+  linear_newton_2d(const std::vector<double>& A,
+                   const std::vector<double>& B,
+                   const std::vector<double>& C,
+                   const double u_A, const double u_B,
+                   const double u_C, std::size_t& n_calls,
+                   std::size_t precision)
   {
     // use boost to minimize via functor
     LinearNewton2D foo(A, B, C, u_A, u_B);
     foo.n_calls = 0;
-    int digits = std::numeric_limits<double>::digits/2; 
+    int digits = std::numeric_limits<double>::digits/precision; 
     double t_min = 0.;
     double t_max = 1.;
     const double a = norm(C - B, 2);
@@ -58,10 +62,10 @@ namespace eikonal
     if(t >= 0 and t <= 1)
     {
       double u_ = boost::fusion::get<0>(foo(t));
-      return u_ < u_C ? u_ : u_C;
+      return std::make_pair<double, double>(t, u_ < u_C ? u_ : u_C);
     }
     else
-      return u_C;
+      return std::make_pair<double, double>(-1., u_C);
   }
   //---------------------------------------------------------------------------
 
@@ -69,7 +73,8 @@ namespace eikonal
                          const double u_value,
                          const std::vector<double>& k_points,
                          const std::vector<double>& k_values,
-                         std::size_t& n_calls)
+                         std::size_t& n_calls,
+                         const std::size_t precision)
   {
     const size_t n_k_points = 2;
     const size_t dim = 2;
@@ -86,8 +91,9 @@ namespace eikonal
                               B(&k_points[ip1*dim], &k_points[ip1*dim] + dim),
                               C(u_point);
     
-    // use the verbose interface
-    return linear_brent_2d(A, B, C, u_A, u_B, u_C, n_calls);
+    // use the verbose interface, getint 
+    // t - parameter of the intersect and the value t, return the value
+    return linear_brent_2d(A, B, C, u_A, u_B, u_C, n_calls, precision).second;
   }
   //---------------------------------------------------------------------------
 
@@ -95,7 +101,8 @@ namespace eikonal
                           const double u_value,
                           const std::vector<double>& k_points,
                           const std::vector<double>& k_values,
-                          std::size_t& n_calls)
+                          std::size_t& n_calls,
+                          const std::size_t precision)
   {
     const size_t n_k_points = 2;
     const size_t dim = 2;
@@ -113,9 +120,72 @@ namespace eikonal
                               C(u_point);
     
     // use the verbose interface
-    return linear_newton_2d(A, B, C, u_A, u_B, u_C, n_calls);
+    return linear_newton_2d(A, B, C, u_A, u_B, u_C, n_calls, precision).second;
   }
   //---------------------------------------------------------------------------
+
+  std::pair<double, double>
+  hermite_newton_2d(const std::vector<double>& A,
+                    const std::vector<double>& B,
+                    const std::vector<double>& C,
+                    const double u_A, const double u_B, const double u_C,
+                    const std::vector<double>& grad_u_A,
+                    const std::vector<double>& grad_u_B,
+                    std::vector<double>& grad_u_C,
+                    std::size_t& n_calls,
+                    const std::size_t precision)
+  {
+    // first call the newton solver //TODO do via call!
+    std::pair<double, double> t_ft = 
+    linear_newton_2d(A, B, C, u_A, u_B, u_C, n_calls, precision);
+
+    // now call hermite using t_ft.first as guess if possible
+    HermiteNewton2D foo(A, B, C, u_A, u_B, grad_u_A, grad_u_B);
+    
+    foo.n_calls = 0;
+    int digits = std::numeric_limits<double>::digits/precision; 
+    double t_min = 0.;
+    double t_max = 1.;
+    const double a = norm(C - B, 2);
+    const double b = norm(C - A, 2);
+    
+    double t_guess;
+    if(t_ft.first < 0) // linear solver did a poor job
+    {
+      t_guess = (u_A+b) <= (u_B+a) ? 0 : 1;
+    }
+    else
+    {
+      t_guess = t_ft.first;
+    }
+
+    double t = boost::math::tools::newton_raphson_iterate(foo,
+                            t_guess, t_min, t_max, digits);
+    n_calls = foo.n_calls;
+    
+    if(t >= 0 and t <= 1)
+    {
+      // if smaller value set also the gradient
+      double u_ = boost::fusion::get<0>(foo(t));
+      if(u_ < u_C)
+      {
+        std::vector<double> I = A*(1-t) + B*t;
+        grad_u_C = (C - I)/norm(C-I, 2);
+        return std::make_pair<double, double>(t, u_);
+      }
+      else
+      {
+        // leave the gradient alone
+        return std::make_pair<double, double>(t, u_C);
+      }
+    }
+    else
+    {
+      // leave the gradient alone
+      return std::make_pair<double, double>(-1., u_C);
+    }
+  //---------------------------------------------------------------------------
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -160,4 +230,53 @@ namespace eikonal
     n_calls++;
     return boost::math::make_tuple(f, df);
   }
+  //---------------------------------------------------------------------------
+
+  HermiteNewton2D::HermiteNewton2D(const std::vector<double>& _A,
+                                   const std::vector<double>& _B,
+                                   const std::vector<double>& _C,
+                                   const double _u_A, const double _u_B,
+                                   const std::vector<double>& _grad_u_A,
+                                   const std::vector<double>& _grad_u_B)
+  : Linear2DFunctor(_A, _B, _C, _u_A, _u_B), grad_u_A(_grad_u_A),
+  grad_u_B(_grad_u_B) { }
+  //----------------------------------------------------------------------------
+
+  boost::math::tuple<double, double> HermiteNewton2D::operator()(double x)
+  {
+    const vector<double> P = A*(1.-x) + B*x;
+    const double f =
+    u_A*pow(1-x, 3) + 3*(u_A + dot(B-A, grad_u_A)/3.)*x*(1-x)*(1-x)
+    + u_B*pow(x, 3.) + 3*(u_B + dot(A-B, grad_u_B)/3.)*x*x*(1-x)
+    + norm(C-P, 2);
+    
+    const double df = 3*u_B*x*x + 3*(u_B + dot(A-B, grad_u_B)/3.)*x*(2-3*x)
+             - 3*u_A*pow(1-x, 2) + 3*(u_A + dot(B-A, grad_u_A)/3.)*(1-x)*(1-3*x)
+             + dot(C-P, A-B)/norm(C-P, 2);
+    n_calls++;
+    return boost::math::make_tuple(f, df);
+  }
+  //---------------------------------------------------------------------------
+
+  HermiteBrent2D::HermiteBrent2D(const std::vector<double>& _A,
+                                   const std::vector<double>& _B,
+                                   const std::vector<double>& _C,
+                                   const double _u_A, const double _u_B,
+                                   const std::vector<double>& _grad_u_A,
+                                   const std::vector<double>& _grad_u_B)
+  : Linear2DFunctor(_A, _B, _C, _u_A, _u_B), grad_u_A(_grad_u_A),
+  grad_u_B(_grad_u_B) { }
+  //----------------------------------------------------------------------------
+
+  double HermiteBrent2D::operator()(double x)
+  {
+    const vector<double> P = A*(1.-x) + B*x;
+    const double f =
+    u_A*pow(1-x, 3) + 3*(u_A + dot(B-A, grad_u_A)/3.)*x*(1-x)*(1-x)
+    + u_B*pow(x, 3.) + 3*(u_B + dot(A-B, grad_u_B)/3.)*x*x*(1-x)
+    + norm(C-P, 2);
+    n_calls++;
+    return f;
+  }
+  //---------------------------------------------------------------------------
 }
