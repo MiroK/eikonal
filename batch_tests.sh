@@ -11,8 +11,14 @@ cd $ROOT/lin_brent/digits_double;
 cd $ROOT/lin_brent/digits_double_2;
 ./run.sh;
 
+cd $ROOT/lin_brent/digits_double_3;
+./run.sh;
+
 cd $ROOT/lin_newton/digits_double;
 ./run.sh;
 
 cd $ROOT/lin_newton/digits_double_2;
+./run.sh;
+
+cd $ROOT/lin_newton/digits_double_3;
 ./run.sh;

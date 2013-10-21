@@ -1,7 +1,4 @@
 #include "eikonal.h"
-#include "test/CG1_VECTOR.h"
-#include "test/CG1_FORMS.h"
-#include <dolfin.h>
 #include <cstdlib>
 
 using namespace eikonal;
@@ -10,7 +7,10 @@ using namespace eikonal;
 
 int main(int argc, char* argv[])
 {
-  for(std::size_t i = 3; i < 8; i++)
+  assert(argc == 3);
+  all_linear_tests(atoi(argv[1]), atoi(argv[2]));
+
+  /*for(std::size_t i = 3; i < 8; i++)
   {
     std::size_t N = (std::size_t)pow(2, i);
     dolfin::UnitSquareMesh mesh(N, N);
@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
     double l2_norm = dolfin::assemble(l2);
     
     std::cout << mesh.hmin() << " " << l1_norm << " " << l2_norm << std::endl;
-  } 
+  }*/ 
   return 0;
 }
 
