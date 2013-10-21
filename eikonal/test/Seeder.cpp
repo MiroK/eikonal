@@ -6,6 +6,7 @@
 #include <cassert>
 #include <cmath>
 #include <fstream>
+#include <algorithm>
 
 using namespace dolfin;
 
@@ -42,7 +43,7 @@ namespace eikonal
   void Segment::gradient(const std::vector<double>& point,
                          std::vector<double>& _gradient) const
   {
-
+    point_edge_gradient(point, A, B, _gradient);
   }
   //---------------------------------------------------------------------------
 
@@ -83,15 +84,37 @@ namespace eikonal
       
   double TwoCircles::distance(const std::vector<double>& point) const
   {
-    return std::min(point_circle(point, c1, r1, "d"),
-                    point_circle(point, c2, r2, "d"));
+    std::size_t source;
+    return distance(point, source);
   }
   //--------------------------------------------------------------------------
 
+  double TwoCircles::distance(const std::vector<double>& point,
+                             std::size_t& source) const
+  {
+    std::vector<double> distances;
+    distances.push_back(point_circle(point, c1, r1, "d"));
+    distances.push_back(point_circle(point, c2, r2, "d"));
+    double min_distance = *std::min_element(distances.begin(), distances.end());
+    source = std::distance(distances.begin(),
+              std::find(distances.begin(), distances.end(), min_distance));
+    return min_distance;
+  }
+  //---------------------------------------------------------------------------
+  
   void TwoCircles::gradient(const std::vector<double>& point,
                          std::vector<double>& _gradient) const
   {
-
+    std::size_t source;
+    double d = distance(point, source);
+    if(source == 0)
+    {
+      point_point_gradient(point, c1, _gradient);
+    }
+    else
+    {
+      point_point_gradient(point, c2, _gradient);
+    }
   }
   //---------------------------------------------------------------------------
   
@@ -126,7 +149,7 @@ namespace eikonal
   void Polygon::gradient(const std::vector<double>& point,
                          std::vector<double>& _gradient) const
   {
-
+    point_polygon_gradient(point, vertices, _gradient);
   }
   //---------------------------------------------------------------------------
   
@@ -204,7 +227,7 @@ namespace eikonal
   void Zalesak::gradient(const std::vector<double>& point,
                          std::vector<double>& _gradient) const
   {
-
+    point_polygon_gradient(point, vertices, _gradient);
   }
   //---------------------------------------------------------------------------
   
@@ -251,7 +274,7 @@ namespace eikonal
   void Dolphin::gradient(const std::vector<double>& point,
                          std::vector<double>& _gradient) const
   {
-
+    point_polygon_gradient(point, vertices, _gradient);
   }
   //---------------------------------------------------------------------------
   

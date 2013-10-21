@@ -77,6 +77,9 @@ namespace eikonal
       
     // compute distance from the sigment, distance NOT SIGNED DISTANCE
     double distance(const std::vector<double>& point) const;
+   
+    // distance + what circle is the source
+    double distance(const std::vector<double>& point, std::size_t& source) const;
     
     // gradient of the distance function defined above
     void gradient(const std::vector<double>& point,

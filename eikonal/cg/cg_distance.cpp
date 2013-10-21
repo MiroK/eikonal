@@ -22,6 +22,7 @@ namespace eikonal
   {
     const double distance = point_point(P, Q);
     const std::size_t dim = P.size(); 
+    
     gradient.resize(dim);
     if(distance > LA_EPS)
     {
@@ -52,9 +53,38 @@ namespace eikonal
   }
   //---------------------------------------------------------------------------
   
+  void point_edge_gradient(const std::vector<double>& P,
+                           const std::vector<double>& A,
+                           const std::vector<double>& B,
+                           std::vector<double>& gradient)
+  {
+    // get the distance to see if point intersects edge
+    double d = point_edge(P, A, B);
+    if(d < 0)// no intersect, zero the gradient
+    {
+      gradient.assign(P.size(), 0.);
+    }
+    else
+    {
+       // call the line is okay
+      point_line_gradient(P, A, B, gradient);
+    }
+  }
+  //---------------------------------------------------------------------------
+
   pair<double, bool> 
   point_line(const std::vector<double>& P, const std::vector<double>& A,
                     const std::vector<double>& B, const std::string type)
+  {
+    std::vector<double> I;
+    return point_line(P, A, B, type, I);
+  }
+  //---------------------------------------------------------------------------
+  
+  std::pair<double, bool> 
+  point_line(const std::vector<double>& P, const std::vector<double>& A,
+             const std::vector<double>& B, const std::string type,
+             std::vector<double>& I)
   {
     assert(type == "sd" or type == "d");
     assert(P.size() == A.size() and A.size() == B.size());
@@ -66,7 +96,7 @@ namespace eikonal
 
     const double t = dot(P - A, B - A)/AB/AB;
     bool inside = (t > 1 or t < 0) ? false : true;
-    const vector<double> I = A + t*(B - A);
+    I = A + t*(B - A);
     if(type == "d") 
     {
       return pair<double, double>(norm(P - I, 2), inside);
@@ -80,6 +110,18 @@ namespace eikonal
   }
   //---------------------------------------------------------------------------
   
+  void point_line_gradient(const std::vector<double>& P,
+                           const std::vector<double>& A,
+                           const std::vector<double>& B,
+                           std::vector<double>& gradient)
+  {
+    // get the distance and intersect
+    std::vector<double> I;
+    std::pair<double, bool> distance_onEdge=point_line(P, A, B, "d", I);
+    gradient = (P-I)/distance_onEdge.first;
+  }
+  //---------------------------------------------------------------------------
+
   double point_polygon(const std::vector<double>& P,
                        const std::vector<double>& vertices,
                        const std::string type)
@@ -119,6 +161,64 @@ namespace eikonal
     {
       const int sign = g_inside(vertices, P) ? -1 : 1;
       return sign*(*min_element(distances.begin(), distances.end()));
+    }
+  }
+  //---------------------------------------------------------------------------
+  
+  void point_polygon_gradient(const std::vector<double>& P,
+                                const std::vector<double>& vertices,
+                                std::vector<double>& _gradient)
+  {
+    // minimal distance from the vertices and edges of the polygon
+    const size_t dim = 2;
+    assert(P.size() == 2);
+    assert(vertices.size()%dim == 0);
+    const size_t n_edges = vertices.size()/dim; // also number of vertices 
+
+    vector<double> distances; // will hold 2*n_edges values
+    distances.reserve(2*n_edges);
+
+    //push back distances from verties and edges;
+    for(size_t i = 0; i < n_edges; i++)
+    {
+      const double* _V = &vertices[i*dim];
+      const vector<double> V(_V, _V + dim);
+      distances.push_back(point_point(P, V));
+     
+      const double* _W = &vertices[((i+1)%n_edges)*dim];
+      const vector<double> W(_W, _W + dim);
+      const double d = point_edge(P, V, W);
+      if(d != -1)
+      {
+        distances.push_back(d);
+      }
+      else
+      {
+        distances.push_back(1E8); // something big too keep the logic below OK
+      }
+    }
+
+    // find index if the min element
+    double minima = *min_element(distances.begin(), distances.end());
+    std::size_t i = std::distance(distances.begin(),
+                         std::find(distances.begin(), distances.end(), minima));
+    // we have ordered distances as vertex, edge from that vertex, vertex ...
+    // if i even it is a vertex
+    if((i%2) == 0)
+    {
+      const double* _Q = &vertices[(i/2)*dim];
+      const std::vector<double> Q(_Q, _Q + dim);
+      point_point_gradient(P, Q, _gradient);
+    }
+    else
+    {
+      const double* _A = &vertices[(i/2)*dim];
+      const std::vector<double> A(_A, _A + dim);
+      
+      const double* _B = &vertices[(((i/2)+1)%n_edges)*dim];
+      const std::vector<double> B(_B, _B + dim);
+
+      point_edge_gradient(P, A, B, _gradient);
     }
   }
   //---------------------------------------------------------------------------
