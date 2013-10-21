@@ -12,5 +12,6 @@
 #include "Solver.h"
 #include "LinMinSolver.h"
 #include "LinNewtonSolver.h"
+#include "HermiteSolver.h"
 
 #endif //_EIKONAL_GS_H_

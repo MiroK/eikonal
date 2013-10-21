@@ -40,7 +40,7 @@ namespace eikonal
     std::size_t min_calls;
     std::size_t max_calls;
 
-  private:
+  protected:
     // initiliaze dof_status, 
     boost::shared_ptr<std::vector<bool> >
     init_dof_status(const dolfin::Function& u,

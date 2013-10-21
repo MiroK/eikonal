@@ -55,7 +55,8 @@ add_executable(${PROJECT_NAME}
                                ./eikonal/gs/Solver.cpp
                                ./eikonal/gs/LinMinSolver.cpp
                                ./eikonal/gs/LinNewtonSolver.cpp
-                               
+                               ./eikonal/gs/HermiteSolver.cpp
+
                                ./eikonal/test/test_common.cpp
                                ./eikonal/test/Seeder.cpp
                                ./eikonal/test/Problem.cpp
