@@ -158,9 +158,10 @@ namespace eikonal
     {
       t_guess = t_ft.first;
     }
-
+      
+    boost::uintmax_t max_iter = 300;
     double t = boost::math::tools::newton_raphson_iterate(foo,
-                            t_guess, t_min, t_max, digits);
+                            t_guess, t_min, t_max, digits, max_iter);
     n_calls = foo.n_calls;
     
     if(t >= 0 and t <= 1)

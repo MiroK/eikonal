@@ -146,7 +146,7 @@ namespace eikonal
     HermiteSolver solver(V);
 
     clock_t start = clock();
-    solver.solve(u, du_dx, du_dy, fixed_dofs, precision);
+    num_iters = solver.solve(u, du_dx, du_dy, fixed_dofs, precision);
     time = (double)(clock() - start)/CLOCKS_PER_SEC;
   
     // get the error in norms
