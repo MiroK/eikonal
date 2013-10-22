@@ -5,7 +5,3 @@ element = VectorElement("Lagrange", triangle, 1)
 u = Coefficient(element)
 v = Coefficient(element)
 
-norm1 = sqrt(dot(u-v, u-v))*dx
-norm2 = abs(dot(u-v, u-v))*dx
-forms = [norm1, norm2]
-

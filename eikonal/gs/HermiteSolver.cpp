@@ -1,5 +1,7 @@
 #include "HermiteSolver.h"
-#include "gs/gs_LpDistanceSorter.h"
+#include "Sorter.h"
+#include "gs_LpDistanceSorter.h"
+#include "gs_MyIterator.h"
 #include "ls/ls_minimize.h"
 #include <dolfin/function/FunctionSpace.h>
 #include <dolfin/function/Function.h>
@@ -17,22 +19,28 @@ namespace eikonal
   HermiteSolver::~HermiteSolver(){ }
   //---------------------------------------------------------------------------
 
-  std::size_t HermiteSolver::solve(dolfin::Function& u,
-                                   dolfin::Function& du_dx,
-                                   dolfin::Function& du_dy,
-                                   const std::set<dolfin::la_index>& fixed_dofs,
-                                   const std::size_t precision)
+  std::size_t
+  HermiteSolver::solve(dolfin::Function& u,
+                       dolfin::Function& du_dx,
+                       dolfin::Function& du_dy,
+                       const std::set<dolfin::la_index>& fixed_dofs,
+                       const std::size_t precision,
+                       const std::size_t p,
+                       std::vector<std::vector<double> >& ref_points)
   {
     // initialization
     dof_status = init_dof_status(u, fixed_dofs);
     
     unset_dofs = init_unset_dofs(u, fixed_dofs);
-    
-    std::vector<std::vector<double> > ref_points = get_reference_points(*V.mesh());
-   
+ 
+    if(ref_points.empty())
+    {
+      ref_points = get_reference_points(*V.mesh());
+    }
+
     LpDistanceSorter sorter(dof_2_coordinate);
     // use L^2 norm to sort unset_dofs by their distance from ref_points;
-    sorter.sort(*unset_dofs, ref_points, 2); 
+    sorter.sort(*unset_dofs, ref_points, p); 
 
     std::size_t n_points = ref_points.size();
     std::size_t n_uniq_sweeps = n_points*2;
@@ -101,6 +109,83 @@ namespace eikonal
   }
   //---------------------------------------------------------------------------
   
+  std::size_t
+  HermiteSolver::solve(dolfin::Function& u,
+                       dolfin::Function& du_dx,
+                       dolfin::Function& du_dy,
+                       const std::set<dolfin::la_index>& fixed_dofs,
+                       const std::size_t precision,
+                       const Sorter& sorter)
+  {
+    // initialization
+    dof_status = init_dof_status(u, fixed_dofs);
+    
+    unset_dofs = init_unset_dofs(u, fixed_dofs);
+ 
+    sorter.sort(*unset_dofs); 
+
+    boost::shared_ptr<GenericVector> u_vector = u.vector();
+    boost::shared_ptr<GenericVector> du_dx_vector = du_dx.vector();
+    boost::shared_ptr<GenericVector> du_dy_vector = du_dy.vector();
+
+    Function v(V);                // solution from previous weep
+    boost::shared_ptr<GenericVector> v_vector = v.vector();
+    *v_vector = *u_vector;
+
+    // sweep
+    std::size_t k = 0; // counter of unique sweeps;
+    while(true)
+    {
+      k++;
+      // apply local solver to unset_dofs in order given by ref_point
+      std::vector<dolfin::la_index>::const_iterator
+      unset_dof = unset_dofs->begin(); 
+      for( ; unset_dof != unset_dofs->end(); unset_dof++)
+      {
+        double u_old = (*u_vector)[*unset_dof];
+        double du_dx_old = (*du_dx_vector)[*unset_dof];
+        double du_dy_old = (*du_dy_vector)[*unset_dof];
+        std::vector<std::size_t> cells = dof_2_cell.find(*unset_dof)->second;
+
+        std::vector<std::size_t>::const_iterator cell = cells.begin();
+        for( ; cell != cells.end(); cell++)
+        {
+          std::vector<la_index>
+          cell_set_dofs = get_cell_set_dofs(*cell, *unset_dof);
+
+          std::pair<double, std::vector<double> > u_gradu = 
+          this->local_solver(*unset_dof, cell_set_dofs, *u_vector, 
+                             *du_dx_vector, *du_dy_vector, precision);
+          double u_ = u_gradu.first;
+          if(u_ < u_old)
+          {
+            u_old = u_;
+            (*dof_status)[*unset_dof - offset] = true;
+            // also set the gradient
+            du_dx_old = (u_gradu.second)[0];
+            du_dy_old = (u_gradu.second)[1];
+          }
+        }
+        u_vector->setitem(*unset_dof, u_old);
+        du_dx_vector->setitem(*unset_dof, du_dx_old);
+        du_dy_vector->setitem(*unset_dof, du_dy_old);
+      }
+
+      // sweep over; check convergence as |u-v| in L infty norm
+      *v_vector -= *u_vector;
+      v_vector->abs();
+      if(v_vector->max() < DOLFIN_EPS)
+      {
+        return k;
+      }
+      else
+      {
+        *v_vector = *u_vector;
+      }
+    }
+  }
+  //---------------------------------------------------------------------------
+
   std::pair<double, std::vector<double> > 
   HermiteSolver::local_solver(const dolfin::la_index unset_dof,
                               const std::vector<dolfin::la_index>& cell_set_dofs,

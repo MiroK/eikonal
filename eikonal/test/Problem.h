@@ -12,6 +12,7 @@
 namespace dolfin
 {
   class Function;
+  template<typename T> class MeshFunction;
 }
 
 namespace eikonal
@@ -41,6 +42,11 @@ namespace eikonal
     // grad(u)/|grad(u) by components
     void exact_solution(dolfin::Function& u, dolfin::Function& du_dx,
                         dolfin::Function& du_dy) const;
+    
+    // get the CellFunction which marks cells of the mesh of u that are
+    // width-cells away from the interface
+    dolfin::MeshFunction<std::size_t> get_band(dolfin::Function& u,
+                                       const std::size_t width) const;
 
     // get name of the seeder
     std::string name() const;

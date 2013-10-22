@@ -8,13 +8,22 @@ namespace eikonal
 {
   int all_hermite_tests(std::size_t precision)
   {
-      std::cout << "Solving with linear geometric solver:" << std::endl;
-      //run_hermite_test("line", precision);  // FIXME
+      std::cout << "Solving with hermite solver:" << std::endl;
+
+      double _P[2] = {0., 0.}; std::vector<double> P(_P, _P+2);
+      MyPoint point(P);
+      Problem problem(point);
+      
+      int status;
+      // convergence test on an unperturbed RectangleMesh crossed [2**3 .. 2**7]
+      //RectangleMeshGenerator mesh_gen0(1, 2, 0, 0, 1, 1, false);
+      //status = hermite_test(problem, mesh_gen0, precision, true);
+
+      /*
       run_hermite_test("point", precision); 
       run_hermite_test("twocircle", precision); 
       run_hermite_test("triangle", precision); 
-      run_hermite_test("zalesak", precision); 
-      run_hermite_test("dolphin", precision);
+      run_hermite_test("zalesak", precision);*/ 
   }
   //---------------------------------------------------------------------------
 
@@ -31,15 +40,19 @@ namespace eikonal
       int status;
       // convergence test on an unperturbed RectangleMesh crossed [2**3 .. 2**7]
       RectangleMeshGenerator mesh_gen0(3, 8, -2, -2, 2, 2, false);
-      status = hermite_test(problem, mesh_gen0, precision, true);
+      //status = hermite_test(problem, mesh_gen0, precision, true);
 
       // convergence test on an perturbed RectangleMesh crossed [2**3 .. 2**7]
       RectangleMeshGenerator mesh_gen1(3, 8, -2, -2, 2, 2, false);
-      status = hermite_test(problem, mesh_gen1, precision, false);
+      //status = hermite_test(problem, mesh_gen1, precision, false);
       
-      // convergence test on meshes by gmsh 0 .. 6
-      GmshMeshGenerator mesh_gen2(1, 7, "rectangle");
-      status = hermite_test(problem, mesh_gen2, precision, false);
+      // convergence test on meshes by gmsh 0 .. 6, no smoothing
+      GmshMeshGenerator mesh_gen2(1, 7, "rectangle", false);
+      //status = hermite_test(problem, mesh_gen2, precision, false);
+      
+      // convergence test on meshes by gmsh 0 .. 6, smoothing
+      GmshMeshGenerator mesh_gen3(1, 7, "rectangle", true);
+      //status = hermite_test(problem, mesh_gen3, precision, false);
       
       return status;
     }
@@ -54,15 +67,19 @@ namespace eikonal
       int status;
       // convergence test on an unperturbed RectangleMesh crossed [2**3 .. 2**7]
       RectangleMeshGenerator mesh_gen0(3, 8, -2, -2, 2, 2, false);
-      status = hermite_test(problem, mesh_gen0, precision, false);
+      //status = hermite_test(problem, mesh_gen0, precision, false);
 
       // convergence test on an perturbed RectangleMesh crossed [2**3 .. 2**7]
       RectangleMeshGenerator mesh_gen1(3, 8, -2, -2, 2, 2, true);
-      status = hermite_test(problem, mesh_gen1, precision, false);
+      //status = hermite_test(problem, mesh_gen1, precision, false);
       
-      // convergence test on meshes by gmsh 0 .. 6
-      GmshMeshGenerator mesh_gen2(1, 7, "rectangle");
-      status = hermite_test(problem, mesh_gen2, precision, false);
+      // convergence test on meshes by gmsh 0 .. 6, no smoothing
+      GmshMeshGenerator mesh_gen2(1, 7, "rectangle", false);
+      //status = hermite_test(problem, mesh_gen2, precision, false);
+      
+      // convergence test on meshes by gmsh 0 .. 6, smoothing
+      GmshMeshGenerator mesh_gen3(1, 7, "rectangle", true);
+      //status = hermite_test(problem, mesh_gen3, precision, false);
       
       return status;
     }
@@ -74,9 +91,22 @@ namespace eikonal
       Problem problem(polygon);
       
       int status;
-      // convergence test on meshes by gmsh 0 .. 6
-      GmshMeshGenerator mesh_gen2(1, 7, "rectangle");
-      status = hermite_test(problem, mesh_gen2, precision, false);
+      // convergence test on an unperturbed RectangleMesh crossed [2**3 .. 2**7]
+      RectangleMeshGenerator mesh_gen0(3, 8, -2, -2, 2, 2, false);
+      //status = hermite_test(problem, mesh_gen0, precision, false);
+
+      // convergence test on an perturbed RectangleMesh crossed [2**3 .. 2**7]
+      RectangleMeshGenerator mesh_gen1(3, 8, -2, -2, 2, 2, true);
+      //status = hermite_test(problem, mesh_gen1, precision, false);
+      
+      // convergence test on meshes by gmsh 0 .. 6, no smoothing
+      GmshMeshGenerator mesh_gen2(1, 7, "rectangle", false);
+      //status = hermite_test(problem, mesh_gen2, precision, false);
+      
+      // convergence test on meshes by gmsh 0 .. 6, smoothing
+      GmshMeshGenerator mesh_gen3(1, 7, "rectangle", true);
+      //status = hermite_test(problem, mesh_gen3, precision, false);
+      
       
       return status;
     }
@@ -89,9 +119,21 @@ namespace eikonal
       Problem problem(zalesak);
       
       int status;
-      // convergence test on meshes by gmsh 0 .. 6
-      GmshMeshGenerator mesh_gen2(1, 7, "rectangle");
-      status = hermite_test(problem, mesh_gen2, precision, false);
+      // convergence test on an unperturbed RectangleMesh crossed [2**3 .. 2**7]
+      RectangleMeshGenerator mesh_gen0(3, 8, -2, -2, 2, 2, false);
+      //status = hermite_test(problem, mesh_gen0, precision, false);
+
+      // convergence test on an perturbed RectangleMesh crossed [2**3 .. 2**7]
+      RectangleMeshGenerator mesh_gen1(3, 8, -2, -2, 2, 2, true);
+      //status = hermite_test(problem, mesh_gen1, precision, false);
+      
+      // convergence test on meshes by gmsh 0 .. 6, no smoothing
+      GmshMeshGenerator mesh_gen2(1, 7, "rectangle", false);
+      //status = hermite_test(problem, mesh_gen2, precision, false);
+      
+      // convergence test on meshes by gmsh 0 .. 6, smoothing
+      GmshMeshGenerator mesh_gen3(1, 7, "rectangle", true);
+      //status = hermite_test(problem, mesh_gen3, precision, false);
       
       return status;
     }
@@ -103,9 +145,21 @@ namespace eikonal
       Problem problem(dolphin);
       
       int status;
-      // convergence test on meshes by gmsh 0 .. 6
-      GmshMeshGenerator mesh_gen2(1, 7, "rectangle");
-      status = hermite_test(problem, mesh_gen2, precision, true);
+      // convergence test on an unperturbed RectangleMesh crossed [2**3 .. 2**7]
+      RectangleMeshGenerator mesh_gen0(3, 8, -2, -2, 2, 2, false);
+      //status = hermite_test(problem, mesh_gen0, precision, false);
+
+      // convergence test on an perturbed RectangleMesh crossed [2**3 .. 2**7]
+      RectangleMeshGenerator mesh_gen1(3, 8, -2, -2, 2, 2, true);
+      //status = hermite_test(problem, mesh_gen1, precision, false);
+      
+      // convergence test on meshes by gmsh 0 .. 6, no smoothing
+      GmshMeshGenerator mesh_gen2(1, 7, "rectangle", false);
+      //status = hermite_test(problem, mesh_gen2, precision, false);
+      
+      // convergence test on meshes by gmsh 0 .. 6, smoothing
+      GmshMeshGenerator mesh_gen3(1, 7, "rectangle", true);
+      //status = hermite_test(problem, mesh_gen3, precision, false);
       
       return status;
     }
@@ -117,9 +171,21 @@ namespace eikonal
       Problem problem(point);
       
       int status;
-      // convergence test on meshes by gmsh 0 .. 6
-      GmshMeshGenerator mesh_gen2(1, 7, "rectangle");
-      status = hermite_test(problem, mesh_gen2, precision, false);
+      // convergence test on an unperturbed RectangleMesh crossed [2**3 .. 2**7]
+      RectangleMeshGenerator mesh_gen0(3, 8, -2, -2, 2, 2, false);
+      //status = hermite_test(problem, mesh_gen0, precision, false);
+
+      // convergence test on an perturbed RectangleMesh crossed [2**3 .. 2**7]
+      RectangleMeshGenerator mesh_gen1(3, 8, -2, -2, 2, 2, true);
+      //status = hermite_test(problem, mesh_gen1, precision, false);
+      
+      // convergence test on meshes by gmsh 0 .. 6, no smoothing
+      GmshMeshGenerator mesh_gen2(1, 7, "rectangle", false);
+      //status = hermite_test(problem, mesh_gen2, precision, false);
+      
+      // convergence test on meshes by gmsh 0 .. 6, smoothing
+      GmshMeshGenerator mesh_gen3(1, 7, "rectangle", true);
+      //status = hermite_test(problem, mesh_gen3, precision, false);
       
       return status;
     }

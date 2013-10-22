@@ -10,6 +10,8 @@
 #include <dolfin/fem/assemble.h>
 #include <dolfin/io/File.h>
 #include <dolfin/plot/plot.h>
+#include <dolfin/mesh/MeshFunction.h>
+#include <dolfin/mesh/SubMesh.h>
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -68,11 +70,11 @@ namespace eikonal
 
       // get the solution
       std::size_t num_iters, min_calls = 0, max_calls = 0;
-      double l1_norm, l2_norm, coo_norm, time;
+      double l1_norm, l2_norm, band_l1_norm, band_l2_norm, coo_norm, time;
       
       int status =
-      hermite_test(problem, *mesh, precision, num_iters, min_calls,
-                   max_calls, l1_norm, l2_norm, coo_norm, time,
+      hermite_test(problem, *mesh, precision, num_iters, min_calls, max_calls,
+                   l1_norm, l2_norm, band_l1_norm, band_l2_norm, coo_norm, time,
                    u_file_name, exact_file_name, error_file_name, plot_on); 
 
       std::cout.precision(8);
@@ -83,7 +85,8 @@ namespace eikonal
       std::cout << std::scientific << mesh->hmin() << " " << l1_norm << " " <<
         l2_norm << " " << coo_norm << " " << time << " " <<
         n_obtuse_cells << "/" << num_cells << " " << num_iters << " " <<
-        min_calls << " " << max_calls << std::endl;
+        min_calls << " " << max_calls << " " << band_l1_norm << 
+        " " << band_l2_norm << std::endl;
       
       // write to text file
       data_file.open(data_file_name.c_str(), std::ios::app);
@@ -91,30 +94,12 @@ namespace eikonal
       data_file << std::scientific << mesh->hmin() << " " << l1_norm << " " <<
         l2_norm << " " << coo_norm << " " << time << " " << n_obtuse_cells <<
         " " << num_cells << " " << num_iters << " " << min_calls << 
-        " " << max_calls << std::endl;
-      
-      data_file.close();
-      }
-
-      if(max_calls == 1E6 and min_calls == 0) 
-      {
-      // write to screen
-      std::cout << std::scientific << mesh->hmin() << " " << l1_norm << " " <<
-        l2_norm << " " << coo_norm << " " << time << " " <<
-        n_obtuse_cells << "/" << num_cells << " " << num_iters << std::endl;
-      
-      // write to text file
-      data_file.open(data_file_name.c_str(), std::ios::app);
-      
-      data_file << std::scientific << mesh->hmin() << " " << l1_norm << " " <<
-        l2_norm << " " << coo_norm << " " << time << " " << n_obtuse_cells <<
-        " " << num_cells << " " << num_iters << std::endl;
+        " " << max_calls << " " << band_l1_norm << " " << band_l2_norm << std::endl;
       
       data_file.close();
       }
     }
     std::cout << std::endl;
-
   }
   //---------------------------------------------------------------------------
 
@@ -122,6 +107,7 @@ namespace eikonal
                       std::size_t precision, std::size_t& num_iters,
                       std::size_t& min_calls, std::size_t& max_calls,
                       double& l1_norm, double& l2_norm,
+                      double& band_l1_norm, double& band_l2_norm,
                       double& coo_norm, double& time,
                       std::string u_file_name, std::string exact_file_name,
                       std::string error_file_name, bool plot_on)
@@ -141,19 +127,38 @@ namespace eikonal
     // set up vars with solver
     problem.init(fixed_dofs, u, du_dx, du_dy);
     problem.exact_solution(exact_u, exact_du_dx, exact_du_dy);
-  
+    dolfin::MeshFunction<std::size_t> band = problem.get_band(u, 3);
+ 
+    dolfin::plot(u);
+    dolfin::plot(exact_u);
+    dolfin::interactive(true);
+
     // set up solver and solve
     HermiteSolver solver(V);
 
     clock_t start = clock();
-    num_iters = solver.solve(u, du_dx, du_dy, fixed_dofs, precision);
+    //num_iters = solver.solve(u, du_dx, du_dy, fixed_dofs, precision);
     time = (double)(clock() - start)/CLOCKS_PER_SEC;
   
+    dolfin::plot(u);
+    dolfin::plot(exact_u);
+    dolfin::interactive(true);
+    
     // get the error in norms
     CG1_FORMS::Form_norm1 l1(mesh, u, exact_u);
     CG1_FORMS::Form_norm2 l2(mesh, u, exact_u);
     l1_norm = dolfin::assemble(l1);
-    l2_norm = dolfin::assemble(l2);
+    l2_norm = sqrt(dolfin::assemble(l2));
+    
+    // get the area of the band and norms1 on the submesh
+    dolfin::SubMesh band_mesh(mesh, band, 1);
+    CG1_FORMS::Form_norm1 l1_band(band_mesh, u, exact_u);
+    CG1_FORMS::Form_norm2 l2_band(band_mesh, u, exact_u);
+    CG1_FORMS::Form_area area_band(band_mesh);
+
+    double area = dolfin::assemble(area_band);
+    band_l1_norm = dolfin::assemble(l1_band)/area;
+    band_l2_norm = sqrt(dolfin::assemble(l2_band))/area;
     
     // save exact solution now, because later it is used to hold the error
     dolfin::File exact_file(exact_file_name);

@@ -52,6 +52,7 @@ add_executable(${PROJECT_NAME}
 
                                ./eikonal/gs/gs_connectivity.cpp
                                ./eikonal/gs/gs_LpDistanceSorter.cpp
+                               ./eikonal/gs/Sorter.cpp
                                ./eikonal/gs/Solver.cpp
                                ./eikonal/gs/LinMinSolver.cpp
                                ./eikonal/gs/LinNewtonSolver.cpp

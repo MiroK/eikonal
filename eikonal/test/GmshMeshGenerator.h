@@ -17,7 +17,8 @@ namespace eikonal
     // names are constructed as root_i.msh.xml
     GmshMeshGenerator(const std::size_t _i_min,
                       const std::size_t _i_max,
-                      const std::string _root);
+                      const std::string _root,
+                      const bool _smoothed);
 
     // iteration is over
     virtual bool end() const;
@@ -36,6 +37,7 @@ namespace eikonal
     const std::size_t i_max;
     const std::string root;
     std::size_t i;
+    const bool smoothed;
   };
 }
 

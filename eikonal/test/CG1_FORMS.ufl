@@ -4,8 +4,10 @@
 element = FiniteElement("Lagrange", triangle, 1)
 u = Coefficient(element)
 v = Coefficient(element)
+one = Constant(triangle)
 
 norm1 = abs(u-v)*dx
-norm2 = abs((u-v)*(u-v))*dx
-forms = [norm1, norm2]
+norm2 = abs(u-v)**2*dx
+area = one*dx
+forms = [norm1, norm2, area]
 

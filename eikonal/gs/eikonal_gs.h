@@ -8,7 +8,7 @@
 #include "gs_connectivity.h"
 #include "gs_MyIterator.h"
 #include "gs_LpDistanceSorter.h"
-
+#include "Sorter.h"
 #include "Solver.h"
 #include "LinMinSolver.h"
 #include "LinNewtonSolver.h"

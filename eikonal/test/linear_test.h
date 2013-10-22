@@ -56,9 +56,13 @@ namespace eikonal
       RectangleMeshGenerator mesh_gen1(3, 8, -2, -2, 2, 2, true);
       status = linear_2D_test<T>(problem, mesh_gen1, precision, false);
       
-      // convergence test on meshes by gmsh 0 .. 6
-      GmshMeshGenerator mesh_gen2(1, 7, "rectangle");
+      // convergence test on meshes by gmsh 0 .. 6 without smoothing
+      GmshMeshGenerator mesh_gen2(1, 7, "rectangle", false);
       status = linear_2D_test<T>(problem, mesh_gen2, precision, false);
+      
+      // convergence test on meshes by gmsh 0 .. 6 with smoothing
+      GmshMeshGenerator mesh_gen3(1, 7, "rectangle", true);
+      status = linear_2D_test<T>(problem, mesh_gen3, precision, false);
       
       return status;
     }
@@ -79,9 +83,13 @@ namespace eikonal
       RectangleMeshGenerator mesh_gen1(3, 8, -2, -2, 2, 2, true);
       status = linear_2D_test<T>(problem, mesh_gen1, precision, false);
       
-      // convergence test on meshes by gmsh 0 .. 6
-      GmshMeshGenerator mesh_gen2(1, 7, "rectangle");
+      // convergence test on meshes by gmsh 0 .. 6 without smoothing
+      GmshMeshGenerator mesh_gen2(1, 7, "rectangle", false);
       status = linear_2D_test<T>(problem, mesh_gen2, precision, false);
+      
+      // convergence test on meshes by gmsh 0 .. 6 with smoothing
+      GmshMeshGenerator mesh_gen3(1, 7, "rectangle", true);
+      status = linear_2D_test<T>(problem, mesh_gen3, precision, false);
       
       return status;
     }
@@ -93,9 +101,21 @@ namespace eikonal
       Problem problem(polygon);
       
       int status;
-      // convergence test on meshes by gmsh 0 .. 6
-      GmshMeshGenerator mesh_gen2(1, 7, "rectangle");
+      // convergence test on an unperturbed RectangleMesh crossed [2**3 .. 2**7]
+      RectangleMeshGenerator mesh_gen0(3, 8, -2, -2, 2, 2, false);
+      status = linear_2D_test<T>(problem, mesh_gen0, precision, false);
+
+      // convergence test on an perturbed RectangleMesh crossed [2**3 .. 2**7]
+      RectangleMeshGenerator mesh_gen1(3, 8, -2, -2, 2, 2, true);
+      status = linear_2D_test<T>(problem, mesh_gen1, precision, false);
+      
+      // convergence test on meshes by gmsh 0 .. 6 without smoothing
+      GmshMeshGenerator mesh_gen2(1, 7, "rectangle", false);
       status = linear_2D_test<T>(problem, mesh_gen2, precision, false);
+      
+      // convergence test on meshes by gmsh 0 .. 6 with smoothing
+      GmshMeshGenerator mesh_gen3(1, 7, "rectangle", true);
+      status = linear_2D_test<T>(problem, mesh_gen3, precision, false);
       
       return status;
     }
@@ -108,9 +128,21 @@ namespace eikonal
       Problem problem(zalesak);
       
       int status;
-      // convergence test on meshes by gmsh 0 .. 6
-      GmshMeshGenerator mesh_gen2(1, 7, "rectangle");
+      // convergence test on an unperturbed RectangleMesh crossed [2**3 .. 2**7]
+      RectangleMeshGenerator mesh_gen0(3, 8, -2, -2, 2, 2, false);
+      status = linear_2D_test<T>(problem, mesh_gen0, precision, false);
+
+      // convergence test on an perturbed RectangleMesh crossed [2**3 .. 2**7]
+      RectangleMeshGenerator mesh_gen1(3, 8, -2, -2, 2, 2, true);
+      status = linear_2D_test<T>(problem, mesh_gen1, precision, false);
+      
+      // convergence test on meshes by gmsh 0 .. 6 without smoothing
+      GmshMeshGenerator mesh_gen2(1, 7, "rectangle", false);
       status = linear_2D_test<T>(problem, mesh_gen2, precision, false);
+      
+      // convergence test on meshes by gmsh 0 .. 6 with smoothing
+      GmshMeshGenerator mesh_gen3(1, 7, "rectangle", true);
+      status = linear_2D_test<T>(problem, mesh_gen3, precision, false);
       
       return status;
     }
@@ -122,9 +154,21 @@ namespace eikonal
       Problem problem(dolphin);
       
       int status;
-      // convergence test on meshes by gmsh 0 .. 6
-      GmshMeshGenerator mesh_gen2(1, 7, "rectangle");
+      // convergence test on an unperturbed RectangleMesh crossed [2**3 .. 2**7]
+      RectangleMeshGenerator mesh_gen0(3, 8, -2, -2, 2, 2, false);
+      status = linear_2D_test<T>(problem, mesh_gen0, precision, false);
+
+      // convergence test on an perturbed RectangleMesh crossed [2**3 .. 2**7]
+      RectangleMeshGenerator mesh_gen1(3, 8, -2, -2, 2, 2, true);
+      status = linear_2D_test<T>(problem, mesh_gen1, precision, false);
+      
+      // convergence test on meshes by gmsh 0 .. 6 without smoothing
+      GmshMeshGenerator mesh_gen2(1, 7, "rectangle", false);
       status = linear_2D_test<T>(problem, mesh_gen2, precision, false);
+      
+      // convergence test on meshes by gmsh 0 .. 6 with smoothing
+      GmshMeshGenerator mesh_gen3(1, 7, "rectangle", true);
+      status = linear_2D_test<T>(problem, mesh_gen3, precision, false);
       
       return status;
     }
@@ -136,9 +180,21 @@ namespace eikonal
       Problem problem(point);
       
       int status;
-      // convergence test on meshes by gmsh 0 .. 6
-      GmshMeshGenerator mesh_gen2(1, 7, "rectangle");
+      // convergence test on an unperturbed RectangleMesh crossed [2**3 .. 2**7]
+      RectangleMeshGenerator mesh_gen0(3, 8, -2, -2, 2, 2, false);
+      status = linear_2D_test<T>(problem, mesh_gen0, precision, false);
+
+      // convergence test on an perturbed RectangleMesh crossed [2**3 .. 2**7]
+      RectangleMeshGenerator mesh_gen1(3, 8, -2, -2, 2, 2, true);
+      status = linear_2D_test<T>(problem, mesh_gen1, precision, false);
+      
+      // convergence test on meshes by gmsh 0 .. 6 without smoothing
+      GmshMeshGenerator mesh_gen2(1, 7, "rectangle", false);
       status = linear_2D_test<T>(problem, mesh_gen2, precision, false);
+      
+      // convergence test on meshes by gmsh 0 .. 6 with smoothing
+      GmshMeshGenerator mesh_gen3(1, 7, "rectangle", true);
+      status = linear_2D_test<T>(problem, mesh_gen3, precision, false);
       
       return status;
     }
