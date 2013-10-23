@@ -5,6 +5,7 @@
 #include "CG1.h"
 #include "CG1_FORMS.h"
 #include "CG1_VECTOR.h"
+#include "CG1_VECTOR_FORMS.h"
 #include "gs/Sorter.h"
 #include "gs/HermiteSolver.h"
 #include "la/la_common.h"
@@ -74,12 +75,14 @@ namespace eikonal
 
       // get the solution
       std::size_t num_iters, min_calls = 0, max_calls = 0;
-      double l1_norm, l2_norm, band_l1_norm, band_l2_norm, coo_norm, time;
+      double l1_norm, l2_norm, band_l1_norm, band_l2_norm, coo_norm, time,
+             v_l2_norm, band_v_l2_norm;
       
       int status =
       hermite_test(problem, *mesh, precision, ordering, p, num_iters, min_calls,
                    max_calls,
-                   l1_norm, l2_norm, band_l1_norm, band_l2_norm, coo_norm, time,
+                   l1_norm, l2_norm, band_l1_norm, band_l2_norm,
+                   v_l2_norm, band_v_l2_norm, coo_norm, time,
                    u_file_name, exact_file_name, error_file_name, plot_on); 
 
       std::cout.precision(8);
@@ -90,8 +93,8 @@ namespace eikonal
       std::cout << std::scientific << mesh->hmin() << " " << l1_norm << " " <<
         l2_norm << " " << coo_norm << " " << time << " " <<
         n_obtuse_cells << "/" << num_cells << " " << num_iters << " " <<
-        min_calls << " " << max_calls << " " << band_l1_norm << 
-        " " << band_l2_norm << std::endl;
+        min_calls << " " << max_calls << " " << band_l1_norm << " " <<
+        band_l2_norm << " " << v_l2_norm << " " << band_v_l2_norm << std::endl;
       
       // write to text file
       data_file.open(data_file_name.c_str(), std::ios::app);
@@ -99,7 +102,8 @@ namespace eikonal
       data_file << std::scientific << mesh->hmin() << " " << l1_norm << " " <<
         l2_norm << " " << coo_norm << " " << time << " " << n_obtuse_cells <<
         " " << num_cells << " " << num_iters << " " << min_calls << 
-        " " << max_calls << " " << band_l1_norm << " " << band_l2_norm << std::endl;
+        " " << max_calls << " " << band_l1_norm << " " << band_l2_norm <<
+        " " << v_l2_norm << " " << band_v_l2_norm << std::endl;
       
       data_file.close();
       }
@@ -113,6 +117,7 @@ namespace eikonal
                       std::size_t& min_calls, std::size_t& max_calls,
                       double& l1_norm, double& l2_norm,
                       double& band_l1_norm, double& band_l2_norm,
+                      double& v_l2_norm, double& band_v_l2_norm,
                       double& coo_norm, double& time,
                       std::string u_file_name, std::string exact_file_name,
                       std::string error_file_name, bool plot_on)
@@ -189,7 +194,37 @@ namespace eikonal
     double area = dolfin::assemble(area_band);
     band_l1_norm = dolfin::assemble(l1_band)/area;
     band_l2_norm = sqrt(dolfin::assemble(l2_band)/area);
-   
+  
+    // get the vector norms
+    CG1_VECTOR::FunctionSpace VV(mesh);
+    
+    dolfin::Function du(VV), exact_du(VV);
+    std::vector<double> du_values(VV.dim()), exact_du_values(VV.dim());
+    
+    boost::shared_ptr<dolfin::GenericVector>
+    du_dx_vector = du_dx.vector(),
+    du_dy_vector = du_dy.vector(),
+    exact_du_dx_vector = exact_du_dx.vector(),
+    exact_du_dy_vector = exact_du_dy.vector();
+    
+    // set the values 
+    for(std::size_t i = 0; i < du_values.size()/2; i++)
+    {
+      du_values[2*i] = (*du_dx_vector)[i];
+      du_values[2*i+1] = (*du_dy_vector)[i];
+      exact_du_values[2*i] = (*exact_du_dx_vector)[i];
+      exact_du_values[2*i+1] = (*exact_du_dy_vector)[i];
+    }
+    du.vector()->set_local(du_values);
+    exact_du.vector()->set_local(exact_du_values);
+
+    CG1_VECTOR_FORMS::Form_norm vector_l2_norm(mesh, du, exact_du);
+    v_l2_norm = sqrt(dolfin::assemble(vector_l2_norm));
+    
+    // get the area of the band and norms1 on the submesh
+    CG1_VECTOR_FORMS::Form_norm vector_l2_band_norm(band_mesh, du, exact_du);
+    band_v_l2_norm = sqrt(dolfin::assemble(vector_l2_band_norm)/area);
+
     // save exact solution now, because later it is used to hold the error
     dolfin::File exact_file(exact_file_name);
     exact_file << exact_u;
@@ -213,31 +248,6 @@ namespace eikonal
     // plot
     if(plot_on)
     {
-      // get the vector ready
-      CG1_VECTOR::FunctionSpace VV(mesh);
-      
-      dolfin::Function du(VV);
-      dolfin::Function exact_du(VV);
-      std::vector<double> du_values(VV.dim());
-      std::vector<double> exact_du_values(VV.dim());
-      
-      boost::shared_ptr<dolfin::GenericVector> du_dx_vector = du_dx.vector();
-      boost::shared_ptr<dolfin::GenericVector> du_dy_vector = du_dy.vector();
-      boost::shared_ptr<dolfin::GenericVector>
-      exact_du_dx_vector = exact_du_dx.vector();
-      boost::shared_ptr<dolfin::GenericVector>
-      exact_du_dy_vector = exact_du_dy.vector();
-      
-      for(std::size_t i = 0; i < du_values.size()/2; i++)
-      {
-        du_values[2*i] = (*du_dx_vector)[i];
-        du_values[2*i+1] = (*du_dy_vector)[i];
-        exact_du_values[2*i] = (*exact_du_dx_vector)[i];
-        exact_du_values[2*i+1] = (*exact_du_dy_vector)[i];
-      }
-      du.vector()->set_local(du_values);
-      exact_du.vector()->set_local(exact_du_values);
-
       dolfin::plot(u);
       dolfin::plot(exact_u); // this is the error
       dolfin::interactive(true);

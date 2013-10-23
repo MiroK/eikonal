@@ -2923,104 +2923,6 @@ public:
     
     
     // Array of quadrature weights.
-    static const double W6[6] = {0.054975871827661, 0.054975871827661, 0.054975871827661, 0.111690794839005, 0.111690794839005, 0.111690794839005};
-    // Quadrature points on the UFC reference element: (0.816847572980459, 0.091576213509771), (0.091576213509771, 0.816847572980459), (0.091576213509771, 0.091576213509771), (0.10810301816807, 0.445948490915965), (0.445948490915965, 0.10810301816807), (0.445948490915965, 0.445948490915965)
-    
-    // Value of basis functions at quadrature points.
-    static const double FE0_C0[6][6] = \
-    {{0.09157621350977, 0.816847572980459, 0.091576213509771, 0.0, 0.0, 0.0},
-    {0.09157621350977, 0.0915762135097711, 0.816847572980459, 0.0, 0.0, 0.0},
-    {0.816847572980458, 0.091576213509771, 0.091576213509771, 0.0, 0.0, 0.0},
-    {0.445948490915965, 0.10810301816807, 0.445948490915965, 0.0, 0.0, 0.0},
-    {0.445948490915965, 0.445948490915965, 0.10810301816807, 0.0, 0.0, 0.0},
-    {0.10810301816807, 0.445948490915965, 0.445948490915965, 0.0, 0.0, 0.0}};
-    
-    static const double FE0_C1[6][6] = \
-    {{0.0, 0.0, 0.0, 0.09157621350977, 0.816847572980459, 0.091576213509771},
-    {0.0, 0.0, 0.0, 0.09157621350977, 0.0915762135097711, 0.816847572980459},
-    {0.0, 0.0, 0.0, 0.816847572980458, 0.091576213509771, 0.091576213509771},
-    {0.0, 0.0, 0.0, 0.445948490915965, 0.10810301816807, 0.445948490915965},
-    {0.0, 0.0, 0.0, 0.445948490915965, 0.445948490915965, 0.10810301816807},
-    {0.0, 0.0, 0.0, 0.10810301816807, 0.445948490915965, 0.445948490915965}};
-    
-    // Reset values in the element tensor.
-    A[0] = 0.0;
-    
-    // Compute element tensor using UFL quadrature representation
-    // Optimisations: ('eliminate zeros', False), ('ignore ones', False), ('ignore zero tables', False), ('optimisation', False), ('remove zero terms', False)
-    
-    // Loop quadrature points for integral.
-    // Number of operations to compute element tensor for following IP loop = 372
-    for (unsigned int ip = 0; ip < 6; ip++)
-    {
-      
-      // Coefficient declarations.
-      double F0 = 0.0;
-      double F1 = 0.0;
-      double F2 = 0.0;
-      double F3 = 0.0;
-      
-      // Total number of operations to compute function values = 48
-      for (unsigned int r = 0; r < 6; r++)
-      {
-        F0 += FE0_C0[ip][r]*w[0][r];
-        F1 += FE0_C0[ip][r]*w[1][r];
-        F2 += FE0_C1[ip][r]*w[0][r];
-        F3 += FE0_C1[ip][r]*w[1][r];
-      }// end loop over 'r'
-      
-      // Number of operations for primary indices: 14
-      // Number of operations to compute entry: 14
-      A[0] += std::sqrt((((F0 + (-1.0)*F1))*((F0 + (-1.0)*F1)) + (((-1.0)*F3 + F2))*(((-1.0)*F3 + F2))))*W6[ip]*det;
-    }// end loop over 'ip'
-  }
-
-};
-
-/// This class defines the interface for the tabulation of the cell
-/// tensor corresponding to the local contribution to a form from
-/// the integral over a cell.
-
-class cg1_vector_forms_cell_integral_1_otherwise: public ufc::cell_integral
-{
-public:
-
-  /// Constructor
-  cg1_vector_forms_cell_integral_1_otherwise() : ufc::cell_integral()
-  {
-    // Do nothing
-  }
-
-  /// Destructor
-  virtual ~cg1_vector_forms_cell_integral_1_otherwise()
-  {
-    // Do nothing
-  }
-
-  /// Tabulate the tensor for the contribution from a local cell
-  virtual void tabulate_tensor(double*  A,
-                               const double * const *  w,
-                               const double*  vertex_coordinates,
-                               int cell_orientation) const
-  {
-    // Compute Jacobian
-    double J[4];
-    compute_jacobian_triangle_2d(J, vertex_coordinates);
-    
-    // Compute Jacobian inverse and determinant
-    double K[4];
-    double detJ;
-    compute_jacobian_inverse_triangle_2d(K, detJ, J);
-    
-    // Set scale factor
-    const double det = std::abs(detJ);
-    
-    // Cell volume
-    
-    // Compute circumradius of triangle in 2D
-    
-    
-    // Array of quadrature weights.
     static const double W3[3] = {0.166666666666667, 0.166666666666667, 0.166666666666667};
     // Quadrature points on the UFC reference element: (0.166666666666667, 0.166666666666667), (0.166666666666667, 0.666666666666667), (0.666666666666667, 0.166666666666667)
     
@@ -3096,193 +2998,6 @@ public:
 
   /// Destructor
   virtual ~cg1_vector_forms_form_0()
-  {
-    // Do nothing
-  }
-
-  /// Return a string identifying the form
-  virtual const char* signature() const
-  {
-    return "762322395d2912e87ccb3cc9b2c8420e978e03907f4a2657d972234c1b6db033f02f6c5b81dcb4f68514de6c00209c58ab41c67c079e8fbfdd81762be1dabdda";
-  }
-
-  /// Return the rank of the global tensor (r)
-  virtual std::size_t rank() const
-  {
-    return 0;
-  }
-
-  /// Return the number of coefficients (n)
-  virtual std::size_t num_coefficients() const
-  {
-    return 2;
-  }
-
-  /// Return the number of cell domains
-  virtual std::size_t num_cell_domains() const
-  {
-    return 0;
-  }
-
-  /// Return the number of exterior facet domains
-  virtual std::size_t num_exterior_facet_domains() const
-  {
-    return 0;
-  }
-
-  /// Return the number of interior facet domains
-  virtual std::size_t num_interior_facet_domains() const
-  {
-    return 0;
-  }
-
-  /// Return the number of point domains
-  virtual std::size_t num_point_domains() const
-  {
-    return 0;
-  }
-
-  /// Return whether the form has any cell integrals
-  virtual bool has_cell_integrals() const
-  {
-    return true;
-  }
-
-  /// Return whether the form has any exterior facet integrals
-  virtual bool has_exterior_facet_integrals() const
-  {
-    return false;
-  }
-
-  /// Return whether the form has any interior facet integrals
-  virtual bool has_interior_facet_integrals() const
-  {
-    return false;
-  }
-
-  /// Return whether the form has any point integrals
-  virtual bool has_point_integrals() const
-  {
-    return false;
-  }
-
-  /// Create a new finite element for argument function i
-  virtual ufc::finite_element* create_finite_element(std::size_t i) const
-  {
-    switch (i)
-    {
-    case 0:
-      {
-        return new cg1_vector_forms_finite_element_1();
-        break;
-      }
-    case 1:
-      {
-        return new cg1_vector_forms_finite_element_1();
-        break;
-      }
-    }
-    
-    return 0;
-  }
-
-  /// Create a new dofmap for argument function i
-  virtual ufc::dofmap* create_dofmap(std::size_t i) const
-  {
-    switch (i)
-    {
-    case 0:
-      {
-        return new cg1_vector_forms_dofmap_1();
-        break;
-      }
-    case 1:
-      {
-        return new cg1_vector_forms_dofmap_1();
-        break;
-      }
-    }
-    
-    return 0;
-  }
-
-  /// Create a new cell integral on sub domain i
-  virtual ufc::cell_integral* create_cell_integral(std::size_t i) const
-  {
-    return 0;
-  }
-
-  /// Create a new exterior facet integral on sub domain i
-  virtual ufc::exterior_facet_integral* create_exterior_facet_integral(std::size_t i) const
-  {
-    return 0;
-  }
-
-  /// Create a new interior facet integral on sub domain i
-  virtual ufc::interior_facet_integral* create_interior_facet_integral(std::size_t i) const
-  {
-    return 0;
-  }
-
-  /// Create a new point integral on sub domain i
-  virtual ufc::point_integral* create_point_integral(std::size_t i) const
-  {
-    return 0;
-  }
-
-  /// Create a new cell integral on everywhere else
-  virtual ufc::cell_integral* create_default_cell_integral() const
-  {
-    return new cg1_vector_forms_cell_integral_0_otherwise();
-  }
-
-  /// Create a new exterior facet integral on everywhere else
-  virtual ufc::exterior_facet_integral* create_default_exterior_facet_integral() const
-  {
-    return 0;
-  }
-
-  /// Create a new interior facet integral on everywhere else
-  virtual ufc::interior_facet_integral* create_default_interior_facet_integral() const
-  {
-    return 0;
-  }
-
-  /// Create a new point integral on everywhere else
-  virtual ufc::point_integral* create_default_point_integral() const
-  {
-    return 0;
-  }
-
-};
-
-/// This class defines the interface for the assembly of the global
-/// tensor corresponding to a form with r + n arguments, that is, a
-/// mapping
-///
-///     a : V1 x V2 x ... Vr x W1 x W2 x ... x Wn -> R
-///
-/// with arguments v1, v2, ..., vr, w1, w2, ..., wn. The rank r
-/// global tensor A is defined by
-///
-///     A = a(V1, V2, ..., Vr, w1, w2, ..., wn),
-///
-/// where each argument Vj represents the application to the
-/// sequence of basis functions of Vj and w1, w2, ..., wn are given
-/// fixed functions (coefficients).
-
-class cg1_vector_forms_form_1: public ufc::form
-{
-public:
-
-  /// Constructor
-  cg1_vector_forms_form_1() : ufc::form()
-  {
-    // Do nothing
-  }
-
-  /// Destructor
-  virtual ~cg1_vector_forms_form_1()
   {
     // Do nothing
   }
@@ -3420,7 +3135,7 @@ public:
   /// Create a new cell integral on everywhere else
   virtual ufc::cell_integral* create_default_cell_integral() const
   {
-    return new cg1_vector_forms_cell_integral_1_otherwise();
+    return new cg1_vector_forms_cell_integral_0_otherwise();
   }
 
   /// Create a new exterior facet integral on everywhere else
@@ -3611,16 +3326,16 @@ public:
 
 };
 
-typedef CoefficientSpace_u Form_norm1_FunctionSpace_0;
+typedef CoefficientSpace_u Form_norm_FunctionSpace_0;
 
-typedef CoefficientSpace_v Form_norm1_FunctionSpace_1;
+typedef CoefficientSpace_v Form_norm_FunctionSpace_1;
 
-class Form_norm1: public dolfin::Form
+class Form_norm: public dolfin::Form
 {
 public:
 
   // Constructor
-  Form_norm1(const dolfin::Mesh& mesh):
+  Form_norm(const dolfin::Mesh& mesh):
     dolfin::Form(0, 2), u(*this, 0), v(*this, 1)
   {
     _mesh = reference_to_no_delete_pointer(mesh);
@@ -3628,7 +3343,7 @@ public:
   }
 
   // Constructor
-  Form_norm1(const dolfin::Mesh& mesh, const dolfin::GenericFunction& u, const dolfin::GenericFunction& v):
+  Form_norm(const dolfin::Mesh& mesh, const dolfin::GenericFunction& u, const dolfin::GenericFunction& v):
     dolfin::Form(0, 2), u(*this, 0), v(*this, 1)
   {
     _mesh = reference_to_no_delete_pointer(mesh);
@@ -3639,7 +3354,7 @@ public:
   }
 
   // Constructor
-  Form_norm1(const dolfin::Mesh& mesh, boost::shared_ptr<const dolfin::GenericFunction> u, boost::shared_ptr<const dolfin::GenericFunction> v):
+  Form_norm(const dolfin::Mesh& mesh, boost::shared_ptr<const dolfin::GenericFunction> u, boost::shared_ptr<const dolfin::GenericFunction> v):
     dolfin::Form(0, 2), u(*this, 0), v(*this, 1)
   {
     _mesh = reference_to_no_delete_pointer(mesh);
@@ -3650,7 +3365,7 @@ public:
   }
 
   // Constructor
-  Form_norm1(boost::shared_ptr<const dolfin::Mesh> mesh):
+  Form_norm(boost::shared_ptr<const dolfin::Mesh> mesh):
     dolfin::Form(0, 2), u(*this, 0), v(*this, 1)
   {
     _mesh = mesh;
@@ -3658,7 +3373,7 @@ public:
   }
 
   // Constructor
-  Form_norm1(boost::shared_ptr<const dolfin::Mesh> mesh, const dolfin::GenericFunction& u, const dolfin::GenericFunction& v):
+  Form_norm(boost::shared_ptr<const dolfin::Mesh> mesh, const dolfin::GenericFunction& u, const dolfin::GenericFunction& v):
     dolfin::Form(0, 2), u(*this, 0), v(*this, 1)
   {
     _mesh = mesh;
@@ -3669,7 +3384,7 @@ public:
   }
 
   // Constructor
-  Form_norm1(boost::shared_ptr<const dolfin::Mesh> mesh, boost::shared_ptr<const dolfin::GenericFunction> u, boost::shared_ptr<const dolfin::GenericFunction> v):
+  Form_norm(boost::shared_ptr<const dolfin::Mesh> mesh, boost::shared_ptr<const dolfin::GenericFunction> u, boost::shared_ptr<const dolfin::GenericFunction> v):
     dolfin::Form(0, 2), u(*this, 0), v(*this, 1)
   {
     _mesh = mesh;
@@ -3680,7 +3395,7 @@ public:
   }
 
   // Destructor
-  ~Form_norm1()
+  ~Form_norm()
   {}
 
   /// Return the number of the coefficient with this name
@@ -3715,126 +3430,16 @@ public:
   }
 
   // Typedefs
-  typedef Form_norm1_FunctionSpace_0 CoefficientSpace_u;
-  typedef Form_norm1_FunctionSpace_1 CoefficientSpace_v;
+  typedef Form_norm_FunctionSpace_0 CoefficientSpace_u;
+  typedef Form_norm_FunctionSpace_1 CoefficientSpace_v;
 
   // Coefficients
   dolfin::CoefficientAssigner u;
   dolfin::CoefficientAssigner v;
 };
 
-typedef CoefficientSpace_u Form_norm2_FunctionSpace_0;
-
-typedef CoefficientSpace_v Form_norm2_FunctionSpace_1;
-
-class Form_norm2: public dolfin::Form
-{
-public:
-
-  // Constructor
-  Form_norm2(const dolfin::Mesh& mesh):
-    dolfin::Form(0, 2), u(*this, 0), v(*this, 1)
-  {
-    _mesh = reference_to_no_delete_pointer(mesh);
-    _ufc_form = boost::shared_ptr<const ufc::form>(new cg1_vector_forms_form_1());
-  }
-
-  // Constructor
-  Form_norm2(const dolfin::Mesh& mesh, const dolfin::GenericFunction& u, const dolfin::GenericFunction& v):
-    dolfin::Form(0, 2), u(*this, 0), v(*this, 1)
-  {
-    _mesh = reference_to_no_delete_pointer(mesh);
-    this->u = u;
-    this->v = v;
-
-    _ufc_form = boost::shared_ptr<const ufc::form>(new cg1_vector_forms_form_1());
-  }
-
-  // Constructor
-  Form_norm2(const dolfin::Mesh& mesh, boost::shared_ptr<const dolfin::GenericFunction> u, boost::shared_ptr<const dolfin::GenericFunction> v):
-    dolfin::Form(0, 2), u(*this, 0), v(*this, 1)
-  {
-    _mesh = reference_to_no_delete_pointer(mesh);
-    this->u = *u;
-    this->v = *v;
-
-    _ufc_form = boost::shared_ptr<const ufc::form>(new cg1_vector_forms_form_1());
-  }
-
-  // Constructor
-  Form_norm2(boost::shared_ptr<const dolfin::Mesh> mesh):
-    dolfin::Form(0, 2), u(*this, 0), v(*this, 1)
-  {
-    _mesh = mesh;
-    _ufc_form = boost::shared_ptr<const ufc::form>(new cg1_vector_forms_form_1());
-  }
-
-  // Constructor
-  Form_norm2(boost::shared_ptr<const dolfin::Mesh> mesh, const dolfin::GenericFunction& u, const dolfin::GenericFunction& v):
-    dolfin::Form(0, 2), u(*this, 0), v(*this, 1)
-  {
-    _mesh = mesh;
-    this->u = u;
-    this->v = v;
-
-    _ufc_form = boost::shared_ptr<const ufc::form>(new cg1_vector_forms_form_1());
-  }
-
-  // Constructor
-  Form_norm2(boost::shared_ptr<const dolfin::Mesh> mesh, boost::shared_ptr<const dolfin::GenericFunction> u, boost::shared_ptr<const dolfin::GenericFunction> v):
-    dolfin::Form(0, 2), u(*this, 0), v(*this, 1)
-  {
-    _mesh = mesh;
-    this->u = *u;
-    this->v = *v;
-
-    _ufc_form = boost::shared_ptr<const ufc::form>(new cg1_vector_forms_form_1());
-  }
-
-  // Destructor
-  ~Form_norm2()
-  {}
-
-  /// Return the number of the coefficient with this name
-  virtual std::size_t coefficient_number(const std::string& name) const
-  {
-    if (name == "u")
-      return 0;
-    else if (name == "v")
-      return 1;
-
-    dolfin::dolfin_error("generated code for class Form",
-                         "access coefficient data",
-                         "Invalid coefficient");
-    return 0;
-  }
-
-  /// Return the name of the coefficient with this number
-  virtual std::string coefficient_name(std::size_t i) const
-  {
-    switch (i)
-    {
-    case 0:
-      return "u";
-    case 1:
-      return "v";
-    }
-
-    dolfin::dolfin_error("generated code for class Form",
-                         "access coefficient data",
-                         "Invalid coefficient");
-    return "unnamed";
-  }
-
-  // Typedefs
-  typedef Form_norm2_FunctionSpace_0 CoefficientSpace_u;
-  typedef Form_norm2_FunctionSpace_1 CoefficientSpace_v;
-
-  // Coefficients
-  dolfin::CoefficientAssigner u;
-  dolfin::CoefficientAssigner v;
-};
-
+// Class typedefs
+typedef Form_norm Functional;
 
 }
 

@@ -5,6 +5,6 @@ element = VectorElement("Lagrange", triangle, 1)
 u = Coefficient(element)
 v = Coefficient(element)
 
-norm = inner(u-v, u-v)*dx
+norm = abs(inner(u-v, u-v))*dx
 forms = [norm]
 

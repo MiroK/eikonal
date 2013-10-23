@@ -34,6 +34,8 @@ namespace eikonal
                                           double& l2_norm,
                                           double& band_l1_norm,
                                           double& band_l2_norm,
+                                          double& v_l2_norm,
+                                          double& band_v_l2_norm,
                                           double& coo_norm,
                                           double& time,
                                           std::string u_file_name,
