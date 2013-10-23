@@ -1,92 +1,48 @@
 #include "eikonal.h"
 #include <cstdlib>
-#include <dolfin.h>
-#include <iostream>
-#include "test.h"
 
 using namespace eikonal;
-using namespace dolfin;
-
-class MyExpression : public Expression
-{
-public:
-  void eval(Array<double>& values, const Array<double>& x) const
-  {
-    values[0] = 1;
-  }
-};
 
 int main(int argc, char* argv[])
 {
-  all_linear_tests(atoi(argv[0]), atoi(argv[1]));
 
-  Dolphin fish1;
-  Dolphin fish2 = fish1;
-
-
-
-/*  double _c1[2] = {-1., 0.}; std::vector<double> c1(_c1, _c1+2);
-  double _c2[2] = {sqrt(1.5), 0}; std::vector<double> c2(_c2, _c2+2);
-  TwoCircles two_circles("twocircle", c1, 0.5, c2, 0.5);
-  Problem problem(two_circles);
-
-  RectangleMesh mesh(-2, -2, 2, 2, 40, 40);
-  test::CoefficientSpace_u V(mesh);
-  Function u(V);
-  MeshFunction<std::size_t> band = problem.get_band(u, 3);
-  plot(band);
-  interactive(true);*/
-
-
-  /*
-  UnitSquareMesh mesh(10, 10);
-  std::size_t dim = mesh.topology().dim();
-  MeshFunction<std::size_t> foo(mesh, dim);
-  foo.set_all(0);
-  foo[110] = 1.;
-
-  mesh.init(dim, dim);
-  for(std::size_t level = 0; level < 4; level++)
-  {
-    plot(foo);
-    interactive(true);
-    std::set<std::size_t> marked_cells;
-    for(CellIterator cell(mesh); !cell.end(); ++cell)
-    {
-      if(foo[*cell] == 1)
-      {
-        std::size_t num_next = cell->num_entities(dim);
-        const std::size_t* next = cell->entities(dim);
-        marked_cells.insert(next, next+num_next);
-      }
-    }
-    std::set<std::size_t>::const_iterator marked_cell = marked_cells.begin();
-    for(; marked_cell != marked_cells.end(); marked_cell++)
-    {
-      foo[*marked_cell] = 1;
-    }
-  }
-
-  SubMesh sub_mesh(mesh, foo, 1);
-  plot(sub_mesh);
-  interactive(true);
+  double _P[2] = {1.0, 0.0}; std::vector<double> P(_P, _P+2);
+  MyPoint point(P);
+  Problem problem(point);
   
-  Constant one(1.);
-  test::Form_area area(sub_mesh, one);
-  double a = assemble(area);
-  std::cout << a << std::endl;
+  int status;
+  std::size_t precision = 2;
+  std::string ordering("distance");
+  std::size_t p = 2;
+  // convergence test on an unperturbed RectangleMesh crossed [2**3 .. 2**7]
+  UnitSquareMeshGenerator mesh_gen0(1, 4, false);
+  status = hermite_test(problem, mesh_gen0, precision, ordering, p, false);
+  //std::cout << "\nlinear\n";
+  //UnitSquareMeshGenerator mesh_gen1(1, 4, false);
+  //status = linear_2D_test<Solver>(problem, mesh_gen1, precision, false);
+  //assert(argc == 3);
+  // LINEAR TESTS
+  //all_linear_tests(atoi(argv[1]), atoi(argv[2]));
+ 
+  //assert(argc == 3);
+  // HERMITE TESTS
+  /*enum HERTMITE_SOLVER {CORNERS, SURFACE, DISTANCE};
+  std::size_t solver_choice = atoi(argv[1]);
+  std::size_t p_norm = atoi(argv[2]);
 
-  test::CoefficientSpace_u V(mesh);
-  Function u(V);
-  u.interpolate(MyExpression());
-  plot(u);
-  interactive(true);
-
-  test::Form_norm norm(sub_mesh, u);
-  double n = assemble(norm);
-  std::cout << n << std::endl;
-  */
-  //all_hermite_tests(2);  
-  //return 0;
+  if(solver_choice == CORNERS)
+  {
+    all_hermite_tests("corners", p_norm);  
+  }
+  else if(solver_choice == SURFACE)
+  {
+    all_hermite_tests("surface", p_norm);
+  }
+  else if(solver_choice == DISTANCE)
+  {
+    all_hermite_tests("distance", p_norm);
+  }*/
+  
+  return 0;
 }
 

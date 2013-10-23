@@ -9,9 +9,9 @@ namespace eikonal
   int all_hermite_tests(std::string ordering, std::size_t p)
   {
       std::cout << "Solving with hermite solver:" << std::endl;
+      std::cout << "ordering = " << ordering << " L^p = " << p << std::endl;
 
       std::size_t precision = 2;
-        
       run_hermite_test("point", precision, ordering, p); 
       run_hermite_test("twocircle", precision, ordering, p); 
       run_hermite_test("triangle", precision, ordering, p); 

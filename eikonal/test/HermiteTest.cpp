@@ -7,6 +7,7 @@
 #include "CG1_VECTOR.h"
 #include "gs/Sorter.h"
 #include "gs/HermiteSolver.h"
+#include "la/la_common.h"
 #include <dolfin/mesh/Mesh.h>
 #include <dolfin/fem/assemble.h>
 #include <dolfin/io/File.h>
@@ -92,6 +93,8 @@ namespace eikonal
         min_calls << " " << max_calls << " " << band_l1_norm << 
         " " << band_l2_norm << std::endl;
       
+      std::cout << "next mesh///////////////////////////////////////" <<std::endl;
+      
       // write to text file
       data_file.open(data_file_name.c_str(), std::ios::app);
       
@@ -103,7 +106,6 @@ namespace eikonal
       data_file.close();
       }
     }
-    std::cout << std::endl;
   }
   //---------------------------------------------------------------------------
 
@@ -133,7 +135,9 @@ namespace eikonal
     problem.init(fixed_dofs, u, du_dx, du_dy);
     problem.exact_solution(exact_u, exact_du_dx, exact_du_dy);
     dolfin::MeshFunction<std::size_t> band = problem.get_band(u, 3);
- 
+
+    std::cout << "fixed_dofs "; print(fixed_dofs);
+
     dolfin::plot(u);
     dolfin::plot(exact_u);
     dolfin::interactive(true);
@@ -153,6 +157,7 @@ namespace eikonal
       // get the reference points from the Problem
       std::vector<std::vector<double> > ref_points;  
       problem.get_ref_points(4, ref_points); // take 4 ref points
+      
       num_iters = solver.solve(u, du_dx, du_dy, fixed_dofs, precision,
                                p, ref_points);
     }
@@ -191,12 +196,12 @@ namespace eikonal
     CG1_FORMS::Form_norm1 l1_band(band_mesh, u, exact_u);
     CG1_FORMS::Form_norm2 l2_band(band_mesh, u, exact_u);
     dolfin::Constant one(1.);
-    CG1_FORMS::Form_area area_band(band_mesh);
+    CG1_FORMS::Form_area area_band(band_mesh, one);
 
     double area = dolfin::assemble(area_band);
     band_l1_norm = dolfin::assemble(l1_band)/area;
-    band_l2_norm = sqrt(dolfin::assemble(l2_band))/area;
-    
+    band_l2_norm = sqrt(dolfin::assemble(l2_band)/area);
+   
     // save exact solution now, because later it is used to hold the error
     dolfin::File exact_file(exact_file_name);
     exact_file << exact_u;

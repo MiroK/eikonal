@@ -209,7 +209,7 @@ namespace eikonal
 
       double area = dolfin::assemble(area_band);
       band_l1_norm = dolfin::assemble(l1_band)/area;
-      band_l2_norm = sqrt(dolfin::assemble(l2_band))/area;
+      band_l2_norm = sqrt(dolfin::assemble(l2_band)/area);
       
       // save exact solution now, because later it is used to hold the error
       dolfin::File exact_file(exact_file_name);

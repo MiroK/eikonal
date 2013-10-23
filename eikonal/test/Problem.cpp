@@ -248,7 +248,7 @@ namespace eikonal
       for(std::size_t i = 0; i < n_points; i++)
       {
         const double* x = points[i].coordinates();
-        ref_points.push_back(std::vector<double>(x, x + 2));
+        ref_points.push_back(std::vector<double>(x, x + 2)); //TODO for 3D
       }
     }
     else

@@ -3,9 +3,12 @@
 #include "gs_LpDistanceSorter.h"
 #include "gs_MyIterator.h"
 #include "ls/ls_minimize.h"
+#include "la/la_loop.h"
 #include <dolfin/function/FunctionSpace.h>
 #include <dolfin/function/Function.h>
 #include <dolfin/la/GenericVector.h>
+
+#include "la/la_common.h"
 
 using namespace dolfin;
 
@@ -41,6 +44,8 @@ namespace eikonal
     LpDistanceSorter sorter(dof_2_coordinate);
     // use L^2 norm to sort unset_dofs by their distance from ref_points;
     sorter.sort(*unset_dofs, ref_points, p); 
+  
+    std::cout << "unset dofs "; print(*unset_dofs);
 
     std::size_t n_points = ref_points.size();
     std::size_t n_uniq_sweeps = n_points*2;
@@ -70,16 +75,24 @@ namespace eikonal
         double du_dy_old = (*du_dy_vector)[*unset_dof];
         std::vector<std::size_t> cells = dof_2_cell.find(*unset_dof)->second;
 
+        std::cout << "global dof " << *unset_dof <<
+                     " current u[dof] " << u_old <<
+                     " current grad_u[dof] " << du_dx_old << " "
+                                             << du_dy_old << std::endl;
+        std::cout << "cells[dof] "; print(cells);
         std::vector<std::size_t>::const_iterator cell = cells.begin();
         for( ; cell != cells.end(); cell++)
         {
           std::vector<la_index>
           cell_set_dofs = get_cell_set_dofs(*cell, *unset_dof);
 
+          std::cout << "global cell = " << *cell; print(cell_set_dofs);
+
           std::pair<double, std::vector<double> > u_gradu = 
           this->local_solver(*unset_dof, cell_set_dofs, *u_vector, 
                              *du_dx_vector, *du_dy_vector, precision);
           double u_ = u_gradu.first;
+          std::cout << "global, value from local = " << u_ << std::endl;
           if(u_ < u_old)
           {
             u_old = u_;
@@ -87,8 +100,17 @@ namespace eikonal
             // also set the gradient
             du_dx_old = (u_gradu.second)[0];
             du_dy_old = (u_gradu.second)[1];
+            std::cout << "setting new values at dof " << *unset_dof <<
+                     " u[dof] " << u_old <<
+                     " grad_u[dof] " << du_dx_old << " "
+                                     << du_dy_old << std::endl;
+          }
+          else
+          {
+            std::cout << "no chage !" << std::endl;
           }
         }
+        std::cout << std::endl;
         u_vector->setitem(*unset_dof, u_old);
         du_dx_vector->setitem(*unset_dof, du_dx_old);
         du_dy_vector->setitem(*unset_dof, du_dy_old);
@@ -124,6 +146,8 @@ namespace eikonal
  
     sorter.sort(*unset_dofs); 
 
+    std::cout << "unset dofs "; print(*unset_dofs);
+
     boost::shared_ptr<GenericVector> u_vector = u.vector();
     boost::shared_ptr<GenericVector> du_dx_vector = du_dx.vector();
     boost::shared_ptr<GenericVector> du_dy_vector = du_dy.vector();
@@ -147,16 +171,24 @@ namespace eikonal
         double du_dy_old = (*du_dy_vector)[*unset_dof];
         std::vector<std::size_t> cells = dof_2_cell.find(*unset_dof)->second;
 
+        std::cout << "global dof " << *unset_dof <<
+                     " current u[dof] " << u_old <<
+                     " current grad_u[dof] " << du_dx_old << " "
+                                             << du_dy_old << std::endl;
+        std::cout << "cells[dof] "; print(cells);
         std::vector<std::size_t>::const_iterator cell = cells.begin();
         for( ; cell != cells.end(); cell++)
         {
           std::vector<la_index>
           cell_set_dofs = get_cell_set_dofs(*cell, *unset_dof);
 
+          std::cout << "global cell = " << *cell; print(cell_set_dofs);
+          
           std::pair<double, std::vector<double> > u_gradu = 
           this->local_solver(*unset_dof, cell_set_dofs, *u_vector, 
                              *du_dx_vector, *du_dy_vector, precision);
           double u_ = u_gradu.first;
+          std::cout << "global, value from local = " << u_ << std::endl;
           if(u_ < u_old)
           {
             u_old = u_;
@@ -164,8 +196,18 @@ namespace eikonal
             // also set the gradient
             du_dx_old = (u_gradu.second)[0];
             du_dy_old = (u_gradu.second)[1];
+            std::cout << "setting new values at dof " << *unset_dof <<
+                     " u[dof] " << u_old <<
+                     " grad_u[dof] " << du_dx_old << " "
+                                     << du_dy_old << std::endl;
+          }
+          else
+          {
+            std::cout << " no change !" << std::endl;
           }
         }
+        std::cout << std::endl;
+        
         u_vector->setitem(*unset_dof, u_old);
         du_dx_vector->setitem(*unset_dof, du_dx_old);
         du_dy_vector->setitem(*unset_dof, du_dy_old);
@@ -198,6 +240,7 @@ namespace eikonal
     
     if(cell_set_dofs.size() != 2)
     {
+      std::cout << "\t local too few data" << std::endl;
       return std::make_pair<double, std::vector<double> >(u_vector[unset_dof],
                                                                     grad_u_C);
     }
@@ -224,10 +267,36 @@ namespace eikonal
     _grad_u_B[1] = du_dy_vector[b];
     const std::vector<double> grad_u_B(_grad_u_B, _grad_u_B + 2);
     
+    std::cout << "\t local dof_to_set, sets " << unset_dof << " ";
+    print(cell_set_dofs);
+    std::cout << "\tlocal A "; print(A);
+    std::cout << "\tlocal B ";print(B);
+    std::cout << "\tlocal C ";print(C);
+    std::cout << "\tlocal u_A " << u_A << std::endl;
+    std::cout << "\tlocal u_B " << u_B << std::endl;
+    std::cout << "\tlocal u_C " << u_C << std::endl;
+    std::cout << "\tlocal grad_u A"; print(grad_u_A);
+    std::cout << "\tlocal grad_u B"; print(grad_u_B);
+    std::cout << "\tlocal grad_u C"; print(grad_u_C);
     std::size_t n_calls;
+    
     std::pair<double, double> t_ft = 
     hermite_newton_2d(A, B, C, u_A, u_B, u_C, grad_u_A, grad_u_B, grad_u_C,
                       n_calls, precision);
+   
+    double _SOURCE[2] = {1., 0.};
+    std::vector<double> SOURCE(_SOURCE, _SOURCE + 2);
+    std::vector<double> exact_grad = (C-SOURCE)/norm(C-SOURCE);
+
+    std::cout.precision(16);
+    std::cout << "\t isect "; print(A*(1-t_ft.first) + B*t_ft.first);
+    std::cout << "\tsolver produced " << t_ft.second << " with error " <<
+                 abs(t_ft.second - norm(C - SOURCE)) << " exact is " <<
+                 norm(C-SOURCE) << std::endl;
+    std::cout << "\tlocal grad_u C"; print(grad_u_C) ;
+    std::cout << "\t grad error  " << norm(exact_grad - grad_u_C) << std::endl;
+    std::cout << "\t exact grad "; print(exact_grad);
+    ;
     
     if(n_calls > max_calls)
     {
