@@ -19,11 +19,14 @@ namespace eikonal
 
   // TODO
   int hermite_test(const Problem& problem, MeshGenerator& mesh_gen,
-                   std::size_t precision, bool plot_on=false);
+                   std::size_t precision, std::string ordering,
+                   std::size_t p, bool plot_on=false);
 
   // TODO
   int hermite_test(const Problem& problem, const dolfin::Mesh& mesh,
                                           std::size_t precision,
+                                          std::string ordering,
+                                          std::size_t p,
                                           std::size_t& num_iters,
                                           std::size_t& min_calls,
                                           std::size_t& max_calls,

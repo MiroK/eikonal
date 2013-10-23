@@ -18,7 +18,14 @@ public:
 
 int main(int argc, char* argv[])
 {
-  double _c1[2] = {-1., 0.}; std::vector<double> c1(_c1, _c1+2);
+  all_linear_tests(atoi(argv[0]), atoi(argv[1]));
+
+  Dolphin fish1;
+  Dolphin fish2 = fish1;
+
+
+
+/*  double _c1[2] = {-1., 0.}; std::vector<double> c1(_c1, _c1+2);
   double _c2[2] = {sqrt(1.5), 0}; std::vector<double> c2(_c2, _c2+2);
   TwoCircles two_circles("twocircle", c1, 0.5, c2, 0.5);
   Problem problem(two_circles);
@@ -28,7 +35,7 @@ int main(int argc, char* argv[])
   Function u(V);
   MeshFunction<std::size_t> band = problem.get_band(u, 3);
   plot(band);
-  interactive(true);
+  interactive(true);*/
 
 
   /*

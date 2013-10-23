@@ -2,6 +2,9 @@
 #include "Seeder.h"
 #include <vector>
 #include <set>
+#include <cstdio>         //
+#include <cstdlib>        // random
+#include <ctime>          //
 #include <dolfin/function/Function.h>
 #include <dolfin/function/FunctionSpace.h>
 #include <dolfin/fem/GenericDofMap.h>
@@ -226,6 +229,45 @@ namespace eikonal
     }
 
     return band;
+  }
+  //---------------------------------------------------------------------------
+
+  void
+  Problem::get_ref_points(const std::size_t n_ref_points,
+                          std::vector<std::vector<double> >& ref_points) const
+  {
+    // get the points from seeder
+    std::vector<Point> points;
+    seeder.seed(points, 1000);
+
+    ref_points.erase(ref_points.begin(), ref_points.end());
+    // check how points seeder actually provided
+    std::size_t n_points = points.size();
+    if(n_points < n_ref_points)
+    {
+      for(std::size_t i = 0; i < n_points; i++)
+      {
+        const double* x = points[i].coordinates();
+        ref_points.push_back(std::vector<double>(x, x + 2));
+      }
+    }
+    else
+    {
+      std::set<std::size_t> used_points;
+      srand(time(NULL));
+      for(std::size_t i = 0; i < n_ref_points; i++)
+      {
+        std::size_t ref_point;
+        do
+        {
+          ref_point = rand() % n_points;
+        } while(used_points.find(ref_point) != used_points.end());
+        used_points.insert(ref_point);
+
+        const double* x = points[ref_point].coordinates();
+        ref_points.push_back(std::vector<double>(x, x + 2));
+      }
+    }
   }
   //---------------------------------------------------------------------------
 

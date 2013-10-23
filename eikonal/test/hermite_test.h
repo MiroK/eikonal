@@ -25,10 +25,13 @@ namespace eikonal
   class Dolphin;
 
   // type of object to compute signed distance from
-  int run_hermite_test(std::string type, std::size_t precision=1);
+  int run_hermite_test(std::string type,
+                       std::size_t precision,
+                       std::string ordering,
+                       std::size_t p);
   
   // all tests
-  int all_hermite_tests(std::size_t precision);
+  int all_hermite_tests(std::string ordering, std::size_t p);
 }
 
 

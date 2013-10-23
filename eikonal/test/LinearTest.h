@@ -204,7 +204,8 @@ namespace eikonal
       dolfin::SubMesh band_mesh(mesh, band, 1);
       CG1_FORMS::Form_norm1 l1_band(band_mesh, u, u_exact);
       CG1_FORMS::Form_norm2 l2_band(band_mesh, u, u_exact);
-      CG1_FORMS::Form_area area_band(band_mesh);
+      dolfin::Constant one(1.);
+      CG1_FORMS::Form_area area_band(band_mesh, one);
 
       double area = dolfin::assemble(area_band);
       band_l1_norm = dolfin::assemble(l1_band)/area;

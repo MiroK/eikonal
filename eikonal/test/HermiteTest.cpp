@@ -5,11 +5,13 @@
 #include "CG1.h"
 #include "CG1_FORMS.h"
 #include "CG1_VECTOR.h"
+#include "gs/Sorter.h"
 #include "gs/HermiteSolver.h"
 #include <dolfin/mesh/Mesh.h>
 #include <dolfin/fem/assemble.h>
 #include <dolfin/io/File.h>
 #include <dolfin/plot/plot.h>
+#include <dolfin/function/Constant.h>
 #include <dolfin/mesh/MeshFunction.h>
 #include <dolfin/mesh/SubMesh.h>
 #include <iostream>
@@ -24,7 +26,8 @@ namespace eikonal
 {
 
   int hermite_test(const Problem& problem, MeshGenerator& mesh_gen,
-                   std::size_t precision, bool plot_on)
+                   std::size_t precision, std::string ordering,
+                   std::size_t p, bool plot_on)
   {
     // get the file names
     std::ostringstream help;
@@ -73,7 +76,8 @@ namespace eikonal
       double l1_norm, l2_norm, band_l1_norm, band_l2_norm, coo_norm, time;
       
       int status =
-      hermite_test(problem, *mesh, precision, num_iters, min_calls, max_calls,
+      hermite_test(problem, *mesh, precision, ordering, p, num_iters, min_calls,
+                   max_calls,
                    l1_norm, l2_norm, band_l1_norm, band_l2_norm, coo_norm, time,
                    u_file_name, exact_file_name, error_file_name, plot_on); 
 
@@ -104,7 +108,8 @@ namespace eikonal
   //---------------------------------------------------------------------------
 
   int hermite_test(const Problem& problem, const dolfin::Mesh& mesh,
-                      std::size_t precision, std::size_t& num_iters,
+                      std::size_t precision, std::string ordering,
+                      std::size_t p, std::size_t& num_iters,
                       std::size_t& min_calls, std::size_t& max_calls,
                       double& l1_norm, double& l2_norm,
                       double& band_l1_norm, double& band_l2_norm,
@@ -137,7 +142,38 @@ namespace eikonal
     HermiteSolver solver(V);
 
     clock_t start = clock();
-    //num_iters = solver.solve(u, du_dx, du_dy, fixed_dofs, precision);
+    if(ordering == "corners")
+    { //let the solver figure out the reference point himself
+      std::vector<std::vector<double> > ref_points; // this is empty
+      num_iters = solver.solve(u, du_dx, du_dy, fixed_dofs, precision,
+                               p, ref_points);
+    }
+    else if(ordering == "surface")
+    {
+      // get the reference points from the Problem
+      std::vector<std::vector<double> > ref_points;  
+      problem.get_ref_points(4, ref_points); // take 4 ref points
+      num_iters = solver.solve(u, du_dx, du_dy, fixed_dofs, precision,
+                               p, ref_points);
+    }
+    else if(ordering == "distance")
+    {
+      // solve the problem first with linear solver
+      dolfin::Function u_lin(V);
+      std::set<dolfin::la_index> lin_fixed_dofs;
+      problem.init(lin_fixed_dofs, u_lin);
+      
+      Solver linear_solver(V); //precision ignored with geometric solver
+      linear_solver.solve(u_lin, lin_fixed_dofs, precision); 
+
+      Sorter sorter(*u_lin.vector());
+      num_iters = solver.solve(u, du_dx, du_dy, fixed_dofs, precision,
+                               sorter);
+    }
+    else
+    {
+      assert(false);
+    }
     time = (double)(clock() - start)/CLOCKS_PER_SEC;
   
     dolfin::plot(u);
@@ -154,6 +190,7 @@ namespace eikonal
     dolfin::SubMesh band_mesh(mesh, band, 1);
     CG1_FORMS::Form_norm1 l1_band(band_mesh, u, exact_u);
     CG1_FORMS::Form_norm2 l2_band(band_mesh, u, exact_u);
+    dolfin::Constant one(1.);
     CG1_FORMS::Form_area area_band(band_mesh);
 
     double area = dolfin::assemble(area_band);

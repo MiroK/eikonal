@@ -5,6 +5,7 @@
   Class for specifing problems for the Eikonal equation.
 */
 
+#include <vector>
 #include <set>
 #include <string>
 #include <dolfin/common/types.h>
@@ -47,6 +48,10 @@ namespace eikonal
     // width-cells away from the interface
     dolfin::MeshFunction<std::size_t> get_band(dolfin::Function& u,
                                        const std::size_t width) const;
+
+    // call seeder and chose randlomly n_ref_points that are returned
+    void get_ref_points(const std::size_t n_ref_points,
+                        std::vector<std::vector<double> >& ref_points) const;
 
     // get name of the seeder
     std::string name() const;
