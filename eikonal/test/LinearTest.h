@@ -28,7 +28,7 @@ namespace eikonal
   // use CG1 in 2D to test Eikonal solvers on meshes of type UnitSquareMesh
   // for iterative solver define convergence tolerance as 
   // std::num_limits<double>::digits/precision
-  template<typename T> int linear_2D_test(const Problem& problem,
+  template<typename T> int linear_2D_test(Problem& problem,
                                           MeshGenerator& mesh_gen,
                                           std::size_t precision,
                                           bool plot_on=false);
@@ -36,7 +36,7 @@ namespace eikonal
   // use CG1 in 2D to test Eikonal solver on a given mesh
   // return number of iterations of the sweeping, L^1,L^2 and C^{oo} norms of the
   // error + thec comp time and save the solution to file under u_file_name
-  template<typename T> int linear_2D_test(const Problem& problem,
+  template<typename T> int linear_2D_test(Problem& problem,
                                           const dolfin::Mesh& mesh,
                                           std::size_t precision,
                                           std::size_t& num_iters,
@@ -58,7 +58,7 @@ namespace eikonal
 
 namespace eikonal
 {
-  template<typename T> int linear_2D_test(const Problem& problem,
+  template<typename T> int linear_2D_test(Problem& problem,
                                           MeshGenerator& mesh_gen,
                                           std::size_t precision,
                                           bool plot_on=false)
@@ -159,7 +159,7 @@ namespace eikonal
   }
   //----------------------------------------------------------------------------
   
-  template<typename T> int linear_2D_test(const Problem& problem,
+  template<typename T> int linear_2D_test(Problem& problem,
                                           const dolfin::Mesh& mesh,
                                           std::size_t precision, 
                                           std::size_t& num_iters,

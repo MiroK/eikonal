@@ -5,6 +5,9 @@
 #include <cstdio>         //
 #include <cstdlib>        // random
 #include <ctime>          //
+#include <iostream>
+#include <sstream>
+#include <fstream>
 #include <dolfin/function/Function.h>
 #include <dolfin/function/FunctionSpace.h>
 #include <dolfin/fem/GenericDofMap.h>
@@ -234,7 +237,7 @@ namespace eikonal
 
   void
   Problem::get_ref_points(const std::size_t n_ref_points,
-                          std::vector<std::vector<double> >& ref_points) const
+                          std::vector<std::vector<double> >& ref_points) 
   {
     // get the points from seeder
     std::vector<Point> points;
@@ -268,6 +271,28 @@ namespace eikonal
         ref_points.push_back(std::vector<double>(x, x + 2));
       }
     }
+    // save reference points for future use and also to file
+    if(reference_points.empty())
+    {
+      reference_points = ref_points;
+      std::ostringstream _file_name;
+      _file_name << seeder.name << ".refpoints";
+      std::string file_name = _file_name.str();
+
+      std::ofstream refp_file;
+      refp_file.open(file_name.c_str(), std::ios::out);
+   
+      for(std::size_t i = 0; i < ref_points.size(); i++)
+      {
+        for(std::size_t j = 0; j <ref_points[i].size(); j++)
+        {
+          refp_file << ref_points[i][j] << " ";
+        }
+        refp_file << std::endl;
+      }
+      refp_file.close();
+    }
+
   }
   //---------------------------------------------------------------------------
 

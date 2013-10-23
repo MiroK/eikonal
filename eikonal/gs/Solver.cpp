@@ -167,7 +167,6 @@ namespace eikonal
   {
     if(cell_set_dofs.size() != 2)
     {
-      std::cout << "\t local too few data" << std::endl;
       return u_vector[unset_dof];
     }
 
@@ -189,21 +188,8 @@ namespace eikonal
                            u_vector[cell_set_dofs[1]]};
     const std::vector<double> k_values(_k_values, _k_values + 2);
     
-
-    std::cout << "\tlocal using unset_dof " << unset_dof << std::endl;
-    std::cout << "\tlocal unset coord "; print(u_point);
-    std::cout << "\tlocal using cell_set_dofs "; print(cell_set_dofs);
-    std::cout << "\tlocal using k_points "; print(k_points);
-    std::cout << "\tlocal using k_values "; print(k_values);
-    
-   
     // geoemtric does not use precision!
-    double _SOURCE[2] = {1., 0.};
-    std::vector<double> SOURCE(_SOURCE, _SOURCE + 2);
     double new_value = linear_geometric_2d(u_point, u_value, k_points, k_values);
-    std::cout << "\tlocal new value " << new_value << " with error " <<
-              abs(new_value-norm(u_point-SOURCE)) << std::endl;  
-    
     return new_value;
   }
   //---------------------------------------------------------------------------
@@ -248,28 +234,18 @@ namespace eikonal
         double u_old = (*u_vector)[*unset_dof];
         std::vector<std::size_t> cells = dof_2_cell.find(*unset_dof)->second;
 
-
-        std::cout << "global dof " << *unset_dof <<
-                     " current u[dof] " << u_old << std::endl;
-        std::cout << "cells[dof] "; print(cells);
-
-
         std::vector<std::size_t>::const_iterator cell = cells.begin();
         for( ; cell != cells.end(); cell++)
         {
           std::vector<la_index>
           cell_set_dofs = get_cell_set_dofs(*cell, *unset_dof);
 
-          std::cout << "global cell = " << *cell; print(cell_set_dofs);
           double u_ = this->local_solver(*unset_dof, cell_set_dofs, *u_vector,
                                          precision);
-          std::cout << "global, value from local = " << u_ << std::endl;
           if(u_ < u_old)
           {
             u_old = u_;
             (*dof_status)[*unset_dof - offset] = true;
-            std::cout << "setting new values at dof " << *unset_dof <<
-                     " u[dof] " << u_old << std::endl;
           }
         }
         u_vector->setitem(*unset_dof, u_old);

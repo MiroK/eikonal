@@ -26,7 +26,7 @@ using namespace dolfin;
 namespace eikonal
 {
 
-  int hermite_test(const Problem& problem, MeshGenerator& mesh_gen,
+  int hermite_test(Problem& problem, MeshGenerator& mesh_gen,
                    std::size_t precision, std::string ordering,
                    std::size_t p, bool plot_on)
   {
@@ -93,8 +93,6 @@ namespace eikonal
         min_calls << " " << max_calls << " " << band_l1_norm << 
         " " << band_l2_norm << std::endl;
       
-      std::cout << "next mesh///////////////////////////////////////" <<std::endl;
-      
       // write to text file
       data_file.open(data_file_name.c_str(), std::ios::app);
       
@@ -109,7 +107,7 @@ namespace eikonal
   }
   //---------------------------------------------------------------------------
 
-  int hermite_test(const Problem& problem, const dolfin::Mesh& mesh,
+  int hermite_test(Problem& problem, const dolfin::Mesh& mesh,
                       std::size_t precision, std::string ordering,
                       std::size_t p, std::size_t& num_iters,
                       std::size_t& min_calls, std::size_t& max_calls,
@@ -135,12 +133,6 @@ namespace eikonal
     problem.init(fixed_dofs, u, du_dx, du_dy);
     problem.exact_solution(exact_u, exact_du_dx, exact_du_dy);
     dolfin::MeshFunction<std::size_t> band = problem.get_band(u, 3);
-
-    std::cout << "fixed_dofs "; print(fixed_dofs);
-
-    dolfin::plot(u);
-    dolfin::plot(exact_u);
-    dolfin::interactive(true);
 
     // set up solver and solve
     HermiteSolver solver(V);
@@ -181,10 +173,6 @@ namespace eikonal
     }
     time = (double)(clock() - start)/CLOCKS_PER_SEC;
   
-    dolfin::plot(u);
-    dolfin::plot(exact_u);
-    dolfin::interactive(true);
-    
     // get the error in norms
     CG1_FORMS::Form_norm1 l1(mesh, u, exact_u);
     CG1_FORMS::Form_norm2 l2(mesh, u, exact_u);

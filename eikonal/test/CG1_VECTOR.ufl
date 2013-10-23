@@ -1,2 +1,10 @@
 # Continuous Lagrange element of degree 1 on triangle, vector version
-element = VectorElement("Lagrange", triangle, 1)
+VV = VectorElement("Lagrange", triangle, 1)
+V = FiniteElement("Lagrange", triangle, 1)
+
+u = TrialFunction(VV)
+v = TestFunction(VV)
+f = Coefficient(V)
+
+a = inner(u, v)*dx
+L = inner(grad(f), v)*dx

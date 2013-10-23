@@ -51,13 +51,14 @@ namespace eikonal
 
     // call seeder and chose randlomly n_ref_points that are returned
     void get_ref_points(const std::size_t n_ref_points,
-                        std::vector<std::vector<double> >& ref_points) const;
+                        std::vector<std::vector<double> >& ref_points);
 
     // get name of the seeder
     std::string name() const;
   
   private:
     const Seeder& seeder;
+    std::vector<std::vector<double> > reference_points;
   };
 }
 

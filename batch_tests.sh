@@ -22,3 +22,14 @@ cd $ROOT/lin_newton/digits_double_2;
 
 cd $ROOT/lin_newton/digits_double_3;
 ./run.sh;
+
+cd $ROOT/hermite/corners;
+./run.sh;
+
+cd $ROOT/hermite/surface;
+./run.sh;
+
+cd $ROOT/hermite/distance;
+./run.sh;
+
+

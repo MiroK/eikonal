@@ -18,12 +18,12 @@ namespace eikonal
   class MeshGenerator;
 
   // TODO
-  int hermite_test(const Problem& problem, MeshGenerator& mesh_gen,
+  int hermite_test(Problem& problem, MeshGenerator& mesh_gen,
                    std::size_t precision, std::string ordering,
                    std::size_t p, bool plot_on=false);
 
   // TODO
-  int hermite_test(const Problem& problem, const dolfin::Mesh& mesh,
+  int hermite_test(Problem& problem, const dolfin::Mesh& mesh,
                                           std::size_t precision,
                                           std::string ordering,
                                           std::size_t p,
