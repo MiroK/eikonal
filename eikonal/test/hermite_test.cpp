@@ -13,9 +13,9 @@ namespace eikonal
 
       std::size_t precision = 2;
       run_hermite_test("point", precision, ordering, p); 
-      run_hermite_test("twocircle", precision, ordering, p); 
+      /*run_hermite_test("twocircle", precision, ordering, p); 
       run_hermite_test("triangle", precision, ordering, p); 
-      run_hermite_test("zalesak", precision, ordering, p); 
+      run_hermite_test("zalesak", precision, ordering, p);*/ 
   }
   //---------------------------------------------------------------------------
 
@@ -166,7 +166,7 @@ namespace eikonal
       int status;
       // convergence test on an unperturbed RectangleMesh crossed [2**3 .. 2**7]
       RectangleMeshGenerator mesh_gen0(3, 8, -2, -2, 2, 2, false);
-      status = hermite_test(problem, mesh_gen0, precision, ordering, p, false);
+      status = hermite_test(problem, mesh_gen0, precision, ordering, p, true);
 
       // convergence test on an perturbed RectangleMesh crossed [2**3 .. 2**7]
       RectangleMeshGenerator mesh_gen1(3, 8, -2, -2, 2, 2, true);

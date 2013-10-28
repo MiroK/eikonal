@@ -5,8 +5,17 @@ using namespace eikonal;
 
 int main(int argc, char* argv[])
 {
-  assert(argc == 3);
   
+  /*Dolphin dolphin;
+  Problem problem(dolphin);
+  
+  int status;
+  // convergence test on meshes by gmsh 0 .. 6, smoothing
+  GmshMeshGenerator mesh_gen3(6, 7, "rectangle", true);
+  status = hermite_test(problem, mesh_gen3, 2, "corners", 2, false);
+ */
+  
+  assert(argc == 3);
   // LINEAR TESTS
   //all_linear_tests(atoi(argv[1]), atoi(argv[2]));
  
@@ -19,7 +28,7 @@ int main(int argc, char* argv[])
   {
     all_hermite_tests("corners", p_norm);  
   }
-  else if(solver_choice == SURFACE)
+  /*else if(solver_choice == SURFACE)
   {
     all_hermite_tests("surface", p_norm);
   }
@@ -27,7 +36,7 @@ int main(int argc, char* argv[])
   {
     all_hermite_tests("distance", p_norm);
   }
-  
+  */
   return 0;
 }
 

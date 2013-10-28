@@ -109,8 +109,11 @@ namespace eikonal
                    const std::vector<double>& _C,
                    const double _u_A, const double _u_B);
     
-    // eval
+    // eval df and (ddf) for we seek the minima by df = 0
     boost::math::tuple<double, double> operator()(double x);
+
+    // return f(x)
+    double eval(double x);
   };
   //---------------------------------------------------------------------------
 
@@ -125,9 +128,12 @@ namespace eikonal
                     const std::vector<double>& _grad_u_A,
                     const std::vector<double>& _grad_u_B);
     
-    // eval
+    // eval df and (ddf) for we seek the minima by df = 0
     boost::math::tuple<double, double> operator()(double x);
 
+    // return f(x)
+    double eval(double x);
+    
   private:
     const std::vector<double> grad_u_A;
     const std::vector<double> grad_u_B;

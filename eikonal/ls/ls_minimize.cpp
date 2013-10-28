@@ -61,7 +61,7 @@ namespace eikonal
 
     if(t >= 0 and t <= 1)
     {
-      double u_ = boost::fusion::get<0>(foo(t));
+      double u_ = foo.eval(t);
       return std::make_pair<double, double>(t, u_ < u_C ? u_ : u_C);
     }
     else
@@ -135,17 +135,13 @@ namespace eikonal
                     std::size_t& n_calls,
                     const std::size_t precision)
   {
-    // first call the newton solver 
-    std::pair<double, double> t_ft = 
+    // first call the newton solver
+    std::pair<double, double> t_ft =
     linear_newton_2d(A, B, C, u_A, u_B, u_C, n_calls, precision);
 
     // now call hermite using t_ft.first as guess if possible
     HermiteNewton2D foo(A, B, C, u_A, u_B, grad_u_A, grad_u_B);
     
-    foo.n_calls = 0;
-    int digits = std::numeric_limits<double>::digits/precision; 
-    double t_min = 0.;
-    double t_max = 1.;
     const double a = norm(C - B, 2);
     const double b = norm(C - A, 2);
     
@@ -159,6 +155,10 @@ namespace eikonal
       t_guess = t_ft.first;
     }
       
+    foo.n_calls = 0;
+    int digits = std::numeric_limits<double>::digits/precision;
+    double t_min = 0.;
+    double t_max = 1.;
     boost::uintmax_t max_iter = 300;
     double t = boost::math::tools::newton_raphson_iterate(foo,
                             t_guess, t_min, t_max, digits, max_iter);
@@ -167,7 +167,7 @@ namespace eikonal
     if(t >= 0 and t <= 1)
     {
       // if smaller value set also the gradient
-      double u_ = boost::fusion::get<0>(foo(t));
+      double u_ = foo.eval(t);
       if(u_ < u_C)
       {
         std::vector<double> I = A*(1-t) + B*t;
@@ -222,14 +222,27 @@ namespace eikonal
     return f;
   }
   //---------------------------------------------------------------------------
+  
+  double LinearNewton2D::eval(double x)
+  {
+    const vector<double> P = A*(1.-x) + B*x;
+    const double f = u_A*(1.-x) + u_B*x + norm(C-P, 2);
+    return f;
+  }
+  //---------------------------------------------------------------------------
 
   boost::math::tuple<double, double> LinearNewton2D::operator()(double x)
   {
     const vector<double> P = A*(1.-x) + B*x;
-    const double f = u_A*(1.-x) + u_B*x + norm(C-P, 2);
-    const double df = -u_A + u_B + dot(C-P, A-B)/norm(C-P, 2);
+    const double df = -u_A + u_B + dot(C-P, A-B)/norm(C-P, 2);       //<---
+    
+    const double nAB = norm(A-B, 2);
+    const double nCP = norm(C-P, 2);
+    const double _dot = dot(C-P,A-B);
+
+    const double ddf = (nAB*nAB*nCP*nCP - _dot*_dot)/nCP/nCP/nCP;      //<---
     n_calls++;
-    return boost::math::make_tuple(f, df);
+    return boost::math::make_tuple(df, ddf);
   }
   //---------------------------------------------------------------------------
 
@@ -243,19 +256,34 @@ namespace eikonal
   grad_u_B(_grad_u_B) { }
   //----------------------------------------------------------------------------
 
-  boost::math::tuple<double, double> HermiteNewton2D::operator()(double x)
+  double HermiteNewton2D::eval(double x)
   {
     const vector<double> P = A*(1.-x) + B*x;
     const double f =
     u_A*pow(1-x, 3) + 3*(u_A + dot(B-A, grad_u_A)/3.)*x*(1-x)*(1-x)
     + u_B*pow(x, 3.) + 3*(u_B + dot(A-B, grad_u_B)/3.)*x*x*(1-x)
     + norm(C-P, 2);
-    
+    return f;
+  }
+  //----------------------------------------------------------------------------
+
+  boost::math::tuple<double, double> HermiteNewton2D::operator()(double x)
+  {
+    const vector<double> P = A*(1.-x) + B*x;
     const double df = 3*u_B*x*x + 3*(u_B + dot(A-B, grad_u_B)/3.)*x*(2-3*x)
              - 3*u_A*pow(1-x, 2) + 3*(u_A + dot(B-A, grad_u_A)/3.)*(1-x)*(1-3*x)
-             + dot(C-P, A-B)/norm(C-P, 2);
+             + dot(C-P, A-B)/norm(C-P, 2);  //<---
+
+    const double nAB = norm(A-B);
+    const double nCP = norm(C-P);
+    const double _dot = dot(C-P,A-B);
+
+    const double ddf = 6*u_B*x + 3*(u_B + dot(A-B, grad_u_B)/3.)*(2-6*x)
+             + 6*u_A*(1-x) + 3*(u_A + dot(B-A, grad_u_A)/3.)*(-4+6*x)
+             + (nAB*nAB*nCP*nCP - _dot*_dot)/nCP/nCP/nCP;      //<---
+
     n_calls++;
-    return boost::math::make_tuple(f, df);
+    return boost::math::make_tuple(df, ddf);
   }
   //---------------------------------------------------------------------------
 
