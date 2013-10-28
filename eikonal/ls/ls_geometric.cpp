@@ -9,31 +9,31 @@ using namespace std;
 
 namespace eikonal
 {
-  double linear_geometric_2d(const std::vector<double>& A,
-                             const std::vector<double>& B,
-                             const std::vector<double>& C,
-                             const double u_A, const double u_B, const double u_C)
+  double
+  linear_geometric_2d(const std::vector<double>& A,
+                      const std::vector<double>& B,
+                      const std::vector<double>& C,
+                      const double u_A, const double u_B, const double u_C)
   {
-    const double a = norm(C - B);
-    const double b = norm(C - A);
-    const double c = norm(A - B);
+    const double a = norm(C - B, 2);
+    const double b = norm(C - A, 2);
+    const double c = norm(A - B, 2);
 
-    if(abs(u_B - u_A) <= c)
+    if((u_B - u_A) <= c)
     {
-      const double theta = asin(abs(u_B - u_A)/c);
+      double theta = asin((u_B - u_A)/c);
       const double alpha = acos(dot(C - B, A - B)/a/c);
       const double beta = acos(dot(C - A, B - A)/b/c);
       const double pip = M_PI/2.;
-
-      if((std::max(0., alpha - pip) <= theta and theta <= (pip - beta)) or
-         ((alpha - pip) <= theta and theta <= std::min(0., pip - beta)))
+      
+      if((std::max(0., alpha - pip) <= theta and theta <= (pip - beta)))
       {
         const double h = a*sin(alpha - theta);
-        const double H = b*sin(beta + theta);
-        
+
         vector<double> values(2);
         values[0] = u_C;
-        values[1] = 0.5*(h + u_B) + 0.5*(H + u_A);
+        values[1] = h + u_B;
+
         return *min_element(values.begin(), values.end());
       }
       else
@@ -68,10 +68,12 @@ namespace eikonal
     assert(k_values.size() == n_k_points);
 
     // unpack 
-    const double u_A = k_values[0], u_B = k_values[1], u_C = u_value;
+    const std::size_t i = k_values[0] <= k_values[1] ? 0 : 1;
+    const std::size_t ip1 = (i+1)%2;
+    const double u_A = k_values[i], u_B = k_values[ip1], u_C = u_value;
     
-    const std::vector<double> A(&k_points[0*dim], &k_points[0*dim] + dim),
-                              B(&k_points[1*dim], &k_points[1*dim] + dim),
+    const std::vector<double> A(&k_points[i*dim], &k_points[i*dim] + dim),
+                              B(&k_points[ip1*dim], &k_points[ip1*dim] + dim),
                               C(u_point);
     
     // use the verbose interface

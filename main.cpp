@@ -1,19 +1,42 @@
 #include "eikonal.h"
+#include <cstdlib>
 
 using namespace eikonal;
 
-int main()
+int main(int argc, char* argv[])
 {
-  // define the seeder
-  double _A[2] = {0, 0}; std::vector<double> A(_A, _A + 2);
-  double _B[2] = {1, 0}; std::vector<double> B(_B, _B + 2);
-  Segment segment(A, B);
+  
+  /*Dolphin dolphin;
+  Problem problem(dolphin);
+  
+  int status;
+  // convergence test on meshes by gmsh 0 .. 6, smoothing
+  GmshMeshGenerator mesh_gen3(6, 7, "rectangle", true);
+  status = hermite_test(problem, mesh_gen3, 2, "corners", 2, false);
+ */
+  
+  assert(argc == 3);
+  // LINEAR TESTS
+  //all_linear_tests(atoi(argv[1]), atoi(argv[2]));
  
-  // define the problem
-  Problem problem(segment);
- 
-  // perform convergence test using Solver
-  int status = linear_2D_test<Solver>(problem);
+  // HERMITE TESTS
+  enum HERTMITE_SOLVER {CORNERS, SURFACE, DISTANCE};
+  std::size_t solver_choice = atoi(argv[1]);
+  std::size_t p_norm = atoi(argv[2]);
 
+  if(solver_choice == CORNERS)
+  {
+    all_hermite_tests("corners", p_norm);  
+  }
+  /*else if(solver_choice == SURFACE)
+  {
+    all_hermite_tests("surface", p_norm);
+  }
+  else if(solver_choice == DISTANCE)
+  {
+    all_hermite_tests("distance", p_norm);
+  }
+  */
   return 0;
 }
+

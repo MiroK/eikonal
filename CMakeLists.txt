@@ -52,10 +52,21 @@ add_executable(${PROJECT_NAME}
 
                                ./eikonal/gs/gs_connectivity.cpp
                                ./eikonal/gs/gs_LpDistanceSorter.cpp
+                               ./eikonal/gs/Sorter.cpp
                                ./eikonal/gs/Solver.cpp
-
+                               ./eikonal/gs/LinMinSolver.cpp
+                               ./eikonal/gs/LinNewtonSolver.cpp
+                               ./eikonal/gs/HermiteSolver.cpp
+                              
+                               ./eikonal/test/test_common.cpp
                                ./eikonal/test/Seeder.cpp
                                ./eikonal/test/Problem.cpp
+                               ./eikonal/test/UnitSquareMeshGenerator.cpp
+                               ./eikonal/test/GmshMeshGenerator.cpp
+                               ./eikonal/test/RectangleMeshGenerator.cpp
+                               ./eikonal/test/linear_test.cpp
+                               ./eikonal/test/HermiteTest.cpp
+                               ./eikonal/test/hermite_test.cpp
 )
 # Target libraries
 target_link_libraries(${PROJECT_NAME} ${DOLFIN_LIBRARIES}

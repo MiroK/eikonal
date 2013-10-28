@@ -26,43 +26,52 @@ namespace eikonal
     Solver(const dolfin::FunctionSpace& V);
 
     // destructor
-    ~Solver();
+    virtual ~Solver();
 
     // solve the eikonal euqtion |grad(u)| = 1 with values of u fixed at
-    // fixed_dofs TODO
+    // fixed_dofs, precision is the parameter used with iteratative local solver
+    // convergence tolerance = std::num_limits<double>::digits/precision
     std::size_t solve(dolfin::Function& u,
-                      const std::set<dolfin::la_index>& fixed_dofs);
+                      const std::set<dolfin::la_index>& fixed_dofs,
+                      const std::size_t precision);
+  
+  public:
+    static std::string name;
+    std::size_t min_calls;
+    std::size_t max_calls;
 
-  private:
-    // initiliaze dof_status TODO, 
+  protected:
+    // initiliaze dof_status, 
     boost::shared_ptr<std::vector<bool> >
     init_dof_status(const dolfin::Function& u,
                     const std::set<dolfin::la_index>& fixed_dofs);
 
-    // initialize unset_dofs, numbers [first,...,last[ exclude fixed TODO
+    // initialize unset_dofs, numbers [first,...,last[ exclude fixed 
     // fixed_dofs will be sorted inside so no const
     boost::shared_ptr<std::vector<dolfin::la_index> >
     init_unset_dofs(const dolfin::Function& u,
                     const std::set<dolfin::la_index>& fixed_dofs);
 
     // return dofs in cell_2_dof[cell] that are not dof and whose dof_status
-    // is true, i.e set, TODO
+    // is true, i.e set, 
     std::vector<dolfin::la_index>
     get_cell_set_dofs(const std::size_t cell, const dolfin::la_index dof) const;
 
     // get reference points; for now corners of domain assuming square, box
-    // domain         TODO
+    // domain        
     std::vector<std::vector<double> > 
     get_reference_points(const dolfin::Mesh& mesh) const;
 
     // local solver of Eikonal equation in the cell
     // compute the approximate value of u_vector in unset_dof from values
-    // in set_dofs TODO
-    double local_solver(const dolfin::la_index unset_dof,
-                        const std::vector<dolfin::la_index>& cell_set_dofs,
-                        const dolfin::GenericVector& u_vector) const;
+    // in set_dofs 
+    virtual double
+    local_solver(const dolfin::la_index unset_dof,
+                 const std::vector<dolfin::la_index>& cell_set_dofs,
+                 const dolfin::GenericVector& u_vector,
+                 const std::size_t precision);
 
-  private:
+  protected:
     // map between cell=size_t and dofs it contains=set([la_index])
     const eikonal::t_smap_la cell_2_dof;
 
