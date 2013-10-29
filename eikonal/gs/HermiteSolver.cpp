@@ -233,10 +233,6 @@ namespace eikonal
     hermite_newton_2d(A, B, C, u_A, u_B, u_C, grad_u_A, grad_u_B, grad_u_C,
                       n_calls, precision);
    
-    double _SOURCE[2] = {1., 0.};
-    std::vector<double> SOURCE(_SOURCE, _SOURCE + 2);
-    std::vector<double> exact_grad = (C-SOURCE)/norm(C-SOURCE);
-
     if(n_calls > max_calls)
     {
       max_calls = n_calls;

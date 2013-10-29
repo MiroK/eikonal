@@ -1,5 +1,4 @@
 #include "ls_minimize.h"
-#include "ls_gsl.h"
 #include "la/la_loop.h"
 #include "la/la_common.h"
 #include <cassert>
@@ -122,7 +121,6 @@ namespace eikonal
     
     // use the verbose interface
     return linear_newton_2d(A, B, C, u_A, u_B, u_C, n_calls, precision).second;
-    //return linear_solver(A, B, C, u_A, u_B, u_C, 40, precision).second;
   }
   //---------------------------------------------------------------------------
 
@@ -169,19 +167,15 @@ namespace eikonal
                             t_guess, t_min, t_max, digits, max_iter);
     n_calls = foo.n_calls;
     
-    std::cout << "\ttfrom newton hermite root finder" << t << std::endl; 
+    //std::cout << "\ttfrom newton hermite" << t << std::endl; 
     
     HermiteBrent2D brent(A, B, C, u_A, u_B, grad_u_A, grad_u_B);
     pair<double, double> XX = 
     boost::math::tools::brent_find_minima(brent, 0., 1., digits);
     
-    std::cout << "\tt from brent hermite" << XX.first << std::endl; 
+    //std::cout << "\tt from brent hermite" << XX.first << std::endl; 
+    //std::cout << "\t diff " << abs(XX.first - t) << std::endl;
 
-    TEST_FUNCTOR test(A, B, C, u_A, u_B, grad_u_A, grad_u_B);
-    double t_test = boost::math::tools::newton_raphson_iterate(test,
-                            t_guess, t_min, t_max, digits, max_iter);
-    std::cout << "\ttfrom newton hermite minimizer" << t_test << std::endl; 
-    
     if(t >= 0 and t <= 1)
     {
       // if smaller value set also the gradient
@@ -338,6 +332,17 @@ namespace eikonal
   grad_u_B(_grad_u_B) { }
   //----------------------------------------------------------------------------
 
+  double HermiteNewton2D::eval(double x)
+  {
+    const vector<double> P = A*(1.-x) + B*x;
+    const double f =
+    u_A*pow(1-x, 3) + 3*(u_A + dot(B-A, grad_u_A)/3.)*x*(1-x)*(1-x)
+    + u_B*pow(x, 3.) + 3*(u_B + dot(A-B, grad_u_B)/3.)*x*x*(1-x)
+    + norm(C-P, 2);
+    return f;
+  }
+  //----------------------------------------------------------------------------
+
   boost::math::tuple<double, double> TEST_FUNCTOR::operator()(double x)
   {
     const vector<double> P = A*(1.-x) + B*x;
@@ -356,7 +361,7 @@ namespace eikonal
              + dot(C-P, A-B)/norm(C-P, 2);  //<---
 
     n_calls++;
-    return boost::math::make_tuple(f, df);
+    return boost::math::make_tuple(df, ddf);
   }
   //---------------------------------------------------------------------------
 }

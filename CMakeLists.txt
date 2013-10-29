@@ -49,6 +49,7 @@ add_executable(${PROJECT_NAME}
                                ./eikonal/ls/ls_geometric.cpp
                                ./eikonal/ls/ls_minimize.cpp
                                ./eikonal/ls/ls_test.cpp
+                               ./eikonal/ls/ls_gsl.cpp
 
                                ./eikonal/gs/gs_connectivity.cpp
                                ./eikonal/gs/gs_LpDistanceSorter.cpp

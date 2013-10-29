@@ -139,7 +139,7 @@ namespace eikonal
     const std::vector<double> grad_u_B;
   };
   //---------------------------------------------------------------------------
-
+  
   class HermiteBrent2D : public Linear2DFunctor
   { // functor for Newton solver of hremite...
   public:
@@ -153,6 +153,24 @@ namespace eikonal
     
     // eval
     double operator()(double x);
+
+  private:
+    const std::vector<double> grad_u_A;
+    const std::vector<double> grad_u_B;
+  };
+  //---------------------------------------------------------------------------
+
+  class TEST_FUNCTOR : public Linear2DFunctor
+  { 
+  public:
+    TEST_FUNCTOR(const std::vector<double>& _A,
+         const std::vector<double>& _B,
+         const std::vector<double>& _C,
+         const double _u_A, const double _u_B,
+         const std::vector<double>& _grad_u_A,
+         const std::vector<double>& _grad_u_B);
+    
+    boost::math::tuple<double, double> operator()(double x);
 
   private:
     const std::vector<double> grad_u_A;

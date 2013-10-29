@@ -8,6 +8,7 @@
 #include "ls_common.h"
 #include "ls_geometric.h"
 #include "ls_minimize.h"
+#include "ls_gsl.h"
 #include "ls_test.h"
 
 #endif // _EIKONAL_LS_H

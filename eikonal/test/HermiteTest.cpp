@@ -136,6 +136,10 @@ namespace eikonal
   
     // set up vars with solver
     problem.init(fixed_dofs, u, du_dx, du_dy);
+    
+    dolfin::plot(u);
+    dolfin::interactive(true);
+    
     problem.exact_solution(exact_u, exact_du_dx, exact_du_dy);
     dolfin::MeshFunction<std::size_t> band = problem.get_band(u, 3);
 

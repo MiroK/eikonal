@@ -63,28 +63,29 @@ void local_test_S(double* _S)
   const std::vector<double> grad_u_B = (B-source)/norm(B-source);
   std::vector<double> grad_u_C;
 
-  print(grad_u_A);
-  print(grad_u_B);
+  std::cout << "grad_A "; print(grad_u_A);
+  std::cout << "grad B "; print(grad_u_B);
   
   std::size_t n_calls;
   double d_g = linear_geometric_2d(A, B, C, u_A, u_B, u_C);
   double e_g = abs(ex - d_g);
-  double d_m = linear_brent_2d(A, B, C, u_A, u_B, u_C, n_calls, 2).second;
+
+  double d_m = linear_solver(A, B, C, u_A, u_B, u_C, 40, 2, n_calls).second;
   double e_m = abs(ex - d_m);
+  std::cout << "number of calls in lin Newton solver " <<n_calls << std::endl;
+  
   double d_h = hermite_newton_2d(A, B, C, u_A, u_B, u_C, grad_u_A, grad_u_B,
                                  grad_u_C, n_calls, 2).second;
   double e_h = abs(d_h - ex);
-  
+  std::cout << "number of calls in herm Newton solver " <<n_calls << std::endl;
+
   std::cout << "S is "; print(source);
-  std::cout << "exact " << ex << "\t";
-  std::cout << "geometric " << d_g << "\t";
-  std::cout << "minimize " << d_m << "\t";
-  std::cout << "hermite " << d_h << std::endl;
-  std::cout << std::setprecision(16) << abs(d_g - d_m) << std::endl;
-  std::cout << std::setprecision(16) << e_g << "\t" << e_m << "\t" <<
-                                        e_h << std::endl;
-  print(grad_u_C);
+  std::cout << "exact " << ex << "\n";
+  std::cout << "geometric " << d_g << " " << e_g << "\n";
+  std::cout << "minimize " << d_m << " " << e_m << "\n";
+  std::cout << "Hermite " << d_h << " " << e_h << std::endl;
+  
+  std::cout << "grad_C "; print(grad_u_C);
   std::cout << std::endl;
-  std::cout << n_calls << std::endl;
 }
 //-----------------------------------------------------------------------------

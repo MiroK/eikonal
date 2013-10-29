@@ -159,27 +159,27 @@ namespace eikonal
 
     if(type == std::string("point"))
     {
-      double _P[2] = {0., 0.}; std::vector<double> P(_P, _P+2);
+      double _P[2] = {1., 0.}; std::vector<double> P(_P, _P+2);
       MyPoint point(P);
       Problem problem(point);
       
       int status;
       // convergence test on an unperturbed RectangleMesh crossed [2**3 .. 2**7]
-      RectangleMeshGenerator mesh_gen0(3, 8, -2, -2, 2, 2, false);
+      RectangleMeshGenerator mesh_gen0(3, 7, 0, 0, 1, 1, false);
       status = hermite_test(problem, mesh_gen0, precision, ordering, p, true);
 
       // convergence test on an perturbed RectangleMesh crossed [2**3 .. 2**7]
-      RectangleMeshGenerator mesh_gen1(3, 8, -2, -2, 2, 2, true);
-      status = hermite_test(problem, mesh_gen1, precision, ordering, p, false);
+      RectangleMeshGenerator mesh_gen1(1, 3, 0, 0, 1, 1, true);
+      status = hermite_test(problem, mesh_gen1, precision, ordering, p, true);
       
       // convergence test on meshes by gmsh 0 .. 6, no smoothing
-      GmshMeshGenerator mesh_gen2(1, 7, "rectangle", false);
+      /*GmshMeshGenerator mesh_gen2(1, 7, "rectangle", false);
       status = hermite_test(problem, mesh_gen2, precision, ordering, p, false);
       
       // convergence test on meshes by gmsh 0 .. 6, smoothing
       GmshMeshGenerator mesh_gen3(1, 7, "rectangle", true);
       status = hermite_test(problem, mesh_gen3, precision, ordering, p, false);
-      
+      */
       return status;
     }
     
