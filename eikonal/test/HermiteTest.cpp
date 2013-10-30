@@ -16,6 +16,7 @@
 #include <dolfin/function/Constant.h>
 #include <dolfin/mesh/MeshFunction.h>
 #include <dolfin/mesh/SubMesh.h>
+#include <dolfin/la/GenericVector.h>
 #include <iostream>
 #include <sstream>
 #include <fstream>

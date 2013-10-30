@@ -15,9 +15,10 @@
 #include <dolfin/la/GenericVector.h>
 #include <dolfin/mesh/Mesh.h>
 #include <dolfin/mesh/Cell.h>
-#include <dolfin/mesh/Point.h>
+#include <dolfin/geometry/Point.h>
 #include <dolfin/mesh/MeshGeometry.h>
 #include <dolfin/mesh/MeshFunction.h>
+#include <dolfin/geometry/BoundingBoxTree.h>
 #include "la/la_common.h"
 
 #include <dolfin/plot/plot.h>
@@ -38,7 +39,13 @@ namespace eikonal
 
     // get the intersected cell
     std::set<std::size_t> cells;
-    u.function_space()->mesh()->intersected_cells(points, cells);
+    std::vector<Point>::const_iterator point = points.begin();
+    for(; point != points.end(); point++)
+    {
+      std::vector<std::size_t> _cells = 
+      u.function_space()->mesh()->bounding_box_tree()->compute_collisions(*point);
+      cells.insert(_cells.begin(), _cells.end());
+    }
 
     // push to fixed_dofs and modify u in fixed_dofs, other dofs set as far
     const double far = u.function_space()->mesh()->hmax()*
@@ -85,9 +92,14 @@ namespace eikonal
     std::vector<Point> points;
     seeder.seed(points, 1000);
 
-    // get the intersected cell
     std::set<std::size_t> cells;
-    u.function_space()->mesh()->intersected_cells(points, cells);
+    std::vector<Point>::const_iterator point = points.begin();
+    for(; point != points.end(); point++)
+    {
+      std::vector<std::size_t> _cells = 
+      u.function_space()->mesh()->bounding_box_tree()->compute_collisions(*point);
+      cells.insert(_cells.begin(), _cells.end());
+    }
 
     // push to fixed_dofs and modify u in fixed_dofs, other dofs set as far
     const double far = u.function_space()->mesh()->hmax()*
@@ -195,8 +207,15 @@ namespace eikonal
     
     // get the intersected cells;
     boost::shared_ptr<const Mesh> mesh(u.function_space()->mesh()); 
+
     std::set<std::size_t> cells;
-    mesh->intersected_cells(points, cells);
+    std::vector<Point>::const_iterator point = points.begin();
+    for(; point != points.end(); point++)
+    {
+      std::vector<std::size_t> _cells = 
+      u.function_space()->mesh()->bounding_box_tree()->compute_collisions(*point);
+      cells.insert(_cells.begin(), _cells.end());
+    }
 
     // mark the intersected cells 1
     const std::size_t dim = mesh->topology().dim();
