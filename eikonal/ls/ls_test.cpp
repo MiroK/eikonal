@@ -74,8 +74,8 @@ void local_test_S(double* _S)
   double e_m = abs(ex - d_m);
   std::cout << "number of calls in lin Newton solver " <<n_calls << std::endl;
   
-  double d_h = hermite_newton_2d(A, B, C, u_A, u_B, u_C, grad_u_A, grad_u_B,
-                                 grad_u_C, n_calls, 2).second;
+  double d_h = hermite_solver(A, B, C, u_A, u_B, u_C, grad_u_A, grad_u_B,
+                                 grad_u_C, 40, 2, n_calls).second;
   double e_h = abs(d_h - ex);
   std::cout << "number of calls in herm Newton solver " <<n_calls << std::endl;
 

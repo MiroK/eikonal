@@ -17,6 +17,7 @@ namespace eikonal
                 const std::size_t precision,
                 std::size_t& n_calls);
 
+  // LINEAR INTERPOLATION
   class LinearData
   {
   // wrapper of data used by linear solver
@@ -53,22 +54,49 @@ namespace eikonal
                 const std::vector<double>& C, const double u_A,
                 const double u_B, const double u_C, const std::size_t max_iter,
                 const std::size_t precision, std::size_t& n_calls);
-  /* HERMITE
+  
+  // HERMITE INTERPOLATION
+  class HermiteData : public LinearData
+  {
+    // wrapper of data used by Hermite solver
+  public:
+    HermiteData(const std::vector<double>& _A, const std::vector<double>& _B,
+                const std::vector<double>& _C, const double _u_A,
+                const double _u_B, const std::vector<double>& _grad_u_A,
+                const std::vector<double>& _grad_u_B) : 
+            LinearData(_A, _B, _C, _u_A, _u_B), grad_u_A(_grad_u_A),
+            grad_u_B(_grad_u_B){ }
+  public:  
+    const std::vector<double>& grad_u_A;
+    const std::vector<double>& grad_u_B;
 
-  class HermiteData;
+  };
 
+  // evaluate the distance function interpolated with Hermite cubic polynomial 
   double hermite_f(double t, void *params);
-  double hermite_df(double t, void *params);
-  double hermite_ddf(double t, void *params);
-  double hermite_solver(const std::vector<double>& A,
-                        const std::vector<double>& B,
-                        const std::vector<double>& C,
-                        const double u_A, const double u_B, const double u_C,
-                        const std::vector<double>& grad_u_A,
-                        const std::vector<double>& grad_u_B,
-                        std::vector<double>& grad_u_C);
 
-*/
+  // evaluate the derivative of the distance function
+  double hermite_df(double t, void *params);
+
+  // evaluate the second derivative
+  double hermite_ddf(double t, void *params);
+
+  // evaluate second and first derivatives
+  void hermite_df_ddf(double t, void* params, double* y, double* dy);
+  
+  // construct the hermite interpolant from data and find its minima
+  // returs t*, f(t*), n_calls counts calls made to newton solver, grad_u_C
+  // hold approximation of the gradient
+  std::pair<double, double> 
+  hermite_solver(const std::vector<double>& A,
+                 const std::vector<double>& B,
+                 const std::vector<double>& C,
+                 const double u_A, const double u_B, const double u_C,
+                 const std::vector<double>& grad_u_A,
+                 const std::vector<double>& grad_u_B,
+                 std::vector<double>& grad_u_C,
+                 const std::size_t max_iter, const std::size_t precision,
+                 std::size_t& n_calls);
 }
 
 #endif // _LS_GSL_H_

@@ -44,7 +44,7 @@ namespace eikonal
                            u_vector[cell_set_dofs[1]]};
     const std::vector<double> k_values(_k_values, _k_values + 2);
     
-    std::size_t n_calls;
+    std::size_t n_calls = 0;
     double u_new = linear_newton_2d(u_point, u_value, k_points, k_values,
                                     n_calls, precision);
     

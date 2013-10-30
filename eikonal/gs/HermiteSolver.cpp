@@ -227,7 +227,7 @@ namespace eikonal
     _grad_u_B[1] = du_dy_vector[b];
     const std::vector<double> grad_u_B(_grad_u_B, _grad_u_B + 2);
     
-    std::size_t n_calls;
+    std::size_t n_calls = 0;
     
     std::pair<double, double> t_ft = 
     hermite_newton_2d(A, B, C, u_A, u_B, u_C, grad_u_A, grad_u_B, grad_u_C,
