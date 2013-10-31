@@ -169,19 +169,6 @@ namespace eikonal
                             t_guess, t_min, t_max, digits, max_iter);
     n_calls = foo.n_calls;
     
-    std::cout << "\ttfrom newton hermite root finder" << t << std::endl; 
-    
-    HermiteBrent2D brent(A, B, C, u_A, u_B, grad_u_A, grad_u_B);
-    pair<double, double> XX = 
-    boost::math::tools::brent_find_minima(brent, 0., 1., digits);
-    
-    std::cout << "\tt from brent hermite" << XX.first << std::endl; 
-
-    TEST_FUNCTOR test(A, B, C, u_A, u_B, grad_u_A, grad_u_B);
-    double t_test = boost::math::tools::newton_raphson_iterate(test,
-                            t_guess, t_min, t_max, digits, max_iter);
-    std::cout << "\ttfrom newton hermite minimizer" << t_test << std::endl; 
-    
     if(t >= 0 and t <= 1)
     {
       // if smaller value set also the gradient

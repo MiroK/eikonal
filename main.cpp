@@ -5,14 +5,14 @@ using namespace eikonal;
 
 int main(int argc, char* argv[])
 {
-  double S[2] = {0.25, -0.5};
-  local_test_S(S);
+  /*double S[2] = {0.25, -0.5};
+  local_test_S(S);*/
 
 
 
 /*
   Dolphin dolphin;
-  Problem problem(dolphin);
+  Problem problem(dolphin);*/
   int status;
   // convergence test on meshes by gmsh 0 .. 6, smoothing
   //GmshMeshGenerator mesh_gen3(6, 7, "rectangle", true);
@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
   if(solver_choice == CORNERS)
   {
     all_hermite_tests("corners", p_norm);  
-  }*/
+  }
   /*else if(solver_choice == SURFACE)
   {
     all_hermite_tests("surface", p_norm);

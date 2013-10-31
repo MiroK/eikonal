@@ -15,7 +15,7 @@ project(${PROJECT_NAME})
 cmake_policy(SET CMP0004 OLD)
 
 # Get DOLFIN configuration data (DOLFINConfig.cmake must be in DOLFIN_CMAKE_CONFIG_PATH)
-FIND_PACKAGE(DOLFIN)
+find_package(DOLFIN)
 
 # Default build type (can be overridden by user)
 if (NOT CMAKE_BUILD_TYPE)
@@ -27,14 +27,14 @@ endif()
 add_definitions(${DOLFIN_CXX_DEFINITIONS})
 
 # Add special DOLFIN compiler flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${DOLFIN_CXX_FLAGS}")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${DOLFIN_CXX_FLAGS}")
 
 # Include directories
 include_directories(${DOLFIN_INCLUDE_DIRS})
 include_directories(SYSTEM ${DOLFIN_3RD_PARTY_INCLUDE_DIRS})
 include_directories(./eikonal)
 
-# Executable
+# Executabl
 add_executable(${PROJECT_NAME}
                                ./main.cpp
                                
