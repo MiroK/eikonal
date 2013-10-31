@@ -38,11 +38,11 @@ namespace eikonal
     seeder.seed(points, 1000);
 
     // get the intersected cell
-    std::set<std::size_t> cells;
+    std::set<unsigned int> cells;
     std::vector<Point>::const_iterator point = points.begin();
     for(; point != points.end(); point++)
     {
-      std::vector<std::size_t> _cells = 
+      std::vector<unsigned int> _cells = 
       u.function_space()->mesh()->bounding_box_tree()->compute_collisions(*point);
       cells.insert(_cells.begin(), _cells.end());
     }
@@ -55,7 +55,7 @@ namespace eikonal
 
     fixed_dofs.clear();
     boost::shared_ptr<const GenericDofMap> dofmap(u.function_space()->dofmap());
-    std::set<std::size_t>::const_iterator cell;
+    std::set<unsigned int>::const_iterator cell;
     for(cell = cells.begin(); cell != cells.end(); cell++)
     {
       // fixed dofs
@@ -92,11 +92,11 @@ namespace eikonal
     std::vector<Point> points;
     seeder.seed(points, 1000);
 
-    std::set<std::size_t> cells;
+    std::set<unsigned int> cells;
     std::vector<Point>::const_iterator point = points.begin();
     for(; point != points.end(); point++)
     {
-      std::vector<std::size_t> _cells = 
+      std::vector<unsigned int> _cells = 
       u.function_space()->mesh()->bounding_box_tree()->compute_collisions(*point);
       cells.insert(_cells.begin(), _cells.end());
     }
@@ -112,7 +112,7 @@ namespace eikonal
     
     fixed_dofs.clear();
     boost::shared_ptr<const GenericDofMap> dofmap(u.function_space()->dofmap());
-    std::set<std::size_t>::const_iterator cell;
+    std::set<unsigned int>::const_iterator cell;
     for(cell = cells.begin(); cell != cells.end(); cell++)
     {
       // fixed dofs
@@ -208,11 +208,11 @@ namespace eikonal
     // get the intersected cells;
     boost::shared_ptr<const Mesh> mesh(u.function_space()->mesh()); 
 
-    std::set<std::size_t> cells;
+    std::set<unsigned int> cells;
     std::vector<Point>::const_iterator point = points.begin();
     for(; point != points.end(); point++)
     {
-      std::vector<std::size_t> _cells = 
+      std::vector<unsigned int> _cells = 
       u.function_space()->mesh()->bounding_box_tree()->compute_collisions(*point);
       cells.insert(_cells.begin(), _cells.end());
     }
@@ -222,7 +222,7 @@ namespace eikonal
     MeshFunction<std::size_t> band(*mesh, dim);
     band.set_all(0);
 
-    for(std::set<std::size_t>::const_iterator cell = cells.begin();
+    for(std::set<unsigned int>::const_iterator cell = cells.begin();
         cell != cells.end(); cell++)
     {
       band[*cell] = 1;
@@ -233,7 +233,7 @@ namespace eikonal
     std::set<std::size_t>::const_iterator marked_cell;
     for(std::size_t level = 0; level < width; level++)
     {
-      std::set<std::size_t> marked_cells;
+      std::set<unsigned int> marked_cells;
       for(CellIterator cell(*mesh); !cell.end(); ++cell)
       {
         if(band[*cell] == 1)
