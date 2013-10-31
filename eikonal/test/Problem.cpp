@@ -230,7 +230,7 @@ namespace eikonal
 
     // now mark the neighbors, get the cell-cell connectivity
     mesh->init(dim, dim);
-    std::set<std::size_t>::const_iterator marked_cell;
+    std::set<unsigned int>::const_iterator marked_cell;
     for(std::size_t level = 0; level < width; level++)
     {
       std::set<unsigned int> marked_cells;
