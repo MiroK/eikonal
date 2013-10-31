@@ -2,7 +2,7 @@
 #include "la/la_loop.h"
 #include "cg/cg_distance.h"
 #include "cg/cg_polygon.h"
-#include <dolfin/mesh/Point.h>
+#include <dolfin/geometry/Point.h>
 #include <cassert>
 #include <cmath>
 #include <fstream>
