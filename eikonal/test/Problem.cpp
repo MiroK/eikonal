@@ -238,8 +238,8 @@ namespace eikonal
       {
         if(band[*cell] == 1)
         {
-          std::size_t num_next = cell->num_entities(dim);
-          const std::size_t* next = cell->entities(dim);
+          unsigned int num_next = cell->num_entities(dim);
+          const unsigned int* next = cell->entities(dim);
           marked_cells.insert(next, next+num_next);
         }
       }
