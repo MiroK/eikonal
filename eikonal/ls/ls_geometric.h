@@ -26,6 +26,11 @@ namespace eikonal
                              const double u_value,
                              const std::vector<double>& k_points,
                              const std::vector<double>& k_values);
+
+  // extrapolate value to B from known value u_A at A
+  double linear_extrapolate(const std::vector<double>& B,
+                            const std::vector<double>& A,
+                            const double u_A);
 }
 
 #endif // _LS_GEOMETRIC_H_

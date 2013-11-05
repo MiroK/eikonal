@@ -80,4 +80,12 @@ namespace eikonal
     return linear_geometric_2d(A, B, C, u_A, u_B, u_C);
   }
   //---------------------------------------------------------------------------
+
+  double linear_extrapolate(const std::vector<double>& B,
+                            const std::vector<double>& A,
+                            const double u_A)
+  {
+    return u_A + norm(B-A, 2);
+  }
+  //---------------------------------------------------------------------------
 }

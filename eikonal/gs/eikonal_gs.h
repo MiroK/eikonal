@@ -13,5 +13,6 @@
 #include "LinMinSolver.h"
 #include "LinNewtonSolver.h"
 #include "HermiteSolver.h"
+#include "FMMSolver.h"
 
 #endif //_EIKONAL_GS_H_

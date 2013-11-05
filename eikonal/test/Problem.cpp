@@ -38,12 +38,13 @@ namespace eikonal
     seeder.seed(points, 1000);
 
     // get the intersected cell
+    boost::shared_ptr<const Mesh> mesh(u.function_space()->mesh()); 
     std::set<unsigned int> cells;
     std::vector<Point>::const_iterator point = points.begin();
     for(; point != points.end(); point++)
     {
       std::vector<unsigned int> _cells = 
-      u.function_space()->mesh()->bounding_box_tree()->compute_collisions(*point);
+      mesh->bounding_box_tree()->compute_entity_collisions(*point);
       cells.insert(_cells.begin(), _cells.end());
     }
 
@@ -92,12 +93,13 @@ namespace eikonal
     std::vector<Point> points;
     seeder.seed(points, 1000);
 
+    boost::shared_ptr<const Mesh> mesh(u.function_space()->mesh()); 
     std::set<unsigned int> cells;
     std::vector<Point>::const_iterator point = points.begin();
     for(; point != points.end(); point++)
     {
       std::vector<unsigned int> _cells = 
-      u.function_space()->mesh()->bounding_box_tree()->compute_collisions(*point);
+      mesh->bounding_box_tree()->compute_entity_collisions(*point);
       cells.insert(_cells.begin(), _cells.end());
     }
 
@@ -213,7 +215,7 @@ namespace eikonal
     for(; point != points.end(); point++)
     {
       std::vector<unsigned int> _cells = 
-      u.function_space()->mesh()->bounding_box_tree()->compute_collisions(*point);
+      mesh->bounding_box_tree()->compute_entity_collisions(*point);
       cells.insert(_cells.begin(), _cells.end());
     }
 

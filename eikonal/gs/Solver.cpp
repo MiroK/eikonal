@@ -23,7 +23,7 @@ namespace eikonal
                                       dof_2_cell(dof_to_cell(cell_2_dof)),
                                       dof_2_coordinate(dof_to_coordinate(_V)),
                                       V(_V),
-                                      offset(-1),
+                                      offset(0),
                                       min_calls(1E6),
                                       max_calls(0)
   {
