@@ -33,7 +33,8 @@ namespace eikonal
     // convergence tolerance = std::num_limits<double>::digits/precision
     std::size_t solve(dolfin::Function& u,
                       const std::set<dolfin::la_index>& fixed_dofs,
-                      const std::size_t precision);
+                      const std::size_t precision,
+                      const std::size_t max_sweep=100);
   
   public:
     static std::string name;

@@ -117,12 +117,12 @@ namespace eikonal
       // get the solution
       std::size_t num_iters, min_calls = 0, max_calls = 0;
       double l1_norm, l2_norm, band_l1_norm, band_l2_norm,
-             v_l2_norm, band_v_l2_norm, coo_norm, time;
+             v_l2_norm, band_v_l2_norm, coo_norm, L1_norm, time;
       
       int status =
       linear_2D_test<T>(problem, *mesh, precision, num_iters, min_calls, max_calls,
                         l1_norm, l2_norm, band_l1_norm, band_l2_norm,
-                        v_l2_norm, band_v_l2_norm, coo_norm,
+                        v_l2_norm, band_v_l2_norm, coo_norm, L1_norm,
                         time, u_file_name, exact_file_name, error_file_name, plot_on); 
 
       std::cout.precision(8);
@@ -134,7 +134,8 @@ namespace eikonal
         l2_norm << " " << coo_norm << " " << time << " " <<
         n_obtuse_cells << "/" << num_cells << " " << num_iters << " " <<
         min_calls << " " << max_calls << " " << band_l1_norm << " "
-        << band_l2_norm << " " << v_l2_norm << " " << band_v_l2_norm << std::endl;
+        << band_l2_norm << " " << v_l2_norm << " " << band_v_l2_norm << " " 
+        << L1_norm << std::endl;
       
       // write to text file
       data_file.open(data_file_name.c_str(), std::ios::app);
@@ -143,7 +144,7 @@ namespace eikonal
         l2_norm << " " << coo_norm << " " << time << " " << n_obtuse_cells <<
         " " << num_cells << " " << num_iters << " " << min_calls << 
         " " << max_calls << " " << band_l1_norm << " " << band_l2_norm <<
-        " " << v_l2_norm << " " << band_v_l2_norm << std::endl;
+        " " << v_l2_norm << " " << band_v_l2_norm << " " << L1_norm << std::endl;
       
       data_file.close();
       }
@@ -155,7 +156,7 @@ namespace eikonal
         l2_norm << " " << coo_norm << " " << time << " " <<
         n_obtuse_cells << "/" << num_cells << " " << num_iters <<
         " " << band_l1_norm << " " << band_l2_norm <<
-        " " << v_l2_norm << " " << band_v_l2_norm << std::endl;
+        " " << v_l2_norm << " " << band_v_l2_norm << " " << L1_norm << std::endl;
       
       // write to text file
       data_file.open(data_file_name.c_str(), std::ios::app);
@@ -164,7 +165,7 @@ namespace eikonal
         l2_norm << " " << coo_norm << " " << time << " " << n_obtuse_cells <<
         " " << num_cells << " " << num_iters << 
         " " << band_l1_norm << " " << band_l2_norm <<
-        " " << v_l2_norm << " " << band_v_l2_norm << std::endl;
+        " " << v_l2_norm << " " << band_v_l2_norm << " " << L1_norm << std::endl;
       
       data_file.close();
       }
@@ -186,6 +187,7 @@ namespace eikonal
                                           double& v_l2_norm,
                                           double& band_v_l2_norm,
                                           double& coo_norm,
+                                          double& L1_norm,
                                           double& time,
                                           std::string u_file_name,
                                           std::string exact_file_name,
@@ -268,8 +270,10 @@ namespace eikonal
       dolfin::File exact_file(exact_file_name);
       exact_file << u_exact;
       
+      // error vector
       *u_exact.vector() -= *u.vector();
       u_exact.vector()->abs();
+      L1_norm = u_exact.vector()->sum()/u_exact.vector()->size();
       coo_norm = u_exact.vector()->max();
 
       // if this is an iterative solver extract min/max number of calls to eval

@@ -91,3 +91,33 @@ def build_dof_to_coordinate(dof_to_cell, V):
 
   return dof_to_coordinate
 
+def build_dof_to_dof(cell_to_dof, dof_to_cell):
+  '''Build connectivity map between degress of freedom.'''
+  dof_to_dof = {}
+  for dof in dof_to_cell.iterkeys():
+    dof_to_dof[dof] = set([dof])
+    for cell in dof_to_cell[dof]:
+      for _dof in cell_to_dof[cell]:
+        dof_to_dof[dof].add(_dof)
+    dof_to_dof[dof].remove(dof)
+
+  return dof_to_dof
+
+
+if __name__ == '__main__':
+  from dolfin import *
+  mesh = UnitSquareMesh(2, 2)
+  V = FunctionSpace(mesh, "CG", 1)
+  cell_dof = build_cell_to_dof(V)
+  dof_cell = build_dof_to_cell(cell_dof)
+  dof_dof = build_dof_to_dof(cell_dof, dof_cell)
+
+  plot(mesh, interactive=True)
+  print "dof->coordinate", build_dof_to_coordinate(dof_cell, V)
+  print
+  print "cell->dof: ", cell_dof
+  print
+  print "dof->cell: ", dof_cell
+  print
+  print "dof->dof: ", dof_dof
+

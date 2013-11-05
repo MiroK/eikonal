@@ -24,6 +24,7 @@ namespace eikonal
   // types of map that are build
   typedef std::map<std::size_t, std::set<dolfin::la_index> > t_smap_la; 
   typedef std::map<dolfin::la_index, std::vector<std::size_t> > la_vmap_t;
+  typedef std::map<dolfin::la_index, std::set<dolfin::la_index> > la_smap_la;
   typedef std::map<std::size_t, std::set<std::size_t> > t_smap_t; 
   typedef std::map<std::size_t, std::vector<std::size_t> > t_vmap_t;
   typedef std::map<std::size_t, std::vector<double> > t_vmap_d;
@@ -35,6 +36,11 @@ namespace eikonal
 
   // build a map: map[dof] = [cells with dof]; la_index -> vector(size_t)
   la_vmap_t dof_to_cell(const t_smap_la& _cell_to_dof);
+
+  // build a map: map[dof] = [dofs of the cells with that dof];
+  // la_index-> set(la_index)
+  la_smap_la dof_to_dof(const t_smap_la& _cell_to_dof,
+                        const la_vmap_t& _dof_to_cell);
 
   // build a map: map[cell] = [facets of the cell]; size_t -> set(size_t)
   t_smap_t cell_to_facet(const dolfin::FunctionSpace& V);
@@ -82,6 +88,7 @@ namespace eikonal
 
     return out.str();
   }
+  //----------------------------------------------------------------------------
 
   template<typename I, typename O, typename U>
   O invert_map(const I& map)

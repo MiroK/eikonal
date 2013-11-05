@@ -37,6 +37,7 @@ namespace eikonal
                                           double& v_l2_norm,
                                           double& band_v_l2_norm,
                                           double& coo_norm,
+                                          double& L1_norm,
                                           double& time,
                                           std::string u_file_name,
                                           std::string exact_file_name,

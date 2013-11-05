@@ -28,7 +28,8 @@ namespace eikonal
                       const std::set<dolfin::la_index>& fixed_dofs,
                       const std::size_t precision,
                       const std::size_t p,
-                      std::vector<std::vector<double> >& ref_points);
+                      std::vector<std::vector<double> >& ref_points,
+                      const std::size_t max_sweep=100);
  
     // unset dofs are set by Sorter
     std::size_t solve(dolfin::Function& u,
@@ -36,7 +37,8 @@ namespace eikonal
                       dolfin::Function& du_dy,
                       const std::set<dolfin::la_index>& fixed_dofs,
                       const std::size_t precision,
-                      const Sorter& sorter); 
+                      const Sorter& sorter,
+                      const std::size_t max_sweep=100); 
   public:
     static std::string name;
   

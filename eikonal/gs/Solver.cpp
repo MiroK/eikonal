@@ -197,7 +197,8 @@ namespace eikonal
   
   std::size_t Solver::solve(dolfin::Function& u,
                             const std::set<dolfin::la_index>& fixed_dofs,
-                            const std::size_t precision)
+                            const std::size_t precision,
+                            const std::size_t max_sweep)
   {
     // initialization
     
@@ -221,7 +222,8 @@ namespace eikonal
 
     // sweep
     std::size_t k = 0; // counter of unique sweeps;
-    while(true)
+    bool converged = false;
+    while(not converged and k < max_sweep)
     {
       k++;
       std::size_t ref_point = ((k-1)%n_uniq_sweeps)/2;
@@ -256,13 +258,14 @@ namespace eikonal
       v_vector->abs();
       if(v_vector->max() < DOLFIN_EPS)
       {
-        return k;
+        converged = true;
       }
       else
       {
         *v_vector = *u_vector;
       }
     }
+    return k;
   }
   //---------------------------------------------------------------------------
 }

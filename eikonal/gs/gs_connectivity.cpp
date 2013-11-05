@@ -10,7 +10,6 @@ using namespace dolfin;
 
 namespace eikonal
 {
-  //-----------------------------------------------------------------------------
   t_smap_la cell_to_dof(const dolfin::FunctionSpace& V)
   {
     boost::shared_ptr<const Mesh> mesh = V.mesh();
@@ -26,14 +25,41 @@ namespace eikonal
 
     return _cell_to_dof;
   }
-
   //-----------------------------------------------------------------------------
+
   la_vmap_t dof_to_cell(const t_smap_la& _cell_to_dof)
   {
     return invert_map<t_smap_la, la_vmap_t, la_index>(_cell_to_dof);
   }
+  //---------------------------------------------------------------------------
 
+  la_smap_la dof_to_dof(const t_smap_la& _cell_to_dof,
+                        const la_vmap_t& _dof_to_cell)
+  {
+    la_smap_la _dof_to_dof;
+    la_vmap_t::const_iterator dc_entry = _dof_to_cell.begin();
+    for( ; dc_entry != _dof_to_cell.end(); dc_entry++)
+    {
+      std::size_t dof = dc_entry->first;
+      
+      // insert dofs of cells with dof;
+      std::vector<la_index>
+      cells(dc_entry->second.begin(), dc_entry->second.end());
+      std::vector<la_index>::const_iterator cell = cells.begin();
+      for( ; cell != cells.end(); cell++)
+      {
+        _dof_to_dof[dof].insert(_cell_to_dof.at(*cell).begin(),
+                                _cell_to_dof.at(*cell).end());
+      }
+
+      // remove the dof
+      _dof_to_dof[dof].erase(dof);
+    }
+
+    return _dof_to_dof;
+  }
   //-----------------------------------------------------------------------------
+  
   t_smap_t cell_to_facet(const dolfin::FunctionSpace& V)
   {
     boost::shared_ptr<const Mesh> mesh = V.mesh();

@@ -29,7 +29,8 @@ namespace eikonal
                        const std::set<dolfin::la_index>& fixed_dofs,
                        const std::size_t precision,
                        const std::size_t p,
-                       std::vector<std::vector<double> >& ref_points)
+                       std::vector<std::vector<double> >& ref_points,
+                       const std::size_t max_sweep)
   {
     // initialization
     dof_status = init_dof_status(u, fixed_dofs);
@@ -58,7 +59,8 @@ namespace eikonal
 
     // sweep
     std::size_t k = 0; // counter of unique sweeps;
-    while(true)
+    bool converged = false;
+    while(not converged and k < max_sweep)
     {
       k++;
       std::size_t ref_point = ((k-1)%n_uniq_sweeps)/2;
@@ -102,13 +104,14 @@ namespace eikonal
       v_vector->abs();
       if(v_vector->max() < DOLFIN_EPS)
       {
-        return k;
+        converged = true;
       }
       else
       {
         *v_vector = *u_vector;
       }
     }
+    return k;
   }
   //---------------------------------------------------------------------------
   
@@ -118,7 +121,8 @@ namespace eikonal
                        dolfin::Function& du_dy,
                        const std::set<dolfin::la_index>& fixed_dofs,
                        const std::size_t precision,
-                       const Sorter& sorter)
+                       const Sorter& sorter,
+                       const std::size_t max_sweep)
   {
     // initialization
     dof_status = init_dof_status(u, fixed_dofs);
@@ -137,7 +141,8 @@ namespace eikonal
 
     // sweep
     std::size_t k = 0; // counter of unique sweeps;
-    while(true)
+    bool converged = false;
+    while(not converged and k < max_sweep)
     {
       k++;
       // apply local solver to unset_dofs in order given by ref_point
@@ -179,13 +184,14 @@ namespace eikonal
       v_vector->abs();
       if(v_vector->max() < DOLFIN_EPS)
       {
-        return k;
+        converged = true;
       }
       else
       {
         *v_vector = *u_vector;
       }
     }
+    return k;
   }
   //---------------------------------------------------------------------------
 

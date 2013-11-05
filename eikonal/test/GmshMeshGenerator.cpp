@@ -27,7 +27,7 @@ namespace eikonal
 
     if(smoothed)
     {
-      mesh->smooth();
+      mesh->smooth(10); // 10 shots to make the mesh smoother
     }
     return mesh;
   }
