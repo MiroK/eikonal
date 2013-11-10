@@ -25,7 +25,7 @@ namespace eikonal
     FMMSolver(const dolfin::FunctionSpace& V);
 
     // destructor
-    ~FMMSolver();
+    virtual ~FMMSolver();
 
     // solve the eikonal euqtion |grad(u)| = 1 with values of u fixed at
     // fixed_dofs, precision is the parameter used with iteratative local solver
@@ -35,7 +35,7 @@ namespace eikonal
                 std::size_t precision,
                 std::size_t compat_dummy=0);
 
-  private:
+  protected:
     // using cell->dof mapping extract from cell all the dofs that are not dof
     // and are fixed
     std::vector<dolfin::la_index>
@@ -49,6 +49,7 @@ namespace eikonal
                       const std::set<dolfin::la_index> fixed,
                       std::vector<dolfin::la_index>& close);
     
+  private:
     // apply the local solver
     double
     local_solver(const dolfin::la_index close_dof,

@@ -9,7 +9,7 @@ using namespace dolfin;
 int main(int argc, char* argv[])
 {
   
-  double _P[2] = {2., -2.}; std::vector<double> P(_P, _P+2);
+  double _P[2] = {0., 0.}; std::vector<double> P(_P, _P+2);
   MyPoint point(P);
   Problem problem(point);
   
@@ -33,18 +33,21 @@ int main(int argc, char* argv[])
   Problem problem(polygon);
   */
   
-  RectangleMesh mesh(-2, -2, 2, 2, 2, 2, "crossed");
+  RectangleMesh mesh(-2, -2, 2, 2, 20, 20, "crossed");
   CG1::FunctionSpace V(mesh);
 
   dolfin::Function u(V);
+  dolfin::Function du_dx(V);
+  dolfin::Function du_dy(V);
+
   dolfin::Function u_exact(V);
   std::set<dolfin::la_index> fixed_dofs;
       
-  problem.init(fixed_dofs, u);
+  problem.init(fixed_dofs, u, du_dx, du_dy);
   problem.exact_solution(u_exact);
 
-  FMMSolver solver(V);
-  solver.solve(u, fixed_dofs, 0, 0); 
+  FMMHermite solver(V);
+  solver.solve(u, du_dx, du_dy, fixed_dofs, 2); 
   
   plot(u);
   interactive(true);
@@ -61,6 +64,10 @@ int main(int argc, char* argv[])
   // HERMITE TESTS
   /*
   enum ORDER_TYPE {CORNERS, SURFACE, DISTANCE};
+=======
+  /*enum ORDER_TYPE {CORNERS, SURFACE, DISTANCE};
+  
+>>>>>>> nightly
   std::size_t solver_choice = atoi(argv[1]);
   std::size_t order_choice = atoi(argv[2]);
   std::size_t p_norm = atoi(argv[3]);
