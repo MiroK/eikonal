@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
   Problem problem(polygon);
   */
   
-  /*RectangleMesh mesh(-2, -2, 2, 2, 2, 2, "crossed");
+  RectangleMesh mesh(-2, -2, 2, 2, 2, 2, "crossed");
   CG1::FunctionSpace V(mesh);
 
   dolfin::Function u(V);
@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
   solver.solve(u, fixed_dofs, 0, 0); 
   
   plot(u);
-  interactive(true);*/
+  interactive(true);
 
   //int status;
   // convergence test on meshes by gmsh 0 .. 6, smoothing
@@ -59,8 +59,8 @@ int main(int argc, char* argv[])
   //all_linear_tests(atoi(argv[1]), atoi(argv[2]));
  
   // HERMITE TESTS
+  /*
   enum ORDER_TYPE {CORNERS, SURFACE, DISTANCE};
-  
   std::size_t solver_choice = atoi(argv[1]);
   std::size_t order_choice = atoi(argv[2]);
   std::size_t p_norm = atoi(argv[3]);
@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
   {
     all_hermite_tests(solver_choice, "corners", p_norm);  
   }
-  /*else if(solver_choice == SURFACE)
+  else if(solver_choice == SURFACE)
   {
     all_hermite_tests("surface", p_norm);
   }
