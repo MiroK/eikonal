@@ -24,7 +24,7 @@ namespace eikonal
     // initialize the vector of close dofs, unigue dofs connected to fixed
     // that are not fixed or close themselves
     
-    //std::cout << "fixed_dofs: "; print(fixed);
+    std::cout << "fixed_dofs: "; print(fixed);
     
     std::vector<la_index> close;
     update_close(fixed, fixed, close);
@@ -37,7 +37,7 @@ namespace eikonal
     std::vector<la_index> update = close;
     while(not close.empty())
     {
-      //std::cout << "close: "; print(close);
+      std::cout << "close: "; print(close);
       // update distance for dofs in update
       std::vector<la_index>::const_iterator dof = update.begin();
       for( ; dof != update.end(); dof++)
@@ -48,25 +48,25 @@ namespace eikonal
 
         std::vector<std::size_t> cells = dof_2_cell.find(*dof)->second;
 
-        //std::cout << "\tdof: " << *dof << std::endl;
-        //std::cout << "\tcells: "; print(cells);
+        std::cout << "\tdof: " << *dof << std::endl;
+        std::cout << "\tcells: "; print(cells);
 
         std::vector<std::size_t>::const_iterator cell = cells.begin();
         for( ; cell != cells.end(); cell++)
         {
           std::vector<la_index>
           cell_fixed_dofs = get_cell_fixed_dofs(*cell, *dof, fixed);
-          //std::cout << "\t\tdofs: " << * cell; print(cell_fixed_dofs);
+          std::cout << "\t\tdofs: " << * cell; print(cell_fixed_dofs);
 
           std::pair<double, std::vector<double> > u_gradu = 
           this->local_solver(*dof, cell_fixed_dofs, *u_vector, 
                              *du_dx_vector, *du_dy_vector, precision);
           double u_ = u_gradu.first;
-          //std::cout << "\t\tcell produced: " << u_ << std::endl;
+          std::cout << "\t\tcell produced: " << u_ << std::endl;
           if(u_ < u_old)
           {
             u_old = u_;
-            //std::cout << "\t\t\tfound minimizer\n";
+            std::cout << "\t\t\tfound minimizer\n";
 
             // also set the gradient
             du_dx_old = (u_gradu.second)[0];
@@ -80,18 +80,18 @@ namespace eikonal
       std::make_heap(close.begin(), close.end(), compare);
       std::pop_heap(close.begin(), close.end(), compare);
       la_index closest = close.back();
-      //std::cout << "closest is " << closest << std::endl;
+      std::cout << "closest is " << closest << std::endl;
       close.pop_back();
 
       // add closest to fixed and his neighbors to close
       fixed.insert(closest);
-      //std::cout << "fixed now "; print(fixed);
+      std::cout << "fixed now "; print(fixed);
 
       // add the neighbors of closest tha are not fixed and close to close
       // mark all the neighbors for next round of distance computation
       update = std::vector<la_index>(dof_2_dof.find(closest)->second.begin(),
                                      dof_2_dof.find(closest)->second.end());
-      //std::cout << "dofs to update "; print(update);
+      std::cout << "dofs to update "; print(update);
 
       std::set<la_index> dofs;
       dofs.insert(closest);
@@ -189,8 +189,8 @@ namespace eikonal
 
         const double u_max = std::max(u_A, u_B);
         new_value = t_ft.second;
-        //std::cout << "hermite has " << new_value << std::endl;
-        //std::cout << "u_A, u_B " << u_A << " " << u_B << std::endl;
+        std::cout << "\t\thermite has " << new_value << std::endl;
+        std::cout << "\t\tu_A, u_B " << u_A << " " << u_B << std::endl;
         // zero the gradient and return the old value if results no good
         if(new_value < u_max)
         {
