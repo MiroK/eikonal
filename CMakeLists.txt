@@ -59,6 +59,7 @@ add_executable(${PROJECT_NAME}
                                ./eikonal/gs/LinNewtonSolver.cpp
                                ./eikonal/gs/HermiteSolver.cpp
                                ./eikonal/gs/FMMSolver.cpp
+                               ./eikonal/gs/FMMHermite.cpp
                               
                                ./eikonal/test/test_common.cpp
                                ./eikonal/test/Seeder.cpp
