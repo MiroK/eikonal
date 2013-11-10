@@ -6,12 +6,13 @@
 #include "gs/Solver.h"
 #include "gs/LinMinSolver.h"
 #include "gs/LinNewtonSolver.h"
+#include "gs/FMMSolver.h"
 
 namespace eikonal
 {
   int all_linear_tests(int solver, std::size_t precision)
   {
-    enum SOLVERS { LIN_GEOMETRIC, LIN_BRENT, LIN_NEWTON};
+    enum SOLVERS {LIN_GEOMETRIC, LIN_BRENT, LIN_NEWTON, FMM_GEOMETRIC};
 
     if(solver == LIN_GEOMETRIC)
     {
@@ -39,6 +40,16 @@ namespace eikonal
       run_linear_test<LinNewtonSolver>("twocircle", precision);
       run_linear_test<LinNewtonSolver>("triangle", precision);
       run_linear_test<LinNewtonSolver>("zalesak", precision);
+    }
+
+    if(solver == FMM_GEOMETRIC)
+    {
+      std::cout << "Solving with FMM geometric:" << std::endl;
+      std::cout << precision << std::endl;
+      run_linear_test<FMMSolver>("point", precision);
+      run_linear_test<FMMSolver>("twocircle", precision);
+      run_linear_test<FMMSolver>("triangle", precision);
+      run_linear_test<FMMSolver>("zalesak", precision);
     }
     return 1;
   }

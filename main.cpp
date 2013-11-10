@@ -8,11 +8,32 @@ using namespace dolfin;
 
 int main(int argc, char* argv[])
 {
-  double _P[2] = {1., 0.}; std::vector<double> P(_P, _P+2);
+  
+  double _P[2] = {2., -2.}; std::vector<double> P(_P, _P+2);
   MyPoint point(P);
   Problem problem(point);
- 
-  UnitSquareMesh mesh(2, 2);
+  
+  /*
+  double _A[2] = {-2., -2.}; std::vector<double> A(_A, _A + 2);
+  double _B[2] = {2., -2}; std::vector<double> B(_B, _B+2);
+  Segment segment("segment", A, B);
+  Problem problem(segment);
+  */
+  
+  /*
+  double _c1[2] = {-1., 0.}; std::vector<double> c1(_c1, _c1+2);
+  double _c2[2] = {sqrt(1.5), 0}; std::vector<double> c2(_c2, _c2+2);
+  TwoCircles two_circles("twocircle", c1, 0.5, c2, 0.5);
+  Problem problem(two_circles);
+  */
+
+  /*
+  double _c[2] = {0., 0.}; std::vector<double> c(_c, _c + 2);
+  eikonal::Polygon polygon("triangle", c, 1, 3);
+  Problem problem(polygon);
+  */
+  
+  RectangleMesh mesh(-2, -2, 2, 2, 2, 2, "crossed");
   CG1::FunctionSpace V(mesh);
 
   dolfin::Function u(V);
@@ -23,7 +44,7 @@ int main(int argc, char* argv[])
   problem.exact_solution(u_exact);
 
   FMMSolver solver(V);
-  solver.solve(u, fixed_dofs); 
+  solver.solve(u, fixed_dofs, 0, 0); 
   
   plot(u);
   interactive(true);

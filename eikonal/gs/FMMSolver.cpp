@@ -11,11 +11,15 @@ using namespace dolfin;
 
 namespace eikonal
 {
+  std::string FMMSolver::name = std::string("fmm_geometric");
+
   FMMSolver::FMMSolver(const dolfin::FunctionSpace& _V) :
                                   cell_2_dof(cell_to_dof(_V)),
                                   dof_2_cell(dof_to_cell(cell_2_dof)),
                                   dof_2_coordinate(dof_to_coordinate(_V)),
                                   dof_2_dof(dof_to_dof(cell_2_dof, dof_2_cell)),
+                                  min_calls(1E6),
+                                  max_calls(0),
                                   offset(0)
   {
     // TODO assertions on V, ideally before all the mapping build
@@ -25,7 +29,10 @@ namespace eikonal
   FMMSolver::~FMMSolver(){ }
   //---------------------------------------------------------------------------
   
-  void FMMSolver:: solve(dolfin::Function& u, std::set<dolfin::la_index>& fixed)
+  std::size_t FMMSolver::solve(dolfin::Function& u,
+                         std::set<dolfin::la_index>& fixed,
+                         std::size_t precision,
+                         std::size_t compat_dummy)
   {
     // initialize the vector of close dofs, unigue dofs connected to fixed
     // that are not fixed or close themselves
@@ -91,6 +98,7 @@ namespace eikonal
       dofs.insert(closest);
       update_close(dofs, fixed, close);
     }
+    return 0;
   }
   //---------------------------------------------------------------------------
 

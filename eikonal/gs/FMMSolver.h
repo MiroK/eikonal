@@ -30,8 +30,10 @@ namespace eikonal
     // solve the eikonal euqtion |grad(u)| = 1 with values of u fixed at
     // fixed_dofs, precision is the parameter used with iteratative local solver
     // convergence tolerance = std::num_limits<double>::digits/precision
-    void solve(dolfin::Function& u,
-               std::set<dolfin::la_index>& fixed);
+    std::size_t solve(dolfin::Function& u,
+                std::set<dolfin::la_index>& fixed,
+                std::size_t precision,
+                std::size_t compat_dummy=0);
 
   private:
     // using cell->dof mapping extract from cell all the dofs that are not dof
@@ -68,7 +70,12 @@ namespace eikonal
 
     // parallel offset
     std::size_t offset;
-  
+    
+  public:
+    static std::string name;
+    std::size_t min_calls;
+    std::size_t max_calls;
+
   };
   
   //---------------------------------------------------------------------------
