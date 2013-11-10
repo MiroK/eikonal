@@ -67,7 +67,6 @@ add_executable(${PROJECT_NAME}
                                ./eikonal/test/GmshMeshGenerator.cpp
                                ./eikonal/test/RectangleMeshGenerator.cpp
                                ./eikonal/test/linear_test.cpp
-                               ./eikonal/test/HermiteTest.cpp
                                ./eikonal/test/hermite_test.cpp
 )
 # Target libraries

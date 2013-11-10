@@ -178,10 +178,14 @@ namespace eikonal
       }
       const std::vector<double> k_points(_k_points, _k_points + g_dim*size);
       const std::vector<double> k_values(_k_values, _k_values + 2);
+      const double k_max = *std::max_element(k_values.begin(), k_values.end());
      
       if(size == 2)
       {
-        new_value = linear_geometric_2d(u_point, u_value, k_points, k_values);
+        if(new_value < k_max)// limit damage if causality broken
+        {
+          new_value = u_vector[close_dof];
+        }
         std::cout << "\t\tlocal_solver 2 value " << new_value;
       }
       else
