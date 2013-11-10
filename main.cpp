@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
   Problem problem(polygon);
   */
   
-  RectangleMesh mesh(-2, -2, 2, 2, 20, 20, "crossed");
+  RectangleMesh mesh(-2, -2, 2, 2, 25, 25, "crossed");
   CG1::FunctionSpace V(mesh);
 
   dolfin::Function u(V);
